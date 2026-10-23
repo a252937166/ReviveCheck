@@ -1,6 +1,10 @@
 {
   "name": "My V3 migration",
   "release": "v0.1.0",
+  "profile": "contract",
+  "logicalContractId": "my-revive-probe",
+  "sourceRevision": "",
+  "assertions": [],
   "expectedChainId": 420420777,
   "account": "",
   "contractAddress": "",

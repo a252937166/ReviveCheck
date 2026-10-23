@@ -1,101 +1,68 @@
-# ReviveCheck product brief
+# ReviveCheck v0.2 product brief
 
-Status: proposed product contract and implementation scope, 2026-10-23. This document describes the intended experience. Implementation and deployment evidence are recorded separately in [CHECK_IN.md](CHECK_IN.md).
+ReviveCheck helps a Portaldot V3 application developer define release expectations, observe the real target, and hand the exact result to a maintainer for review. It is a developer acceptance and evidence-handoff tool. The decision it supports is: **“Does this version satisfy this plan in this observed environment, and what needs a new check?”**
 
-## Product promise
+Status: implemented v0.2 workflow, reviewed 2026-10-23. Our own signed testnet deployment and state writes remain pending a reported balance of 0 tPOT. The original 78-second video and six-page deck show v0.1. See [v0.2 delivery evidence](RELEASE_V2.md); submission and organizer decisions remain separate in [SUBMISSION.md](SUBMISSION.md).
 
-ReviveCheck helps a Solidity developer decide whether a specific application version is ready to run on Portaldot V3. The developer brings a project, runs acceptance checks, fixes a concrete failure, and compares the next run with the original evidence.
+## The user and the task
 
-The central question is: **“What did this change fix, what still fails, and what was actually observed on Portaldot?”** A reachable RPC or a successful local rehearsal cannot answer that question alone.
+The primary user is a Solidity developer migrating or releasing an application on V3. A maintainer is the second participant: they need to inspect the same checks and return feedback on that exact observation. Native-asset integrators can instead check whether an existing native asset agrees with its ERC-20 interface.
 
-The first user is a developer migrating a small Solidity application to V3, or a maintainer reviewing that migration. The immediate job is to replace scattered wallet settings, RPC responses, deployment logs, and screenshots with one repeatable acceptance workflow.
+Today this work often means reconciling a plan, RPC responses, account mappings, explorer references, and screenshots. ReviveCheck keeps the expected behavior, observed checkpoint, limitations, and review decision connected. It does not decide whether a business should launch or certify that a contract is secure.
 
-## Why Portaldot V3 matters
+For example, a release plan can require `approved() == true`, `revision() == 1`, and a specific `reportHash()`. A report records what the supplied target returned through both V3 interfaces. If a new release changes the contract, a reviewer can inspect a new report without their previous acceptance silently following it. The included ReleaseGate application exercises this pattern locally; its own V3 deployment is still pending.
 
-The initial checks address the V3 environment: its chain configuration, native account and EVM address relationship, test-token funding, and revive-based Solidity execution. The official guide warns that the mapped H160 address must be checked rather than inferred from the Ethereum address produced by the same key. This creates a concrete migration task before funding or deployment.
+## Complete the implemented lifecycle
 
-The product should turn that difference into an observable result: identify which address was checked, where the mapping came from, which network answered, and which acceptance assertions were evaluated. It must preserve an unknown result when an endpoint or method cannot establish a fact.
-
-References: [officially recommended V3 guide](https://github.com/ItsCogumellum/portaldot-v3-testnet-guide), [V3 FAQ](https://github.com/ItsCogumellum/portaldot-v3-testnet-guide/blob/main/FAQ.md), [October network update](https://discord.com/channels/1440212664751099996/1506204427651125349/1560719007307403354). The guide is an integration source, not evidence that our own contract has been deployed.
-
-## One complete user journey
-
-| Step | User action | Result the product must make clear |
+| Step | User action | Result and boundary |
 | --- | --- | --- |
-| 1. Create a project | Name a migration and enter the intended network, account, contract target, and version | A reusable acceptance target belonging to the user; a sample project remains visibly identified as a sample |
-| 2. Check readiness | Run network, address-mapping, and funding checks | The observed network and account, the failed or unknown condition, and the next action |
-| 3. Run acceptance | Evaluate the configured contract and read assertions | Each assertion has an expectation, an observation, a result, and its evidence source |
-| 4. Fix and rerun | Correct the same project's configuration or implementation | A new run is created; the failed run remains available |
-| 5. Save evidence | Retain and export the selected run | A reviewable record with its mode, time, target, version, checks, and unresolved items |
-| 6. Compare versions | Select a baseline and candidate run | Show resolved, new, persistent, and incomparable findings; distinguish a configuration correction from an application change |
+| Plan | Create or import a named project; save release/source, logical identity, target and assertions | A reusable acceptance plan. Source references and logical continuity are declared, not authenticated |
+| Live check | Run the saved plan against V3 | A new report pinned to a finalized checkpoint, with individual expectations, observations and limitations. No transaction is signed by the UI |
+| Correct and rerun | Address a failed prerequisite or application expectation | A separate report; earlier inputs and outcomes remain unchanged |
+| Compare | Select a baseline and candidate | Distinguish configuration correction, deployment versions, assertion changes, runtime drift and sample scenario changes before crediting any improvement |
+| Share | Export original JSON or prepare a static-reviewer link/QR | The recipient verifies the same report fingerprint. A locally prepared share is not proof of delivery or recipient access |
+| Review | Inspect the report and return an accepted/changes-requested receipt; owner imports it | Append-only feedback bound to one exact report hash. Reviewer identity is self-declared and nonofficial |
+| Recheck | Check the current plan after a version, target, plan or observed runtime change | A new live report, without inherited review or sharing state. Existing reports become historical evidence |
+| Archive/restore | Retire or reopen a project | Preserve history; restore is required before another run |
 
-The demonstration should follow one project through all six steps. Creating a second unrelated sample is not evidence that the first failure was fixed.
+Verification, sharing, review, and freshness are independent states. An accepted review can coexist with a failed check or stale report. Runtime drift is detected from later saved observations, not from a continuous monitoring service.
 
-## The core product mechanism
+## Two bounded acceptance profiles
 
-The unit of work is an acceptance run attached to a project version. Every result needs both a conclusion and its basis. The proposed run record contains:
+**Contract acceptance** supports up to eight ABI scalar view assertions with stable IDs, up to four arguments each, and an expected result. Supported values are `uint256`, `address`, `bool`, `string`, and `bytes32`; legacy `value()` plans remain supported. Checks cover network identity, a shared finalized checkpoint, native/H160 mapping, funding, deployed code, configured dual-interface reads, and supplied transaction provenance. Missing evidence stays blocked or unknown.
 
-- A project identity, configuration version, application version when supplied, and run identity.
-- Evidence mode: `live-read-only`, `local-rehearsal`, or `testnet-execution`.
-- Observation time, endpoint, chain ID, and observed block information when available.
-- The account and contract targets actually checked, with the mapping method and source identified.
-- Checks containing expected and observed values, a result, and a reason for failure or uncertainty.
-- Contract addresses, transaction hashes, and receipt information only when obtained from actual execution.
-- Outstanding checks and the limits of the conclusion.
+**Native asset acceptance** checks an existing asset's native supply, holder balance and precision against its ERC-20 precompile at the same finalized checkpoint. It needs no funded wallet or user-owned deployment. An empty holder selects the asset owner and records that choice. The current precompile address adapter is scoped to the observed runtime spec 3002; unsupported versions do not silently inherit it. A passing report establishes the configured read parity, not transfer/approve semantics.
 
-Saved runs must not silently change when project settings change. A comparison must flag different networks, modes, targets, or assertion definitions before treating a changed result as a regression or repair. An unknown check becoming unknown again is not a resolved issue. A local rehearsal passing does not resolve a failed live testnet check.
+## What is specific to V3
 
-Export is useful when another person can review the same migration or a developer can rerun the acceptance target after changing code. A downloaded JSON file alone does not establish adoption value, independent verification, or a security attestation. CI integration is a later delivery path for this mechanism.
+The useful platform integration is the evidence collected through two views of the same runtime:
 
-## Differentiation hypothesis
+- Resolve native/H160 identities through ReviveApi and require the mapping round trip, rather than assuming an Ethereum-derived address is the native account's mapping.
+- Anchor native and Ethereum reads to one finalized height and map its distinct block hashes through ReviveApi.
+- Keep native funding units, EVM balances, and runtime conversion parameters explicit.
+- Compare native Assets storage with the runtime's ERC-20 precompile, using a version-scoped address adapter.
+- Decode asset-paid native transaction evidence with the applicable runtime registry, including a retained real historical-block regression.
 
-The following comparison is based on the public descriptions observed during the October 22 research. It is not a fresh audit or a claim that competing projects lack unlisted capabilities.
+These checks make a specific V3 release plan reproducible. They are not a claim of arbitrary EVM equivalence or complete platform coverage. Runtime findings and the separate constructor-encoding simulation are documented in [CHAIN_FINDINGS.md](CHAIN_FINDINGS.md).
 
-| Existing approach | Its visible focus | ReviveCheck's proposed focus |
-| --- | --- | --- |
-| Portaldot PDK / FailLens | General development commands and transaction-error diagnosis | Repeated acceptance of a developer's own V3 migration, with saved before/after results |
-| NodePulse, PortalPulse, PortalGuard, PortaPulse | Network, validator, node, or execution monitoring | A named application version and its migration acceptance criteria |
-| Manual wallet, explorer, and RPC checks | Individual observations gathered by the developer | A repeatable target with explicit uncertainty and comparable runs |
-| A single deployment script | Performing deployment and logging its result | Checking whether the resulting target satisfies application assertions, then repeating after a change |
+## The implemented innovation mechanism
 
-The innovation hypothesis is the combination of **V3-specific migration checks, a reusable acceptance target, and evidence-aware version comparison**. This is unproven as a market advantage. If the first build is only a form that makes several RPC calls, it does not yet establish this distinction.
+The report binds an acceptance plan and its caller/asset, declared source revision, target/code fingerprint when available, runtime fingerprint, and native/EVM checkpoint. Hashing then preserves that payload during export and review. The browser reviewer checks integrity without needing the author's local server or a wallet.
 
-## MVP acceptance boundary
+Comparison preserves the meaning of that evidence. Changing an expectation, caller, or asset holder requires a new baseline. A new deployment can be compared under the same explicit logical identity and plan, with no causal claim that code fixed the result. Runtime and synthetic scenario changes are context changes, never credited as repairs. A review names the exact report; a later report starts unreviewed.
 
-The Check-in target is one complete lifecycle with a small number of meaningful checks:
+This is a concrete contribution beyond a collection of RPC checks: a portable acceptance record with rules for comparing and reviewing subsequent releases. It is not a proven market advantage or a claim that no other tool offers similar workflows. A JSON hash detects changed content; it does not authenticate RPC truth, ownership, the reviewer, or source-to-bytecode correspondence.
 
-1. Create and reopen a project with an explicit Portaldot V3 target.
-2. Observe the live network through read-only calls, exposing the real chain ID and account-check limits.
-3. Show a deliberate configuration failure and correct it on the same project.
-4. Run a clearly labeled synthetic lifecycle rehearsal when live deployment is unavailable. Fixture outcomes exercise the workflow; they do not execute a local Probe contract.
-5. Save both runs and compare their evidence without turning simulated results into live success.
-6. Export a report that a reviewer can understand without the author explaining every field.
+## Evidence and remaining limits
 
-The desired testnet execution milestone is separate: deploy our Probe contract on V3, write a value, read it back, and bind the real contract and transaction evidence to the acceptance run. This milestone remains pending until actual execution and readback are recorded. Mock data being permitted in preliminary demonstrations does not settle eligibility when deployment evidence is missing.
+The retained live report for public asset **7777/pUSD** records finalized block **157426**, runtime **3002**, and **3/3 passed checks**. Its SHA-256 is `15baa9e1d2e8746bdc94b873e314a3fd839fbd52ecc13dd99470bec8444ba544`; [the original JSON](../public/reports/15baa9e1d2e8746bdc94b873e314a3fd839fbd52ecc13dd99470bec8444ba544.json) verifies locally. This is an existing external asset, not our deployment, state write, customer or independent adoption.
 
-## Future scope and limits
+ReleaseGate's compiled bytecode has executed in a local in-memory EVM: constructor, first report submission, reviewer approval, and a second submission that clears approval and increments revision. Nonowner submission and nonreviewer decisions revert. This establishes local contract behavior only; it does not establish revive execution, testnet fees, finality, or our own live write/readback.
 
-A command-line JSON acceptance plan and report verification are implemented alongside the local UI. The next candidates are a CI example, checks against another developer's contract, and additional validated V3 assertions. Those remain roadmap items until implemented and tested. Saved-run fingerprints detect payload changes; they do not authenticate RPC responses.
+The UI/API stay read-only. An explicitly invoked developer helper exists for testnet deployment and writes, but implementation readiness is not execution evidence. There is no hosted team workspace, authenticated reviewer identity, automatic promotion, background watcher, security audit, or production guarantee. Archive/restore and importing/exporting files are implemented; these should not be described as team adoption.
 
-The first version does not promise arbitrary EVM equivalence, cross-chain execution, synchronous ink!/Solidity interoperability, a security audit, production readiness, or guaranteed prevention of loss. The app should not request a seed phrase or private key. Any signed deployment workflow requires its own explicit controls and evidence; read-only acceptance must not imply that a deployment occurred.
+## Validate value before expanding
 
-## Business and adoption hypotheses
+An ecosystem maintainer or foundation could eventually fund repeatable migration acceptance; that is a buyer hypothesis, not an established customer. The first distribution hypothesis is an open-source local tool with a static reviewer. Managed CI or hosted team history should wait for evidence that this handoff is useful.
 
-The likely initial users are V3 ecosystem builders and maintainers helping them migrate. A free, open-source local workflow is the first distribution hypothesis. Hosted history, team review, or managed CI could be later paid services; pricing, willingness to pay, and a sustainable business model are unvalidated.
-
-Before adding more checks, test whether an external developer can bring one real project and complete the lifecycle. Record the task, elapsed time, author intervention, failed assumptions, and whether the saved comparison is useful for the developer's next release. Do not count our sample runs, wallets, or transactions as independent users.
-
-Suggested validation gates:
-
-- Two readers unfamiliar with the project can explain who uses it, what decision it supports, and why V3 matters after viewing the short introduction.
-- At least one external developer can supply their own target and complete a run; the result may fail, provided it is accurate and actionable.
-- The developer can identify what changed between two runs and name a next action without opening raw RPC logs.
-- A maintainer can reproduce the documented checks or explain why the environment prevents reproduction.
-
-All four are pending validation. If users obtain the same result as quickly from the existing guide and scripts, narrow or change the product before expanding it.
-
-## Event fit
-
-The intended primary track is Modular Cloud & Middleware. Technical delivery should be supported by reproducible runs; innovation by the migration and comparison mechanism; ecosystem contribution by an external builder workflow; business potential by a clear user and a measured adoption test. These are evidence plans aligned with the published 30/30/20/20 criteria, not predicted scores or organizer approval.
-
-The event requires new work, a public repository with genuine development history, testnet integration evidence, and a short demonstration. Registration, Check-in acceptance, final submission, and deployment are separate states. Current event requirements and dates are recorded in [PARTICIPATION_RESEARCH.md](../PARTICIPATION_RESEARCH.md).
+The next product gate is one independent builder bringing their own compatible target, then a maintainer reviewing a second report without the author explaining raw RPC logs. Record completion, author intervention, elapsed time, whether a useful failure was found, and whether the comparison changes the next release decision. These are pending validation; our samples, wallets and transactions do not count. If the guide and scripts solve that task just as well, narrow the tool before adding more checks, attestations or monitoring.
