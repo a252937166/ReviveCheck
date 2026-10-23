@@ -1,6 +1,6 @@
-# ReviveCheck — Week 2 Check-in draft
+# ReviveCheck — Week 2 Check-in
 
-Check-in packet updated on 2026-10-23 after a complete 26-test run, production build, and public asset readback. **This file is not a submitted Check-in.** Core browser create/edit, synthetic failure/rerun/comparison, and live blocked-state flows have been exercised. Archive/restore, mobile, and JSON/HTML HTTP exports also passed; native browser download completion was not confirmed. Signed deployment is pending test-token funding. See [VALIDATION.md](VALIDATION.md) for exact evidence scopes.
+Check-in packet updated on 2026-10-23 after a complete 26-test run, production build, and public asset readback. **Submitted to DoraHacks; status Under Review.** [Build 50176](https://dorahacks.io/build/50176) and [submission receipt](SUBMISSION.md). Core browser create/edit, synthetic failure/rerun/comparison, and live blocked-state flows have been exercised. Archive/restore, mobile, and JSON/HTML HTTP exports also passed; native browser download completion was not confirmed. Signed deployment is pending test-token funding. See [VALIDATION.md](VALIDATION.md) for exact evidence scopes.
 
 ## Project overview
 
@@ -39,7 +39,7 @@ Check-in packet updated on 2026-10-23 after a complete 26-test run, production b
 | Pitch Deck | Completed; public PDF provided | [Six-page Check-in Deck](../artifacts/ReviveCheck-Check-in-Deck.pdf), with editable PPTX companion |
 | External developer validation | Pending | One independent builder bringing their own target is the first adoption test |
 | Event registration | Completed with UI readback | The coordinating workstream confirmed the platform displayed “Unregister” and “Congratulations” after registration |
-| Check-in submission | **Pending** | Registration does not establish that this Check-in was submitted or approved |
+| Check-in submission | **Submitted — Under Review** | Build 50176; explicit success receipt and event-list status verified. Organizer acceptance remains pending |
 
 This validation pass reran the complete `npm test` suite: **26 passed, 0 failed, 0 skipped**. `npm run build` also passed with Vite `7.3.7`. The suite includes comparison/rehearsal and both H160 reverse-mapping regressions. ffprobe independently confirmed the local video as H.264, 1920×1080, 30 fps, exactly 78.000 seconds, with no audio stream. Detailed manual results and evidence limits are listed in [VALIDATION.md](VALIDATION.md). No private wallet material appears in the public-facing artifacts.
 

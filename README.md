@@ -2,7 +2,7 @@
 
 Repeatable release acceptance for Solidity applications moving to Portaldot V3.
 
-[Watch the 78-second Check-in video](https://a252937166.github.io/ReviveCheck/) · [Pitch Deck (PDF)](artifacts/ReviveCheck-Check-in-Deck.pdf) · [Public source](https://github.com/a252937166/ReviveCheck)
+[DoraHacks submission: Under Review](https://dorahacks.io/build/50176) · [Watch the 78-second Check-in video](https://a252937166.github.io/ReviveCheck/) · [Pitch Deck (PDF)](artifacts/ReviveCheck-Check-in-Deck.pdf) · [Public source](https://github.com/a252937166/ReviveCheck)
 
 **Catch a migration failure, correct the same project, rerun the checks, and show what changed.** ReviveCheck preserves the original inputs and evidence so the next maintainer can review the result instead of reconstructing screenshots and RPC logs.
 

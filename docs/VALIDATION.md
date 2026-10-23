@@ -1,6 +1,6 @@
 # ReviveCheck validation record
 
-Validation date: 2026-10-23, America/New_York. Scope: the local prototype at implementation revision `a07a912` and its local Check-in materials. The interactive app remains local. Public video and source are available; formal Check-in submission is still pending.
+Validation date: 2026-10-23, America/New_York. Scope: the local prototype at implementation revision `a07a912` and its local Check-in materials. The interactive app remains local. Public video and source are available; formal Check-in was submitted and is Under Review; see [SUBMISSION.md](SUBMISSION.md).
 
 ## Commands run for this record
 
@@ -79,7 +79,7 @@ The delivered sequence is documented in [DEMO_SCRIPT.md](DEMO_SCRIPT.md), [video
 - An isolated test wallet was created and stored as requested. No private wallet content is included in the product, repository, or this record.
 - Discord ticket `1295` was created. After the temporary timeout expired, a further attempt was removed again and triggered another approximately five-minute timeout. **Funding-request delivery is not confirmed.** Automated retries stopped; the user must contact support manually. No reason for the moderation action was established.
 - The latest reported balance is **0 tPOT**. Our Probe is **not deployed**, and signed write/readback is **not completed**.
-- Public repository and public video playback are verified. A six-page PDF Deck is prepared for the required form field. Formal Check-in submission and organizer acceptance remain pending.
+- Public repository and public video playback are verified. A six-page PDF Deck is prepared for the required form field. Formal Check-in submission is confirmed; organizer acceptance remains pending.
 
 No independent user, saved development time, revenue, security audit, or general EVM compatibility claim is established by these checks.
 
@@ -87,7 +87,7 @@ No independent user, saved development time, revenue, security audit, or general
 
 1. Manually confirm the support request reaches staff, then independently confirm test-token receipt.
 2. Perform and record our own V3 deployment and a separate write/readback when funded; keep it distinct from constructor simulation.
-3. Complete formal Check-in submission with the published links and outstanding deployment evidence disclosed.
+3. Record the organizer decision and later execution evidence against the already submitted Check-in.
 4. Record the platform receipt and organizer decision separately from preparing the local artifacts.
 
 ## Reproducible exported example
