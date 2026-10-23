@@ -1,6 +1,6 @@
 # ReviveCheck — Week 2 Check-in draft
 
-Draft updated on 2026-10-23 after a complete 26-test run and production build. **This file is not a submitted Check-in.** Core browser create/edit, synthetic failure/rerun/comparison, and live blocked-state flows have been exercised. Archive/restore, mobile, and JSON/HTML HTTP exports also passed; native browser download completion was not confirmed. Signed deployment is pending test-token funding. See [VALIDATION.md](VALIDATION.md) for exact evidence scopes.
+Check-in packet updated on 2026-10-23 after a complete 26-test run, production build, and public asset readback. **This file is not a submitted Check-in.** Core browser create/edit, synthetic failure/rerun/comparison, and live blocked-state flows have been exercised. Archive/restore, mobile, and JSON/HTML HTTP exports also passed; native browser download completion was not confirmed. Signed deployment is pending test-token funding. See [VALIDATION.md](VALIDATION.md) for exact evidence scopes.
 
 ## Project overview
 
@@ -33,9 +33,10 @@ Draft updated on 2026-10-23 after a complete 26-test run and production build. *
 | Probe deployed on Portaldot V3 | **Pending** | No contract address or transaction is claimed in this draft |
 | V3 write and readback | **Pending** | Requires a real deployed target and linked transaction/readback evidence |
 | Constructor failure/correction | Real unsigned runtime simulation recorded | [Dry-run artifact](../artifacts/constructor-dryrun.json) reproduces `EvmConstructorNonEmptyData` and corrected EVM initcode encoding using the public guide's origin; no persistent deployment or signed write is proved |
-| Public GitHub repository | **Pending publication** | Add the real public URL and verified revision after publication |
-| Genuine development history | Three meaningful local commits prepared across product contract, implementation, and validation/materials | Publication and organizer evaluation remain pending; no backdated or fabricated history |
-| Video of at most three minutes | Local video completed; public URL pending | [check-in.mp4](../video/check-in.mp4): 78 seconds, 1080p/30fps, silent actual-UI screenshots with English captions; HyperFrames/decode review passed. It is a screenshot walkthrough, not a continuous interaction recording |
+| Public GitHub repository | **Published and anonymously verified** | [a252937166/ReviveCheck](https://github.com/a252937166/ReviveCheck); default branch main preserves the genuine development history |
+| Genuine development history | Original three commits publicly preserved, plus publication materials | Product contract, implementation, and validation/materials are distinct records; organizer evaluation remains pending |
+| Video of at most three minutes | **Published and anonymously verified** | [Watch](https://a252937166.github.io/ReviveCheck/) / [direct MP4](https://a252937166.github.io/ReviveCheck/check-in.mp4). [check-in.mp4](../video/check-in.mp4): 78 seconds, 1080p/30fps, silent actual-UI screenshots with English captions; HyperFrames/decode review passed. It is a screenshot walkthrough, not a continuous interaction recording |
+| Pitch Deck | Completed; public PDF provided | [Six-page Check-in Deck](../artifacts/ReviveCheck-Check-in-Deck.pdf), with editable PPTX companion |
 | External developer validation | Pending | One independent builder bringing their own target is the first adoption test |
 | Event registration | Completed with UI readback | The coordinating workstream confirmed the platform displayed “Unregister” and “Congratulations” after registration |
 | Check-in submission | **Pending** | Registration does not establish that this Check-in was submitted or approved |
@@ -57,8 +58,6 @@ Record only the steps the application can actually perform. A filmed local rehea
 ## Remaining work
 
 - Obtain tPOT, deploy Probe, perform one write and readback, and preserve the evidence if time permits.
-- Publish the repository with real development records when authorized.
-- Publish the completed 78-second video or another qualified demonstration link when authorized, then verify anonymous access.
 - Confirm late-entry/Check-in eligibility and treatment of delayed test-token distribution with the organizer.
 - Ask a builder to try their own target before expanding the acceptance suite.
 
@@ -80,9 +79,11 @@ The local UI, API, adapters, history, comparison, and export are implemented. Si
 
 ## Links to complete before platform submission
 
-- Public repository: pending.
-- Tested implementation revision: `a07a912` (local; public repository pending).
-- Local video: [check-in.mp4](../video/check-in.mp4); public URL pending.
+- Public repository: https://github.com/a252937166/ReviveCheck .
+- Tested implementation revision: `a07a912` (implementation tested; public repository available).
+- Public video player: https://a252937166.github.io/ReviveCheck/ .
+- Direct video: https://a252937166.github.io/ReviveCheck/check-in.mp4 .
+- Public Pitch Deck: https://github.com/a252937166/ReviveCheck/blob/main/artifacts/ReviveCheck-Check-in-Deck.pdf .
 - Testnet contract address: pending.
 - Testnet transaction and readback evidence: pending.
 - Example exported run: [example-live-report.json](../artifacts/example-live-report.json), fingerprint verified, live status blocked.
