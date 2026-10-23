@@ -51,6 +51,21 @@ The deployed runtime was inspected rather than assumed equivalent to Ethereum:
 
 See [technical findings and limitations](docs/CHAIN_FINDINGS.md) and [the recorded negative/corrected simulation](artifacts/constructor-dryrun.json). A successful simulation is not a persistent deployment.
 
+## Explorer references and retained upgrade baseline
+
+Live reports now include the [official V3 testnet explorer](https://scanner-testnet-v3.portaldot.dev/) and verified native block/extrinsic detail links. Contract and transaction QR codes are derived from complete, matching saved evidence. Missing targets stay pending. The current explorer has no verified H160 contract detail route and its EVM transaction route is disabled; those QR codes contain the actual plain address/hash, explicitly labeled **Address only** or **Hash only**. They are not payment requests or fabricated explorer links. Browser reports offer SVG/PNG downloads; standalone HTML includes the same scoped references and SVG QR.
+
+The [current immutable baseline](public/baselines/current-2026-10-23.json) retains the original report at finalized block **157790**, runtime **3002**, and its exact report/environment/plan hashes. It is a current observation, not proof that it preceded a particular upgrade. A new checkpoint alone does not establish an upgrade.
+
+```sh
+# Minimal identity/runtime/constants observation; no signing or asset check if unchanged.
+node scripts/check-upgrade.js
+# Reuse a previous saved complete result to avoid repeating the same environment recheck.
+node scripts/check-upgrade.js --previous-result artifacts/local/upgrade-checks/<saved>.result.json
+```
+
+Actual environment drift creates a new same-plan report and a context-aware comparison, without rewriting the baseline or inheriting its reviews. Unexpected chain identity stops for manual review. See [baseline, recheck and deduplication rules](docs/UPGRADE_BASELINE.md).
+
 ## Inspect or reproduce from the terminal
 
 ```sh

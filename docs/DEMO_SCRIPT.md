@@ -29,4 +29,4 @@ The separate [SRT file](../video/captions.srt) includes the explicit “Local re
 
 ## Delivery check
 
-The local MP4 was rendered and previewed. Duration is **78.000 seconds** (2,340 frames); the result is H.264 at 1080p and 30 fps. HyperFrames checks and sampled rendered-frame review completed. Silence is intentional; the captions carry the narration. The video has not been externally published.
+The local MP4 was rendered and previewed. Duration is **78.000 seconds** (2,340 frames); the result is H.264 at 1080p and 30 fps. HyperFrames checks and sampled rendered-frame review completed. Silence is intentional; the captions carry the narration. The original v0.1 video is publicly available at https://a252937166.github.io/ReviveCheck/check-in.mp4 and remains a historical Check-in artifact. A separate v0.2 progress walkthrough covers the newer report/review and upgrade-baseline flow; it does not overwrite these original scenes.
