@@ -1,0 +1,128 @@
+{
+  "checkedAt": "2026-10-23T09:04:44.779Z",
+  "baseUrl": "https://a252937166.github.io/ReviveCheck/",
+  "pagesRevision": "3ee7847b7d190b8014e0376182c33cab0fbc62e0",
+  "passed": true,
+  "files": [
+    {
+      "path": "index.html",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 441,
+      "sha256": "1f51f2f127232f8256bd2e406c98a8a169b5f0d1f5e5dfc68c54a221c27d4594",
+      "matchesLocal": true
+    },
+    {
+      "path": "demo/manifest.json",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "bytes": 734,
+      "sha256": "f6704d8c58f6cba66ab478204cc1952973a9bfcf8487872aa37d46bc89f6c39e",
+      "matchesLocal": true
+    },
+    {
+      "path": "lifecycle-demo-v0.2.mp4",
+      "status": 200,
+      "contentType": "video/mp4",
+      "bytes": 2074264,
+      "sha256": "1a088f929bdbfa3a77609923916a174735d825ea5920865423a44424dcfbaf04",
+      "matchesLocal": true
+    },
+    {
+      "path": "lifecycle-demo-v0.2-poster.png",
+      "status": 200,
+      "contentType": "image/png",
+      "bytes": 79153,
+      "sha256": "3182e54845ac2330261b0cef50f8a8b50811d2b927f134f329d5a224509a4d47",
+      "matchesLocal": true
+    },
+    {
+      "path": "demo/qa.json",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "bytes": 2360,
+      "sha256": "5e6ddff5cfc0bb9fb0ce4c808339ac70b10b80136bea0beff29b24c85d832b07",
+      "matchesLocal": true
+    },
+    {
+      "path": "demo/captions.srt",
+      "status": 200,
+      "contentType": "application/x-subrip",
+      "bytes": 1005,
+      "sha256": "2e989dd056b2077b2709163021d9388fe846f53d8bca4ccd36dcfa2b5f9838ed",
+      "matchesLocal": true
+    },
+    {
+      "path": "demo/scene-plan.json",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "bytes": 3835,
+      "sha256": "0d4424a6fee062a44e2cdc6b9e0cd665aa2c3d843ca4506e7c3416720f42e197",
+      "matchesLocal": true
+    },
+    {
+      "path": "reports/0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5.json",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "bytes": 6514,
+      "sha256": "7abb6f04a014721c716045c460288aafae17b2066af1dea921cd6d91ce49b6b2",
+      "matchesLocal": true
+    },
+    {
+      "path": "reports/0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5.html",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 19148,
+      "sha256": "2cab0dd12a12012f47e8003ff6f8bde8edd90ecb2d126c41e90cf2e55017d250",
+      "matchesLocal": true
+    },
+    {
+      "path": "baselines/current-2026-10-23.json",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "bytes": 2165,
+      "sha256": "fe16fcc0683321832e41bf2828e35a97962cd6a61fa79313500f69af61c10475",
+      "matchesLocal": true
+    }
+  ],
+  "assets": [
+    {
+      "path": "assets/index-M9rQcQCe.js",
+      "status": 200
+    },
+    {
+      "path": "assets/index-DxV0pvnX.css",
+      "status": 200
+    }
+  ],
+  "originalCheckIn": {
+    "status": 200,
+    "contentType": "video/mp4"
+  },
+  "baselineIntegrityVerified": true,
+  "baselineReportHash": "0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5",
+  "baselineByteSha256": "7abb6f04a014721c716045c460288aafae17b2066af1dea921cd6d91ce49b6b2",
+  "videoSha256": "1a088f929bdbfa3a77609923916a174735d825ea5920865423a44424dcfbaf04",
+  "browserRendering": {
+    "verifiedAt": "2026-10-23T09:05:53.734Z",
+    "url": "https://a252937166.github.io/ReviveCheck/#/review",
+    "method": "Anonymous IAB rendered page and read-only video DOM metadata",
+    "video": {
+      "duration": 120,
+      "width": 1920,
+      "height": 1080,
+      "readyState": 4
+    },
+    "originalCheckIn": {
+      "duration": 78,
+      "width": 1920,
+      "height": 1080,
+      "readyState": 4
+    },
+    "screenshot": "Local raw capture retained; no private wallet or user data shown"
+  },
+  "pending": [
+    "Own funded deployment, writes and finalized readback",
+    "Observed real environment change and same-plan comparison"
+  ]
+}

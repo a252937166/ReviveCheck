@@ -1,0 +1,180 @@
+[
+  {
+    "id": "01-problem",
+    "start": 0,
+    "end": 10,
+    "title": "Keep the evidence with the release.",
+    "caption": "A maintainer needs the plan, the observation and the review to stay connected.",
+    "sourceScope": "REVIVECHECK  /  PORTALDOT V3",
+    "layers": []
+  },
+  {
+    "id": "02-plan",
+    "start": 10,
+    "end": 24,
+    "title": "Start with a saved acceptance plan.",
+    "caption": "A stable logical target and explicit expectations make later results comparable.",
+    "sourceScope": "ACTUAL LOCAL WORKSPACE",
+    "layers": [
+      [
+        "workspace-full.png",
+        [
+          270,
+          160,
+          1600,
+          800
+        ],
+        [
+          160,
+          175
+        ]
+      ]
+    ]
+  },
+  {
+    "id": "03-baseline",
+    "start": 24,
+    "end": 40,
+    "title": "Retain the exact live baseline.",
+    "caption": "Public asset 7777 passes 3/3 checks. This is not our deployment.",
+    "sourceScope": "LIVE READ-ONLY OBSERVATION",
+    "layers": [
+      [
+        "public-review-full.png",
+        [
+          330,
+          350,
+          1260,
+          650
+        ],
+        [
+          600,
+          210
+        ]
+      ]
+    ]
+  },
+  {
+    "id": "04-targets",
+    "start": 40,
+    "end": 58,
+    "title": "Scan the target. Know what it means.",
+    "caption": "The precompile QR contains the actual address. A project transaction is still absent.",
+    "sourceScope": "ACTUAL PUBLIC REPORT UI",
+    "layers": [
+      [
+        "public-review-full.png",
+        [
+          330,
+          900,
+          1260,
+          650
+        ],
+        [
+          600,
+          210
+        ]
+      ]
+    ]
+  },
+  {
+    "id": "05-explorer",
+    "start": 58,
+    "end": 68,
+    "title": "Follow the real finalized checkpoint.",
+    "caption": "The official explorer resolves the report's native hash to block 157790.",
+    "sourceScope": "OFFICIAL PUBLIC EXPLORER",
+    "layers": [
+      [
+        "official-block-1080.png",
+        [
+          280,
+          80,
+          1360,
+          420
+        ],
+        [
+          280,
+          210
+        ]
+      ]
+    ]
+  },
+  {
+    "id": "06-review",
+    "start": 68,
+    "end": 84,
+    "title": "Share one report. Return one decision.",
+    "caption": "The self-declared review receipt is bound to the exact report hash.",
+    "sourceScope": "ACTUAL UI EXCERPTS  /  INTERNAL WALKTHROUGH",
+    "layers": [
+      [
+        "public-review-full.png",
+        [
+          349,
+          1629,
+          878,
+          374
+        ],
+        [
+          100,
+          260
+        ]
+      ],
+      [
+        "public-review-full.png",
+        [
+          1251,
+          382,
+          320,
+          811
+        ],
+        [
+          1500,
+          175
+        ]
+      ]
+    ]
+  },
+  {
+    "id": "07-owner",
+    "start": 84,
+    "end": 100,
+    "title": "The owner imports the review receipt.",
+    "caption": "The saved check stays passed. Review feedback and the next recheck are separate.",
+    "sourceScope": "ACTUAL LOCAL WORKSPACE",
+    "layers": [
+      [
+        "workspace-full.png",
+        [
+          661,
+          2057,
+          1196,
+          461
+        ],
+        [
+          620,
+          280
+        ]
+      ]
+    ]
+  },
+  {
+    "id": "08-change",
+    "start": 100,
+    "end": 112,
+    "title": "Wait for an observed environment change.",
+    "caption": "A later block alone is not an upgrade. No new acceptance run was created.",
+    "sourceScope": "CAPTURED LIVE READ-ONLY RESULT",
+    "layers": []
+  },
+  {
+    "id": "09-gates",
+    "start": 112,
+    "end": 120,
+    "title": "One lifecycle. Explicit evidence gates.",
+    "caption": "Deployment, writes and final readback follow actual funding. Upgrade comparison follows actual drift.",
+    "sourceScope": "CURRENT PROGRESS  /  REMAINING WORK",
+    "layers": []
+  }
+]

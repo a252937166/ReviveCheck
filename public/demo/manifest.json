@@ -1,0 +1,20 @@
+{
+  "schema": "revivecheck/demo-v1",
+  "version": "v0.2",
+  "url": "lifecycle-demo-v0.2.mp4",
+  "poster": "lifecycle-demo-v0.2-poster.png",
+  "durationSeconds": 120,
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "sha256": "1a088f929bdbfa3a77609923916a174735d825ea5920865423a44424dcfbaf04",
+  "status": "progress",
+  "format": "Silent English-captioned walkthrough from current actual UI captures; not continuous recording",
+  "audio": null,
+  "baselineReportHash": "0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5",
+  "pending": [
+    "Actual environment change and same-plan recheck comparison",
+    "Own funded deployment, writes and finalized dual-interface readback"
+  ],
+  "originalCheckInPreserved": true
+}
