@@ -2,11 +2,13 @@
 
 Release acceptance and reviewer handoff for Portaldot V3 applications.
 
-[DoraHacks submission: Under Review](https://dorahacks.io/build/50176) · [Public report reviewer](https://a252937166.github.io/ReviveCheck/) · [Original Check-in video](https://a252937166.github.io/ReviveCheck/check-in.mp4) · [Original Check-in deck](artifacts/ReviveCheck-Check-in-Deck.pdf)
+[DoraHacks submission: Under Review](https://dorahacks.io/build/50176) · [Current baseline reviewer](https://a252937166.github.io/ReviveCheck/?report=0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5#/review) · [Verified v0.2 lifecycle walkthrough](https://a252937166.github.io/ReviveCheck/lifecycle-demo-v0.2.mp4) · [Original Check-in video](https://a252937166.github.io/ReviveCheck/check-in.mp4) · [Original Check-in deck](artifacts/ReviveCheck-Check-in-Deck.pdf)
 
 **Define the release checks, inspect the real target, correct a failure, and hand the exact report to a reviewer.** Preserve that review with its report; create a new check when the release, plan, deployment, or runtime changes.
 
-The v0.2 workbench uses the real V3 testnet. Its static public reviewer verifies report integrity without a backend or wallet. The included public pUSD report verifies an existing native asset against its ERC-20 precompile; it does not claim we created that asset or have an independent customer. Our own ReleaseGate deployment and state writes remain pending test-token funding. The original video/deck document v0.1. See [v0.2 evidence and validation](docs/RELEASE_V2.md).
+The v0.2 workbench uses the real V3 testnet. Its static public reviewer verifies report integrity without a backend or wallet. The included public pUSD report verifies an existing native asset against its ERC-20 precompile; it does not claim we created that asset or have an independent customer. Anonymous browser checks have verified the current report, its official native block detail, and a review receipt created, downloaded and imported into an isolated demo workspace. That is an internal workflow demonstration, not independent adoption.
+
+The new **120-second, 1080p/30 fps, silent English-captioned walkthrough** uses actual current UI screenshots and has passed local render/QA, including decoding its two displayed QR codes. The anonymous public download matched the local video SHA-256, and its public browser player loaded the correct duration and dimensions. Own ReleaseGate deployment, state writes and finalized dual-interface readback remain pending test-token funding; the latest account check at **2026-10-23 09:00:19.771 UTC / 05:00 EDT** still found **0 tPOT**, with no signing or broadcast. Revalidation after an actual environment change also remains unobserved. The original 78-second Check-in video/deck and organizer form are unchanged. See [the video evidence and publication record](docs/DEMO_V2.md) and [v0.2 validation](docs/RELEASE_V2.md).
 
 ## Run it
 
@@ -55,7 +57,7 @@ See [technical findings and limitations](docs/CHAIN_FINDINGS.md) and [the record
 
 Live reports now include the [official V3 testnet explorer](https://scanner-testnet-v3.portaldot.dev/) and verified native block/extrinsic detail links. Contract and transaction QR codes are derived from complete, matching saved evidence. Missing targets stay pending. The current explorer has no verified H160 contract detail route and its EVM transaction route is disabled; those QR codes contain the actual plain address/hash, explicitly labeled **Address only** or **Hash only**. They are not payment requests or fabricated explorer links. Browser reports offer SVG/PNG downloads; standalone HTML includes the same scoped references and SVG QR.
 
-The [current immutable baseline](public/baselines/current-2026-10-23.json) retains the original report at finalized block **157790**, runtime **3002**, and its exact report/environment/plan hashes. It is a current observation, not proof that it preceded a particular upgrade. A new checkpoint alone does not establish an upgrade.
+The [current immutable baseline manifest](public/baselines/current-2026-10-23.json) retains report **`0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5`** at finalized block **157790**, runtime **3002**, and its exact report/environment/plan hashes. The later minimal observation at **2026-10-23 04:49 EDT**, block **158114**, found the same environment. A new checkpoint alone does not establish an upgrade; this is not evidence of completing a recheck after a real runtime change.
 
 ```sh
 # Minimal identity/runtime/constants observation; no signing or asset check if unchanged.
@@ -129,6 +131,7 @@ flowchart LR
 - [Product, innovation hypothesis, lifecycle, adoption gates](docs/PRODUCT.md)
 - [Check-in description and honest progress ledger](docs/CHECK_IN.md)
 - [Delivered 78-second demonstration and captions](docs/DEMO_SCRIPT.md)
+- [Verified 120-second v0.2 UI walkthrough](https://a252937166.github.io/ReviveCheck/lifecycle-demo-v0.2.mp4) and [scene/evidence/QA record](docs/DEMO_V2.md)
 - [Test-token request and manual support follow-up](docs/TOKEN_REQUEST.md)
 - [API contract](docs/API.md)
 - [Manual acceptance record](docs/VALIDATION.md)
