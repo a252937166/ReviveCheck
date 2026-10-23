@@ -42,3 +42,7 @@ The user explicitly confirmed both **Terms of Use Agreement** and **Participant 
 3. Validate the workflow with an external builder's compatible contract before expanding the acceptance suite.
 
 The Check-in deadline is October 24, 12:00 UTC. The event's final code freeze is November 6, 04:00 UTC. Passing Check-in or final eligibility is an organizer decision, not established by successful upload.
+
+## v0.2 publication follow-up
+
+The public root now includes the original v0.1 video player and a browser-only report reviewer. A [live existing-asset report](https://a252937166.github.io/ReviveCheck/?report=15baa9e1d2e8746bdc94b873e314a3fd839fbd52ecc13dd99470bec8444ba544#/review) and QR handoff were added after Check-in; see [the separate v0.2 delivery record](RELEASE_V2.md). The local workbench remains local. This source/viewer publication did not edit the organizer form or establish a new organizer decision. The original video and deck remain v0.1 evidence, and own signed deployment/write/readback are still pending test-token funding.

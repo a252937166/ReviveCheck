@@ -1,7 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
-import { inspectWithClients, decodeUint256, formatNative, parseTokenAmount, availableNativeBalance, NETWORK } from '../lib/chain.js';
+import { TypeRegistry, Metadata } from '@polkadot/types';
+import { getSpecTypes } from '@polkadot/types-known';
+import { readFile } from 'node:fs/promises';
+import { gunzipSync } from 'node:zlib';
+import { createHash } from 'node:crypto';
+import { Interface } from 'ethers';
+import { inspectWithClients, decodeUint256, formatNative, parseTokenAmount, availableNativeBalance, NETWORK, NATIVE_TYPES_BUNDLE, nativeAssetAddress } from '../lib/chain.js';
 import { compileProbe } from '../scripts/compile-probe.js';
 
 const native = encodeAddress(new Uint8Array(32).fill(1), 42);
@@ -164,4 +170,124 @@ test('probe compiles with the pinned compiler and exposes an owned state-changin
   assert.ok(artifact.abi.some((entry) => entry.name === 'setValue' && entry.stateMutability === 'nonpayable'));
   assert.ok(artifact.abi.some((entry) => entry.name === 'UnauthorizedCaller' && entry.type === 'error'));
   assert.ok(artifact.abi.some((entry) => entry.name === 'ValueChanged' && entry.type === 'event'));
+});
+
+test('historical asset-paid block fails with default types and decodes with the spec-scoped historical registry', async () => {
+  const fixture = JSON.parse(await readFile(new URL('./fixtures/portaldot-156435.json', import.meta.url), 'utf8'));
+  const metadataBytes = gunzipSync(Buffer.from(fixture.metadataGzipBase64, 'base64'));
+  assert.equal(createHash('sha256').update(metadataBytes).digest('hex'), fixture.metadataSha256);
+  const registryFor = (patched) => {
+    const registry = new TypeRegistry();
+    if (patched) {
+      registry.setKnownTypes({ typesBundle: NATIVE_TYPES_BUNDLE });
+      registry.register(getSpecTypes(registry, 'Portaldot', fixture.runtime.specName, fixture.runtime.specVersion));
+    }
+    registry.setMetadata(new Metadata(registry, metadataBytes), undefined, undefined, true);
+    return registry;
+  };
+  assert.throws(() => registryFor(false).createType('SignedBlock', fixture.raw), /assetId|MultiLocation/);
+  const block = registryFor(true).createType('SignedBlock', fixture.raw);
+  assert.equal(block.block.header.hash.toHex(), fixture.blockHash);
+  assert.equal(block.block.header.number.toString(), '156435');
+  assert.equal(block.block.extrinsics.length, 2);
+  assert.equal(block.block.extrinsics[1].hash.toHex(), '0xbb7823122c7e1500d846e6b040768c3f9390ecd5326b27bfee689a5b6d8162ff');
+  assert.deepEqual(block.block.extrinsics[1].assetId.toJSON(), { withId: 7777 });
+  assert.equal(block.block.extrinsics[1].method.section, 'utility');
+  const registry = new TypeRegistry();
+  registry.setKnownTypes({ typesBundle: NATIVE_TYPES_BUNDLE });
+  for (const version of [3001, 3003]) assert.notEqual(getSpecTypes(registry, 'Portaldot', 'portaldot-v3', version).TAssetConversion, 'Option<NativeOrWithId>');
+  assert.notEqual(getSpecTypes(registry, 'Other chain', 'other-runtime', 3002).TAssetConversion, 'Option<NativeOrWithId>');
+});
+
+function assetClients({ exists = true, nativeSupply = '100000000000', evmSupply = nativeSupply, nativeBalance = '99683035000', evmBalance = nativeBalance, mapped = true, specVersion = 3002 } = {}) {
+  const mocked = clients({ mapped });
+  mocked.api.runtimeVersion = { specName: 'portaldot-v3', specVersion, transactionVersion: 2, stateVersion: 1 };
+  const some = (value) => ({ isSome: true, isNone: false, unwrap: () => value });
+  mocked.api.query.assets = {
+    asset: async () => exists ? some({ owner: native, supply: nativeSupply }) : { isSome: false, isNone: true },
+    metadata: async () => ({ decimals: 6 }),
+    account: async () => some({ balance: nativeBalance }),
+  };
+  const originalRpc = mocked.rpc;
+  mocked.rpc = async (method, params) => {
+    if (method === 'eth_getCode') throw new Error('Precompiles must not require deployed code');
+    if (method === 'eth_call') {
+      assert.deepEqual(params[1], { blockHash: evmHash, requireCanonical: true });
+      const selector = params[0].data.slice(0, 10);
+      return valueWord(selector === '0x18160ddd' ? evmSupply : selector === '0x70a08231' ? evmBalance : 6);
+    }
+    return originalRpc(method, params);
+  };
+  return mocked;
+}
+
+const assetProject = { profile: 'native-asset', nativeAsset: { assetId: '7777', holder: '' } };
+
+test('public native-asset profile passes without wallet, contract code, transaction, or own funding', async () => {
+  const report = await inspectWithClients(assetProject, assetClients());
+  assert.deepEqual(report.checks.map((c) => c.id), ['network.chain-id', 'network.finalized', 'asset.native-erc20']);
+  assert.ok(report.checks.every((c) => c.status === 'passed'));
+  const evidence = byId(report, 'asset.native-erc20').evidence;
+  assert.equal(evidence.holderSource, 'native-asset-owner');
+  assert.equal(evidence.nativeHolder, native);
+  assert.equal(evidence.precompileAddress, '0x00001e6100000000000000000000000000010000');
+  assert.equal(evidence.nativeBalance, evidence.erc20Balance);
+  assert.match(evidence.targetOwnership, /External public asset/);
+  assert.equal(report.network.specName, 'portaldot-v3');
+  assert.equal(report.network.specVersion, '3002');
+});
+
+test('missing native asset cannot pass when precompile returns zeros', async () => {
+  const mocked = assetClients({ exists: false, evmSupply: '0', evmBalance: '0' });
+  let evmCalls = 0;
+  const rpc = mocked.rpc;
+  mocked.rpc = async (method, params) => { if (method === 'eth_call') evmCalls++; return rpc(method, params); };
+  const report = await inspectWithClients(assetProject, mocked);
+  assert.equal(byId(report, 'asset.native-erc20').status, 'failed');
+  assert.equal(evmCalls, 0);
+});
+
+test('asset parity detects a wrong supply or holder balance and rejects unverified runtime versions', async () => {
+  for (const change of [{ evmSupply: '1' }, { evmBalance: '1' }]) {
+    const report = await inspectWithClients(assetProject, assetClients(change));
+    assert.equal(byId(report, 'asset.native-erc20').status, 'failed');
+  }
+  assert.equal(byId(await inspectWithClients(assetProject, assetClients({ specVersion: 3003 })), 'asset.native-erc20').status, 'blocked');
+  assert.equal(byId(await inspectWithClients(assetProject, assetClients({ mapped: false })), 'asset.native-erc20').status, 'blocked');
+});
+
+test('configured ABI views replace the legacy value() check and compare both interfaces', async () => {
+  const assertions = [
+    { id: 'owner', label: 'Owner', signature: 'owner()', returns: 'address', args: [], expected: h160 },
+    { id: 'approved', label: 'Approved', signature: 'approved()', returns: 'bool', args: [], expected: true },
+    { id: 'revision', label: 'Revision', signature: 'revision()', returns: 'uint256', args: [], expected: '2' },
+    { id: 'report', label: 'Report', signature: 'reportHash()', returns: 'bytes32', args: [], expected: txHash },
+  ];
+  const iface = new Interface(assertions.map((a) => `function ${a.signature} view returns (${a.returns})`));
+  const response = (data) => {
+    const assertion = assertions.find((a) => iface.getFunction(a.signature).selector === data.slice(0, 10));
+    assert.ok(assertion, 'No legacy value() call should execute');
+    return iface.encodeFunctionResult(assertion.signature, [assertion.expected]);
+  };
+  const mocked = clients();
+  const originalRpc = mocked.rpc;
+  mocked.rpc = async (method, params) => method === 'eth_call' ? response(params[0].data) : originalRpc(method, params);
+  mocked.api.call.reviveApi.call = async (_from, _to, _value, _weight, _deposit, data) => ({ result: { isOk: true, asOk: { flags: { bits: 0 }, data: response(data) } } });
+  const report = await inspectWithClients({ ...project, assertions }, mocked);
+  assert.equal(byId(report, 'contract.value'), undefined);
+  assert.equal(byId(report, 'contract.assertions').status, 'passed');
+  assert.equal(byId(report, 'contract.assertions').evidence.assertions.length, 4);
+  assert.equal(report.network.contractCodeHash, byId(report, 'contract.code').evidence.codeHash);
+  const approvedSelector = iface.getFunction('approved()').selector;
+  mocked.rpc = async (method, params) => method === 'eth_call'
+    ? params[0].data === approvedSelector ? iface.encodeFunctionResult('approved()', [false]) : response(params[0].data)
+    : originalRpc(method, params);
+  assert.equal(byId(await inspectWithClients({ ...project, assertions }, mocked), 'contract.assertions').status, 'failed');
+  mocked.api.call.reviveApi.call = async () => ({ result: { isOk: true, asOk: { flags: { bits: 1 }, data: '0x' } } });
+  assert.equal(byId(await inspectWithClients({ ...project, assertions }, mocked), 'contract.assertions').status, 'unknown');
+});
+
+test('asset precompile address rejects out-of-range IDs', () => {
+  assert.equal(nativeAssetAddress('7777'), '0x00001e6100000000000000000000000000010000');
+  assert.throws(() => nativeAssetAddress('4294967296'));
 });

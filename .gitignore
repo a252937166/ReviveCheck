@@ -5,6 +5,7 @@ dist/
 !.env.example
 .private/
 .revivecheck/
+.revivecheck-v2-qa/
 .hyperframes/
 video/node_modules/
 video/.hyperframes/

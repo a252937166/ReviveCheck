@@ -1,0 +1,10 @@
+{
+  "name": "Public pUSD native asset compatibility",
+  "release": "runtime-3002",
+  "profile": "native-asset",
+  "logicalContractId": "portaldot-v3-native-asset-7777",
+  "sourceRevision": "",
+  "expectedChainId": 420420777,
+  "nativeAsset": { "assetId": "7777", "holder": "" },
+  "assertions": []
+}
