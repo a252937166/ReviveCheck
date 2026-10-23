@@ -1,0 +1,100 @@
+{
+  "schema": "hackathon-video/qa-v1",
+  "source": "lifecycle-demo-v0.2.mp4",
+  "passed": true,
+  "summary": {
+    "duration": 120.0,
+    "width": 1920,
+    "height": 1080,
+    "fps": 30.0,
+    "video_codec": "h264",
+    "pixel_format": "yuv420p",
+    "audio_streams": 0,
+    "format": "mov,mp4,m4a,3gp,3g2,mj2"
+  },
+  "checks": [
+    {
+      "name": "video_stream",
+      "passed": true,
+      "actual": 1,
+      "expected": ">= 1"
+    },
+    {
+      "name": "width",
+      "passed": true,
+      "actual": 1920,
+      "expected": 1920
+    },
+    {
+      "name": "height",
+      "passed": true,
+      "actual": 1080,
+      "expected": 1080
+    },
+    {
+      "name": "minimum_duration",
+      "passed": true,
+      "actual": 120.0,
+      "expected": ">= 1.0"
+    },
+    {
+      "name": "minimum_fps",
+      "passed": true,
+      "actual": 30.0,
+      "expected": ">= 24.0"
+    },
+    {
+      "name": "audio_stream",
+      "passed": true,
+      "actual": 0,
+      "expected": "optional"
+    },
+    {
+      "name": "maximum_duration",
+      "passed": true,
+      "actual": 120.0,
+      "expected": "<= 170.0"
+    }
+  ],
+  "sha256": "1a088f929bdbfa3a77609923916a174735d825ea5920865423a44424dcfbaf04",
+  "manual_checks": [
+    {
+      "name": "claim-to-visual alignment",
+      "passed": true
+    },
+    {
+      "name": "subtitle readability and safe area",
+      "passed": true
+    },
+    {
+      "name": "accept/reject result legibility",
+      "passed": true
+    },
+    {
+      "name": "secret and personal-data review",
+      "passed": true
+    },
+    {
+      "name": "stale-copy review",
+      "passed": true
+    }
+  ],
+  "qr_checks": {
+    "passed": true,
+    "results": [
+      {
+        "second": 48,
+        "expected": "0x00001e6100000000000000000000000000010000",
+        "actual": "0x00001e6100000000000000000000000000010000",
+        "passed": true
+      },
+      {
+        "second": 116,
+        "expected": "https://a252937166.github.io/ReviveCheck/?report=0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5#/review",
+        "actual": "https://a252937166.github.io/ReviveCheck/?report=0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5#/review",
+        "passed": true
+      }
+    ]
+  },
+  "scope": "Current UI progress and public read-only baseline. No own deployment, write or actual upgrade comparison is claimed."
+}
