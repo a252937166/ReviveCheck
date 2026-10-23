@@ -5,6 +5,11 @@ dist/
 !.env.example
 .private/
 .revivecheck/
+.hyperframes/
+video/node_modules/
+video/.hyperframes/
+video/.cache/
+video/renders/
 artifacts/local/
 *.log
 .DS_Store
