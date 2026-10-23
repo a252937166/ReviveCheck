@@ -1,0 +1,31 @@
+{
+  "name": "revivecheck",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Reproducible release acceptance for Portaldot V3 migrations",
+  "scripts": {
+    "dev": "node server/index.js",
+    "build": "vite build",
+    "start": "NODE_ENV=production node server/index.js",
+    "test": "node --test test/*.test.js",
+    "wallet:create": "node scripts/create-wallet.js",
+    "check:live": "node scripts/check-live.js"
+  },
+  "dependencies": {
+    "@polkadot/api": "^16.4.8",
+    "@polkadot/keyring": "^14.0.3",
+    "@polkadot/util-crypto": "^14.0.3",
+    "express": "^5.1.0",
+    "lucide-react": "^0.468.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "solc": "^0.8.24"
+  },
+  "devDependencies": {
+    "vite": "^7.1.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
