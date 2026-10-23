@@ -67,7 +67,7 @@ The Check-in target is one complete lifecycle with a small number of meaningful 
 1. Create and reopen a project with an explicit Portaldot V3 target.
 2. Observe the live network through read-only calls, exposing the real chain ID and account-check limits.
 3. Show a deliberate configuration failure and correct it on the same project.
-4. Run a clearly labeled local rehearsal for the Probe contract when live deployment is unavailable.
+4. Run a clearly labeled synthetic lifecycle rehearsal when live deployment is unavailable. Fixture outcomes exercise the workflow; they do not execute a local Probe contract.
 5. Save both runs and compare their evidence without turning simulated results into live success.
 6. Export a report that a reviewer can understand without the author explaining every field.
 
@@ -75,7 +75,7 @@ The desired testnet execution milestone is separate: deploy our Probe contract o
 
 ## Future scope and limits
 
-After the lifecycle is useful, the next candidates are command-line acceptance targets, a CI example, content hashes for saved artifacts, checks against another developer's contract, and additional validated V3 assertions. These are roadmap items until implemented and tested.
+A command-line JSON acceptance plan and report verification are implemented alongside the local UI. The next candidates are a CI example, checks against another developer's contract, and additional validated V3 assertions. Those remain roadmap items until implemented and tested. Saved-run fingerprints detect payload changes; they do not authenticate RPC responses.
 
 The first version does not promise arbitrary EVM equivalence, cross-chain execution, synchronous ink!/Solidity interoperability, a security audit, production readiness, or guaranteed prevention of loss. The app should not request a seed phrase or private key. Any signed deployment workflow requires its own explicit controls and evidence; read-only acceptance must not imply that a deployment occurred.
 

@@ -1,0 +1,102 @@
+{
+  "capturedAt": "2026-10-23T04:19:35.569Z",
+  "network": {
+    "name": "Portaldot V3 Testnet",
+    "chainId": 420420777,
+    "evmRpcUrl": "https://test-evm-rpc-v3.portaldot.dev",
+    "substrateRpcUrl": "wss://test-node-v3.portaldot.dev",
+    "genesisHash": "0xd4f9acbcf7f52388d8b095abe3c198d19fc510e0343e643e87cfbccb155283bd"
+  },
+  "scope": "read-only-runtime-simulation",
+  "checkpoint": "0x2a791e280f2692e9028bc7490a32fb031083549932fcccda6a98d90d515ee5ee",
+  "origin": {
+    "evmAddress": "0xf7eC65d11e35375A250e474059a917B537804142",
+    "nativeAccount": "5Hfmuhj1AHrTBJiC9zUPnJo1cfG2G52LLMwofSigBnjtto8Y",
+    "provenance": "Public example from the official guide; not a ReviveCheck-owned wallet."
+  },
+  "source": "contracts/ReviveProbe.sol",
+  "sourceSha256": "6645467766b2963fbebb89a88a03446fc823635ff4f9787e7ed6c46305e8b103",
+  "compiler": "0.8.24+commit.e11b9ed9.Emscripten.clang",
+  "target": "evm-paris",
+  "negative": {
+    "codeBytes": 620,
+    "constructorArgsPlacement": "native data field",
+    "rawResult": {
+      "weightConsumed": {
+        "refTime": 0,
+        "proofSize": 0
+      },
+      "weightRequired": {
+        "refTime": 0,
+        "proofSize": 0
+      },
+      "storageDeposit": {
+        "charge": 0
+      },
+      "maxStorageDeposit": {
+        "charge": 0
+      },
+      "gasConsumed": 0,
+      "result": {
+        "err": {
+          "module": {
+            "index": 80,
+            "error": "0x36000000"
+          }
+        }
+      }
+    },
+    "decodedError": {
+      "section": "revive",
+      "name": "EvmConstructorNonEmptyData",
+      "docs": [
+        "When calling an EVM constructor `data` has to be empty.",
+        "",
+        "EVM constructors do not accept data. Their input data is part of the code blob itself."
+      ]
+    }
+  },
+  "corrected": {
+    "codeBytes": 652,
+    "constructorArgsPlacement": "appended to EVM initcode; native data = 0x",
+    "rawResult": {
+      "weightConsumed": {
+        "refTime": 174223172,
+        "proofSize": 10257
+      },
+      "weightRequired": {
+        "refTime": 174223172,
+        "proofSize": 10673
+      },
+      "storageDeposit": {
+        "charge": "0x00000000000000000013fd22b121cc00"
+      },
+      "maxStorageDeposit": {
+        "charge": "0x00000000000000000013fd22b121cc00"
+      },
+      "gasConsumed": 1659591931637270,
+      "result": {
+        "ok": {
+          "result": {
+            "flags": {
+              "bits": 0
+            },
+            "data": "0x608060405234801561001057600080fd5b506004361061004c5760003560e01c80633fa4f24514610051578063552410771461006d5780637cc96380146100825780638da5cb5b1461008b575b600080fd5b61005a60005481565b6040519081526020015b60405180910390f35b61008061007b366004610182565b6100ca565b005b61005a60015481565b6100b27f000000000000000000000000f7ec65d11e35375a250e474059a917b53780414281565b6040516001600160a01b039091168152602001610064565b336001600160a01b037f000000000000000000000000f7ec65d11e35375a250e474059a917b537804142161461011357604051635c427cd960e01b815260040160405180910390fd5b600080549050816000819055506001806000828254610132919061019b565b909155505060015460408051838152602081018590529081019190915233907fb485dddf4584d4931927aeccc95476c87e02c5b136fb4fbbac317b823d9a522c9060600160405180910390a25050565b60006020828403121561019457600080fd5b5035919050565b808201808211156101bc57634e487b7160e01b600052601160045260246000fd5b9291505056fea2646970667358221220eb4ba497814391af9fbcb6419f4f20fc9b295bdbe8f00bc7c5e4843999c9865164736f6c63430008180033"
+          },
+          "addr": "0x32514f81c9fa7d61a0f799bf87bb432f27cea881"
+        }
+      }
+    },
+    "maxStorageDepositRaw": "5626350000000000",
+    "maxStorageDepositTpot": "56.2635"
+  },
+  "assertions": {
+    "negativeRejected": true,
+    "expectedError": true,
+    "correctedSucceeded": true
+  },
+  "limitations": [
+    "No wallet was loaded and no transaction was signed, broadcast, or persisted.",
+    "The simulated address is not proof of deployment. The public example origin is not controlled by this project."
+  ]
+}
