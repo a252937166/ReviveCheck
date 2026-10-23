@@ -1,0 +1,44 @@
+{
+  "schema": "revivecheck.baseline.v1",
+  "id": "current-2026-10-23",
+  "label": "Current observed V3 testnet baseline",
+  "chronology": "current-observed-baseline",
+  "observedAt": "2026-10-23T08:17:25.008Z",
+  "observedAtEpochMs": 1792743445008,
+  "reportHash": "0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5",
+  "currentBaselineReportHash": "0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5",
+  "reportPath": "../reports/0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5.json",
+  "reportUrl": "https://a252937166.github.io/ReviveCheck/reports/0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5.json",
+  "viewerUrl": "https://a252937166.github.io/ReviveCheck/?report=0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5#/review",
+  "plan": {
+    "profile": "native-asset",
+    "logicalContractId": "portaldot-v3-native-asset-7777",
+    "nativeAsset": {
+      "assetId": "7777",
+      "holder": "asset-owner-at-checkpoint"
+    }
+  },
+  "planHash": "cea204c3baed44623d942252664b0617d7d07cd88dacb6a8bacd9a1b947f31e2",
+  "environment": {
+    "chainId": "420420777",
+    "genesisHash": "0xd4f9acbcf7f52388d8b095abe3c198d19fc510e0343e643e87cfbccb155283bd",
+    "specName": "portaldot-v3",
+    "specVersion": "3002",
+    "transactionVersion": "2",
+    "stateVersion": "1",
+    "constantsHash": "0xfb9b71dc034742bb9df2ee1e1e6c3a0f4e734b75898b7291ef8806a4b1e2b759"
+  },
+  "environmentHash": "585d0c8da2b0137796aea6acd09e814d8d2b970f5ec3bba917f9a010fa2c48d0",
+  "checkpoint": {
+    "number": "157790",
+    "nativeHash": "0x421a987d96acf7f7b644aaf8e951817bbbb96ea5e13452df45f28a617f4dc8b2",
+    "evmHash": "0xf048f606e637e2d82df0c787aa60ebc3ec99dc6eb71d5de86c59d6525bf38785"
+  },
+  "status": "passed",
+  "checkSummary": {
+    "passed": 3,
+    "total": 3
+  },
+  "caveat": "This is a current observed testnet baseline, not proof of pre-upgrade chronology. Changed runtime context does not prove an application repair. No signing, publishing, review inheritance, or automatic baseline replacement is performed.",
+  "manifestHash": "8ba98add262983bd22ceb9a33aab15ec19d8a863aedcfea6020ecc30cd1f1fc1"
+}

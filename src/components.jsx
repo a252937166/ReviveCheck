@@ -1,5 +1,6 @@
 import React from 'react';
 import { CheckCheck, CircleCheck, CircleAlert, CircleDashed, Clock3, ChevronDown, Code2, RotateCcw, Radio, FlaskConical, ArrowRight, GitCompareArrows, LoaderCircle } from 'lucide-react';
+import ExplorerEvidence from './ExplorerEvidence.jsx';
 
 export const labels = { passed:'Passed', failed:'Failed', blocked:'Blocked', unknown:'Unknown', inconclusive:'Inconclusive', accepted:'Accepted', 'changes-requested':'Changes requested', sample:'Sample', unreviewed:'Not reviewed', 'share-prepared':'Share prepared', 'not-shared':'Not shared', 'current-snapshot':'Snapshot saved', 'plan-changed':'Plan changed', 'release-changed':'Release changed', 'target-changed':'Target changed', 'environment-changed':'Environment changed' };
 export const text = value => value === null || value === undefined || value === '' ? 'Not supplied' : typeof value === 'object' ? JSON.stringify(value) : String(value);
@@ -33,6 +34,7 @@ export function ReportCard({run,actions,integrity=false}) {
     <div className="report-meta"><span>{date(run.completedAt || run.startedAt)}</span><span>{run.checks.filter(item=>item.status==='passed').length}/{run.checks.length} checks passed</span><Pill status={run.status}/></div>
     <div className="checkpoint-row"><span>Checkpoint <strong>{run.network?.finalizedBlockNumber ? `#${run.network.finalizedBlockNumber}` : 'Not established'}</strong></span><span>Runtime <strong>{run.network?.specVersion || 'Not recorded'}</strong></span>{integrity && <span className="integrity-good"><CircleCheck size={13}/> JSON fingerprint matches</span>}</div>
     <CheckLedger checks={run.checks}/>
+    <ExplorerEvidence run={run}/>
     <details className="limitations"><summary><CircleAlert size={14}/> Evidence scope & limitations<ChevronDown size={14}/></summary><p>A matching fingerprint detects content changes. It does not authenticate RPC responses, the project owner, or the reviewer.</p><ul>{(run.limitations || []).map((item,index)=><li key={index}>{text(item)}</li>)}</ul></details>
     <details className="saved-plan"><summary><Code2 size={14}/> Saved acceptance plan<ChevronDown size={14}/></summary><pre>{JSON.stringify(run.input,null,2)}</pre></details>
     <div className="report-footer"><div className="evidence-hash"><span>Report SHA-256</span><code title={run.evidenceHash}>{short(run.evidenceHash,30)}</code></div>{actions}</div>

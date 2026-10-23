@@ -11,7 +11,7 @@ const option = (key, fallback) => { const i = args.indexOf(key); return i < 0 ? 
 const broadcast = args.includes('--broadcast');
 const budgetText = option('--max-cost-tpot', '');
 const journalPath = option('--journal', 'artifacts/local/release-execution.json');
-const reportFile = option('--report-file', 'public/reports/15baa9e1d2e8746bdc94b873e314a3fd839fbd52ecc13dd99470bec8444ba544.json');
+const reportFile = option('--report-file', 'public/reports/0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5.json');
 const sourceReport = JSON.parse(await readFile(reportFile, 'utf8'));
 validateImportedRun(sourceReport);
 const reportHash = `0x${sourceReport.evidenceHash}`;
