@@ -6,6 +6,16 @@
       "release": "runtime-3002",
       "profile": "native-asset",
       "completedAt": "2026-10-23T07:40:57.899Z"
+    },
+    {
+      "evidenceHash": "0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5",
+      "projectName": "Public pUSD native asset compatibility",
+      "release": "runtime-3002",
+      "profile": "native-asset",
+      "completedAt": "2026-10-23T08:17:25.008Z",
+      "role": "upgrade-baseline",
+      "baselineId": "current-2026-10-23"
     }
-  ]
+  ],
+  "currentBaselineReportHash": "0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5"
 }
