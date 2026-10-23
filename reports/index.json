@@ -1,0 +1,11 @@
+{
+  "reports": [
+    {
+      "evidenceHash": "15baa9e1d2e8746bdc94b873e314a3fd839fbd52ecc13dd99470bec8444ba544",
+      "projectName": "Public pUSD native asset compatibility",
+      "release": "runtime-3002",
+      "profile": "native-asset",
+      "completedAt": "2026-10-23T07:40:57.899Z"
+    }
+  ]
+}
