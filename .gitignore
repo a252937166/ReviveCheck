@@ -13,3 +13,4 @@ video/renders/
 artifacts/local/
 *.log
 .DS_Store
+scratchpad/
