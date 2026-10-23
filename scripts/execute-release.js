@@ -3,7 +3,7 @@ import { AbiCoder, Interface } from 'ethers';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { compileReleaseGate } from './compile-release-gate.js';
 import { connectNative, evmRpc, assertTestnet, NETWORK, availableNativeBalance, formatNative, parseTokenAmount, inspectChain } from '../lib/chain.js';
-import { loadTestnetSigner, assertDryRun, sendFinalized } from '../lib/execution.js';
+import { loadTestnetSigner, assertDryRun, sendFinalized, recordFinalizedNativeFee } from '../lib/execution.js';
 import { sealRun, overall, validateImportedRun } from '../lib/report.js';
 
 const args = process.argv.slice(2);
@@ -76,19 +76,10 @@ try {
       committed += cost;
       journal.estimatedCommittedRaw = committed.toString();
       journal.stages.push({ ...summary, ...receipt });
-      const feeEvent = receipt.events.find(event => event.section === 'transactionPayment' && event.method === 'TransactionFeePaid');
-      const actualFee = feeEvent?.data?.[1];
-      if (typeof actualFee === 'string' && /^\d+$/.test(actualFee)) {
-        journal.actualNativeFeesRaw = (BigInt(journal.actualNativeFeesRaw || '0') + BigInt(actualFee)).toString();
-        journal.stages.at(-1).actualNativeFeeRaw = actualFee;
-        if (BigInt(actualFee) > feeReserve) journal.budgetNeedsReconciliation = true;
-      } else {
-        journal.actualFeeNeedsReconciliation = true;
-      }
+      const feeStopReason = recordFinalizedNativeFee(journal, receipt, feeReserve);
       delete journal.pending;
       await saveJournal();
-      if (journal.actualFeeNeedsReconciliation) throw new Error('Finalized transaction saved, but actual native fee evidence is missing. Reconcile the receipt before sending another transaction.');
-      if (BigInt(actualFee) > feeReserve) throw new Error('Finalized transaction saved; actual native fee exceeded its conservative reserve. Reconcile the cumulative budget before continuing.');
+      if (feeStopReason) throw new Error(feeStopReason);
       return receipt;
     }
     if (!journal.contractAddress) {
