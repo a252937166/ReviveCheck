@@ -1,0 +1,116 @@
+{
+  "scope": "portaldot-testnet-readonly",
+  "checkedAt": "2026-10-23T04:23:47.329Z",
+  "input": {
+    "account": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+    "contractAddress": "",
+    "expectedValue": "42",
+    "expectedChainId": 420420777,
+    "transactionHash": "",
+    "transactionBlockHash": ""
+  },
+  "checks": [
+    {
+      "id": "network.chain-id",
+      "title": "Expected testnet identity",
+      "status": "passed",
+      "observed": "EVM and native runtime identify 420420777; pinned native genesis matches",
+      "expected": "420420777",
+      "remediation": "",
+      "evidence": {
+        "evmChainIdHex": "0x190f1ca9",
+        "nativeGenesisHash": "0xd4f9acbcf7f52388d8b095abe3c198d19fc510e0343e643e87cfbccb155283bd",
+        "nativeRuntimeChainId": "420420777"
+      }
+    },
+    {
+      "id": "network.finalized",
+      "title": "Finalized cross-interface checkpoint",
+      "status": "passed",
+      "observed": "Both interfaces resolve finalized block 155464",
+      "expected": "One canonical finalized checkpoint across the two interfaces",
+      "remediation": "",
+      "evidence": {
+        "nativeBlockHash": "0xbd8aa9acdf09a497e7be679722974ba793e434df8897e4b80d85e06857a8d0f8",
+        "nativeBlockNumber": "155464",
+        "evmBlockHash": "0x7e2f38adb1a6fe86504825be34a4060d025009485597f204b8666ae3df2ee0af",
+        "runtimeEvmBlockHash": "0x7e2f38adb1a6fe86504825be34a4060d025009485597f204b8666ae3df2ee0af"
+      }
+    },
+    {
+      "id": "account.mapping",
+      "title": "Native / EVM account mapping",
+      "status": "blocked",
+      "observed": "Runtime mapping does not round-trip to the supplied native account",
+      "expected": "A chain-resolved native / EVM account pair",
+      "remediation": "The native account needs on-chain mapping before it can be used as the same EVM caller.",
+      "evidence": {
+        "nativeAccount": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+        "evmAccount": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+        "source": "ReviveApi.account_id / address",
+        "checkpoint": "0xbd8aa9acdf09a497e7be679722974ba793e434df8897e4b80d85e06857a8d0f8"
+      }
+    },
+    {
+      "id": "account.balance",
+      "title": "Test-token funding",
+      "status": "blocked",
+      "observed": "0 tPOT available on the native account",
+      "expected": "Nonzero available test-token balance",
+      "remediation": "Request tPOT from the official Discord support flow using this native address.",
+      "evidence": {
+        "nativeAccount": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+        "nativeFreeRaw": "0",
+        "nativeFrozenRaw": "0",
+        "nativeAvailableRaw": "0",
+        "nativeDecimals": 14,
+        "nativeSymbol": "tPOT",
+        "evmBalanceRaw": "0x0",
+        "nativeToEthRatio": "10000",
+        "checkpoint": "0xbd8aa9acdf09a497e7be679722974ba793e434df8897e4b80d85e06857a8d0f8"
+      }
+    },
+    {
+      "id": "contract.code",
+      "title": "Deployed contract code",
+      "status": "blocked",
+      "observed": "No contract address supplied",
+      "expected": "Nonempty deployed code on Portaldot V3 testnet",
+      "remediation": "Deploy ReviveProbe and save the resulting contract address."
+    },
+    {
+      "id": "contract.value",
+      "title": "Cross-interface value assertion",
+      "status": "blocked",
+      "observed": "No contract address supplied",
+      "expected": "Both interfaces return value() = 42",
+      "remediation": "Deploy the probe and configure its expected value."
+    },
+    {
+      "id": "transaction.finality",
+      "title": "Finalized contract transaction",
+      "status": "blocked",
+      "observed": "No transaction hash supplied",
+      "expected": "A successful transaction for this contract in a canonical finalized block",
+      "remediation": "Deploy or update the probe, then save its transaction hash and native block hash."
+    }
+  ],
+  "network": {
+    "name": "Portaldot V3 Testnet",
+    "chainId": 420420777,
+    "evmRpcUrl": "https://test-evm-rpc-v3.portaldot.dev",
+    "substrateRpcUrl": "wss://test-node-v3.portaldot.dev",
+    "genesisHash": "0xd4f9acbcf7f52388d8b095abe3c198d19fc510e0343e643e87cfbccb155283bd",
+    "observedChainId": 420420777,
+    "nativeGenesisHash": "0xd4f9acbcf7f52388d8b095abe3c198d19fc510e0343e643e87cfbccb155283bd",
+    "specVersion": "3002",
+    "finalizedBlockNumber": "155464",
+    "finalizedNativeBlockHash": "0xbd8aa9acdf09a497e7be679722974ba793e434df8897e4b80d85e06857a8d0f8",
+    "finalizedEvmBlockHash": "0x7e2f38adb1a6fe86504825be34a4060d025009485597f204b8666ae3df2ee0af"
+  },
+  "limitations": [
+    "Read-only verification does not sign, deploy, or prove a complete product flow.",
+    "A funded balance does not prove that deployment fees and storage deposits are affordable.",
+    "Transaction evidence associates the project sender and contract; it does not prove that this historical transaction caused the currently observed value."
+  ]
+}

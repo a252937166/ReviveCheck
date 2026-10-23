@@ -1,0 +1,28 @@
+1
+00:00:00,000 --> 00:00:08,000
+One project. The original failure. A comparable rerun.
+
+2
+00:00:08,000 --> 00:00:20,000
+Catch the wrong network before marking the plan ready.
+Local rehearsal — synthetic fixtures.
+
+3
+00:00:20,000 --> 00:00:32,000
+The rehearsal passes. Testnet deployment remains unproven.
+Local rehearsal — synthetic fixtures.
+
+4
+00:00:32,000 --> 00:00:50,000
+Compare the same target.
+Separate configuration correction from execution proof.
+
+5
+00:00:50,000 --> 00:01:06,000
+Live queries expose missing evidence.
+Blocked checks stay blocked.
+
+6
+00:01:06,000 --> 00:01:18,000
+Export the report.
+Signed testnet deployment is still pending.

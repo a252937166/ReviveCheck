@@ -1,0 +1,10 @@
+{
+  "name": "My V3 migration",
+  "release": "v0.1.0",
+  "expectedChainId": 420420777,
+  "account": "",
+  "contractAddress": "",
+  "expectedValue": "42",
+  "transactionHash": "",
+  "transactionBlockHash": ""
+}
