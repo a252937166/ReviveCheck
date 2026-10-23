@@ -15,6 +15,23 @@
       "completedAt": "2026-10-23T08:17:25.008Z",
       "role": "upgrade-baseline",
       "baselineId": "current-2026-10-23"
+    },
+    {
+      "evidenceHash": "9dd04e0685d06a1a9a0525b2b8d6ac4b259d1618184789f345a7be5e55ae0645",
+      "projectName": "ReviveCheck release gate",
+      "release": "v0.2.0",
+      "profile": "contract",
+      "completedAt": "2026-10-23T13:28:08.379Z",
+      "role": "application-execution"
+    },
+    {
+      "evidenceHash": "151097f8e765e0d56e4ca3979787b6612c84808dcc44604c11dabe93e523eb36",
+      "projectName": "ReviveCheck release gate",
+      "release": "v0.2.0",
+      "profile": "contract",
+      "completedAt": "2026-10-23T13:34:10.197Z",
+      "role": "manual-recheck",
+      "previousReportHash": "9dd04e0685d06a1a9a0525b2b8d6ac4b259d1618184789f345a7be5e55ae0645"
     }
   ],
   "currentBaselineReportHash": "0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5"
