@@ -1,0 +1,9 @@
+{
+  "name": "ReviveCheck isolated V3 testnet development",
+  "network": "portaldot-v3-testnet",
+  "type": "sr25519",
+  "ss58Format": 42,
+  "ss58Address": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+  "publicKey": "0xba6a4dbe0bb8345aebab0800131bdae6fdc994a411f27b6603c88bcf4c508b68",
+  "createdAt": "2026-10-23T04:12:04.574Z"
+}

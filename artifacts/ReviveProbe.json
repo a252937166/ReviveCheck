@@ -1,0 +1,110 @@
+{
+  "contractName": "ReviveProbe",
+  "compiler": "0.8.24+commit.e11b9ed9.Emscripten.clang",
+  "target": "evm-paris",
+  "optimizerRuns": 200,
+  "sourceSha256": "6645467766b2963fbebb89a88a03446fc823635ff4f9787e7ed6c46305e8b103",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "initialValue",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "UnauthorizedCaller",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "caller",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "previousValue",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "nextValue",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "revision",
+          "type": "uint256"
+        }
+      ],
+      "name": "ValueChanged",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "revision",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "nextValue",
+          "type": "uint256"
+        }
+      ],
+      "name": "setValue",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "value",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x60a060405234801561001057600080fd5b5060405161026c38038061026c83398101604081905261002f9161003b565b33608052600055610054565b60006020828403121561004d57600080fd5b5051919050565b6080516101f8610074600039600081816090015260d501526101f86000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c80633fa4f24514610051578063552410771461006d5780637cc96380146100825780638da5cb5b1461008b575b600080fd5b61005a60005481565b6040519081526020015b60405180910390f35b61008061007b366004610182565b6100ca565b005b61005a60015481565b6100b27f000000000000000000000000000000000000000000000000000000000000000081565b6040516001600160a01b039091168152602001610064565b336001600160a01b037f0000000000000000000000000000000000000000000000000000000000000000161461011357604051635c427cd960e01b815260040160405180910390fd5b600080549050816000819055506001806000828254610132919061019b565b909155505060015460408051838152602081018590529081019190915233907fb485dddf4584d4931927aeccc95476c87e02c5b136fb4fbbac317b823d9a522c9060600160405180910390a25050565b60006020828403121561019457600080fd5b5035919050565b808201808211156101bc57634e487b7160e01b600052601160045260246000fd5b9291505056fea2646970667358221220eb4ba497814391af9fbcb6419f4f20fc9b295bdbe8f00bc7c5e4843999c9865164736f6c63430008180033",
+  "deployedBytecodeTemplate": "0x608060405234801561001057600080fd5b506004361061004c5760003560e01c80633fa4f24514610051578063552410771461006d5780637cc96380146100825780638da5cb5b1461008b575b600080fd5b61005a60005481565b6040519081526020015b60405180910390f35b61008061007b366004610182565b6100ca565b005b61005a60015481565b6100b27f000000000000000000000000000000000000000000000000000000000000000081565b6040516001600160a01b039091168152602001610064565b336001600160a01b037f0000000000000000000000000000000000000000000000000000000000000000161461011357604051635c427cd960e01b815260040160405180910390fd5b600080549050816000819055506001806000828254610132919061019b565b909155505060015460408051838152602081018590529081019190915233907fb485dddf4584d4931927aeccc95476c87e02c5b136fb4fbbac317b823d9a522c9060600160405180910390a25050565b60006020828403121561019457600080fd5b5035919050565b808201808211156101bc57634e487b7160e01b600052601160045260246000fd5b9291505056fea2646970667358221220eb4ba497814391af9fbcb6419f4f20fc9b295bdbe8f00bc7c5e4843999c9865164736f6c63430008180033"
+}
