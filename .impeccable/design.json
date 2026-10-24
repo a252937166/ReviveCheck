@@ -1,0 +1,1157 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-24T12:00:00.000Z",
+  "title": "Design System: ReviveCheck",
+  "extensions": {
+    "colorMeta": {
+      "accent": {
+        "role": "primary",
+        "displayName": "Indigo",
+        "canonical": "oklch(54.7% 0.251 270.9)",
+        "tonalRamp": [
+          "oklch(15% 0.251 270.9)",
+          "oklch(26% 0.251 270.9)",
+          "oklch(37% 0.251 270.9)",
+          "oklch(48% 0.251 270.9)",
+          "oklch(59% 0.251 270.9)",
+          "oklch(70% 0.251 270.9)",
+          "oklch(82% 0.251 270.9)",
+          "oklch(95% 0.030 270.9)"
+        ]
+      },
+      "accent-hover": {
+        "role": "primary",
+        "displayName": "Deep Indigo",
+        "canonical": "oklch(47.6% 0.240 269.4)",
+        "tonalRamp": [
+          "oklch(15% 0.240 269.4)",
+          "oklch(26% 0.240 269.4)",
+          "oklch(37% 0.240 269.4)",
+          "oklch(48% 0.240 269.4)",
+          "oklch(59% 0.240 269.4)",
+          "oklch(70% 0.240 269.4)",
+          "oklch(82% 0.240 269.4)",
+          "oklch(95% 0.030 269.4)"
+        ]
+      },
+      "accent-soft": {
+        "role": "primary",
+        "displayName": "Indigo Wash",
+        "canonical": "oklch(95.8% 0.020 279.9)",
+        "tonalRamp": [
+          "oklch(15% 0.020 279.9)",
+          "oklch(26% 0.020 279.9)",
+          "oklch(37% 0.020 279.9)",
+          "oklch(48% 0.020 279.9)",
+          "oklch(59% 0.020 279.9)",
+          "oklch(70% 0.020 279.9)",
+          "oklch(82% 0.020 279.9)",
+          "oklch(95% 0.020 279.9)"
+        ]
+      },
+      "accent-ink": {
+        "role": "primary",
+        "displayName": "Indigo Ink",
+        "canonical": "oklch(43.7% 0.220 269.7)",
+        "tonalRamp": [
+          "oklch(15% 0.220 269.7)",
+          "oklch(26% 0.220 269.7)",
+          "oklch(37% 0.220 269.7)",
+          "oklch(48% 0.220 269.7)",
+          "oklch(59% 0.220 269.7)",
+          "oklch(70% 0.220 269.7)",
+          "oklch(82% 0.220 269.7)",
+          "oklch(95% 0.030 269.7)"
+        ],
+        "note": "Text on indigo wash: the App tag, the current sidebar item, product tags, the stored chip."
+      },
+      "pd-violet": {
+        "role": "secondary",
+        "displayName": "Portaldot Violet",
+        "canonical": "oklch(49.3% 0.260 289.7)",
+        "tonalRamp": [
+          "oklch(15% 0.260 289.7)",
+          "oklch(26% 0.260 289.7)",
+          "oklch(37% 0.260 289.7)",
+          "oklch(48% 0.260 289.7)",
+          "oklch(59% 0.260 289.7)",
+          "oklch(70% 0.260 289.7)",
+          "oklch(82% 0.260 289.7)",
+          "oklch(95% 0.030 289.7)"
+        ],
+        "note": "Start of the --portaldot gradient (violet, #4148f5 at 55%, azure): glows, the co-brand dot, live progress, the closing band."
+      },
+      "pd-azure": {
+        "role": "secondary",
+        "displayName": "Portaldot Azure",
+        "canonical": "oklch(58.9% 0.225 260.3)",
+        "tonalRamp": [
+          "oklch(15% 0.225 260.3)",
+          "oklch(26% 0.225 260.3)",
+          "oklch(37% 0.225 260.3)",
+          "oklch(48% 0.225 260.3)",
+          "oklch(59% 0.225 260.3)",
+          "oklch(70% 0.225 260.3)",
+          "oklch(82% 0.225 260.3)",
+          "oklch(95% 0.030 260.3)"
+        ],
+        "note": "End of the --portaldot gradient."
+      },
+      "live-ink": {
+        "role": "secondary",
+        "displayName": "Live Ink",
+        "canonical": "oklch(38.0% 0.178 293.7)",
+        "tonalRamp": [
+          "oklch(15% 0.178 293.7)",
+          "oklch(26% 0.178 293.7)",
+          "oklch(37% 0.178 293.7)",
+          "oklch(48% 0.178 293.7)",
+          "oklch(59% 0.178 293.7)",
+          "oklch(70% 0.178 293.7)",
+          "oklch(82% 0.178 293.7)",
+          "oklch(95% 0.030 293.7)"
+        ]
+      },
+      "band": {
+        "role": "tertiary",
+        "displayName": "Band",
+        "canonical": "oklch(15.1% 0.004 285.9)",
+        "tonalRamp": [
+          "oklch(15% 0.004 285.9)",
+          "oklch(26% 0.004 285.9)",
+          "oklch(37% 0.004 285.9)",
+          "oklch(48% 0.004 285.9)",
+          "oklch(59% 0.004 285.9)",
+          "oklch(70% 0.004 285.9)",
+          "oklch(82% 0.004 285.9)",
+          "oklch(95% 0.004 285.9)"
+        ],
+        "note": "The one dark surface family: rules band, lifecycle panel, wallet card."
+      },
+      "band-2": {
+        "role": "tertiary",
+        "displayName": "Band 2",
+        "canonical": "oklch(20.1% 0.008 274.5)",
+        "tonalRamp": [
+          "oklch(15% 0.008 274.5)",
+          "oklch(26% 0.008 274.5)",
+          "oklch(37% 0.008 274.5)",
+          "oklch(48% 0.008 274.5)",
+          "oklch(59% 0.008 274.5)",
+          "oklch(70% 0.008 274.5)",
+          "oklch(82% 0.008 274.5)",
+          "oklch(95% 0.008 274.5)"
+        ],
+        "note": "Rule cards on the band, at 85%."
+      },
+      "band-accent": {
+        "role": "tertiary",
+        "displayName": "Band Accent",
+        "canonical": "oklch(71.0% 0.153 277.2)",
+        "tonalRamp": [
+          "oklch(15% 0.153 277.2)",
+          "oklch(26% 0.153 277.2)",
+          "oklch(37% 0.153 277.2)",
+          "oklch(48% 0.153 277.2)",
+          "oklch(59% 0.153 277.2)",
+          "oklch(70% 0.153 277.2)",
+          "oklch(82% 0.153 277.2)",
+          "oklch(95% 0.030 277.2)"
+        ],
+        "note": "Bullets and hovered links on the band."
+      },
+      "ground": {
+        "role": "neutral",
+        "displayName": "Ground",
+        "canonical": "oklch(97.3% 0.003 264.5)",
+        "tonalRamp": [
+          "oklch(15% 0.003 264.5)",
+          "oklch(26% 0.003 264.5)",
+          "oklch(37% 0.003 264.5)",
+          "oklch(48% 0.003 264.5)",
+          "oklch(59% 0.003 264.5)",
+          "oklch(70% 0.003 264.5)",
+          "oklch(82% 0.003 264.5)",
+          "oklch(95% 0.003 264.5)"
+        ],
+        "note": "The page behind everything; never white."
+      },
+      "bg": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "oklch(15% 0.000 0.0)",
+          "oklch(26% 0.000 0.0)",
+          "oklch(37% 0.000 0.0)",
+          "oklch(48% 0.000 0.0)",
+          "oklch(59% 0.000 0.0)",
+          "oklch(70% 0.000 0.0)",
+          "oklch(82% 0.000 0.0)",
+          "oklch(95% 0.000 0.0)"
+        ]
+      },
+      "bg-subtle": {
+        "role": "neutral",
+        "displayName": "Paper Subtle",
+        "canonical": "oklch(98.5% 0.001 0.0)",
+        "tonalRamp": [
+          "oklch(15% 0.001 0.0)",
+          "oklch(26% 0.001 0.0)",
+          "oklch(37% 0.001 0.0)",
+          "oklch(48% 0.001 0.0)",
+          "oklch(59% 0.001 0.0)",
+          "oklch(70% 0.001 0.0)",
+          "oklch(82% 0.001 0.0)",
+          "oklch(95% 0.001 0.0)"
+        ]
+      },
+      "bg-muted": {
+        "role": "neutral",
+        "displayName": "Paper Muted",
+        "canonical": "oklch(95.8% 0.004 271.4)",
+        "tonalRamp": [
+          "oklch(15% 0.004 271.4)",
+          "oklch(26% 0.004 271.4)",
+          "oklch(37% 0.004 271.4)",
+          "oklch(48% 0.004 271.4)",
+          "oklch(59% 0.004 271.4)",
+          "oklch(70% 0.004 271.4)",
+          "oklch(82% 0.004 271.4)",
+          "oklch(95% 0.004 271.4)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(93.1% 0.006 264.5)",
+        "tonalRamp": [
+          "oklch(15% 0.006 264.5)",
+          "oklch(26% 0.006 264.5)",
+          "oklch(37% 0.006 264.5)",
+          "oklch(48% 0.006 264.5)",
+          "oklch(59% 0.006 264.5)",
+          "oklch(70% 0.006 264.5)",
+          "oklch(82% 0.006 264.5)",
+          "oklch(95% 0.006 264.5)"
+        ]
+      },
+      "line-strong": {
+        "role": "neutral",
+        "displayName": "Strong Hairline",
+        "canonical": "oklch(87.9% 0.010 267.4)",
+        "tonalRamp": [
+          "oklch(15% 0.010 267.4)",
+          "oklch(26% 0.010 267.4)",
+          "oklch(37% 0.010 267.4)",
+          "oklch(48% 0.010 267.4)",
+          "oklch(59% 0.010 267.4)",
+          "oklch(70% 0.010 267.4)",
+          "oklch(82% 0.010 267.4)",
+          "oklch(95% 0.010 267.4)"
+        ]
+      },
+      "line-hover": {
+        "role": "neutral",
+        "displayName": "Hover Hairline",
+        "canonical": "oklch(81.7% 0.013 266.7)",
+        "tonalRamp": [
+          "oklch(15% 0.013 266.7)",
+          "oklch(26% 0.013 266.7)",
+          "oklch(37% 0.013 266.7)",
+          "oklch(48% 0.013 266.7)",
+          "oklch(59% 0.013 266.7)",
+          "oklch(70% 0.013 266.7)",
+          "oklch(82% 0.013 266.7)",
+          "oklch(95% 0.013 266.7)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "oklch(15.5% 0.007 271.0)",
+        "tonalRamp": [
+          "oklch(15% 0.007 271.0)",
+          "oklch(26% 0.007 271.0)",
+          "oklch(37% 0.007 271.0)",
+          "oklch(48% 0.007 271.0)",
+          "oklch(59% 0.007 271.0)",
+          "oklch(70% 0.007 271.0)",
+          "oklch(82% 0.007 271.0)",
+          "oklch(95% 0.007 271.0)"
+        ]
+      },
+      "ink-hover": {
+        "role": "neutral",
+        "displayName": "Ink Hover",
+        "canonical": "oklch(26.4% 0.014 267.0)",
+        "tonalRamp": [
+          "oklch(15% 0.014 267.0)",
+          "oklch(26% 0.014 267.0)",
+          "oklch(37% 0.014 267.0)",
+          "oklch(48% 0.014 267.0)",
+          "oklch(59% 0.014 267.0)",
+          "oklch(70% 0.014 267.0)",
+          "oklch(82% 0.014 267.0)",
+          "oklch(95% 0.014 267.0)"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Ink 2",
+        "canonical": "oklch(36.7% 0.016 266.5)",
+        "tonalRamp": [
+          "oklch(15% 0.016 266.5)",
+          "oklch(26% 0.016 266.5)",
+          "oklch(37% 0.016 266.5)",
+          "oklch(48% 0.016 266.5)",
+          "oklch(59% 0.016 266.5)",
+          "oklch(70% 0.016 266.5)",
+          "oklch(82% 0.016 266.5)",
+          "oklch(95% 0.016 266.5)"
+        ]
+      },
+      "ink-3": {
+        "role": "neutral",
+        "displayName": "Ink 3",
+        "canonical": "oklch(52.3% 0.020 264.4)",
+        "tonalRamp": [
+          "oklch(15% 0.020 264.4)",
+          "oklch(26% 0.020 264.4)",
+          "oklch(37% 0.020 264.4)",
+          "oklch(48% 0.020 264.4)",
+          "oklch(59% 0.020 264.4)",
+          "oklch(70% 0.020 264.4)",
+          "oklch(82% 0.020 264.4)",
+          "oklch(95% 0.020 264.4)"
+        ]
+      },
+      "ink-4": {
+        "role": "neutral",
+        "displayName": "Ink 4",
+        "canonical": "oklch(70.4% 0.017 262.7)",
+        "tonalRamp": [
+          "oklch(15% 0.017 262.7)",
+          "oklch(26% 0.017 262.7)",
+          "oklch(37% 0.017 262.7)",
+          "oklch(48% 0.017 262.7)",
+          "oklch(59% 0.017 262.7)",
+          "oklch(70% 0.017 262.7)",
+          "oklch(82% 0.017 262.7)",
+          "oklch(95% 0.017 262.7)"
+        ]
+      },
+      "pass": {
+        "role": "state",
+        "displayName": "Pass Green",
+        "canonical": "oklch(52.7% 0.137 150.1)",
+        "tonalRamp": [
+          "oklch(15% 0.137 150.1)",
+          "oklch(26% 0.137 150.1)",
+          "oklch(37% 0.137 150.1)",
+          "oklch(48% 0.137 150.1)",
+          "oklch(59% 0.137 150.1)",
+          "oklch(70% 0.137 150.1)",
+          "oklch(82% 0.137 150.1)",
+          "oklch(95% 0.030 150.1)"
+        ]
+      },
+      "pass-soft": {
+        "role": "state",
+        "displayName": "Pass Wash",
+        "canonical": "oklch(97.7% 0.016 156.9)",
+        "tonalRamp": [
+          "oklch(15% 0.016 156.9)",
+          "oklch(26% 0.016 156.9)",
+          "oklch(37% 0.016 156.9)",
+          "oklch(48% 0.016 156.9)",
+          "oklch(59% 0.016 156.9)",
+          "oklch(70% 0.016 156.9)",
+          "oklch(82% 0.016 156.9)",
+          "oklch(95% 0.016 156.9)"
+        ]
+      },
+      "pass-line": {
+        "role": "state",
+        "displayName": "Pass Line",
+        "canonical": "oklch(89.4% 0.057 155.2)",
+        "tonalRamp": [
+          "oklch(15% 0.057 155.2)",
+          "oklch(26% 0.057 155.2)",
+          "oklch(37% 0.057 155.2)",
+          "oklch(48% 0.057 155.2)",
+          "oklch(59% 0.057 155.2)",
+          "oklch(70% 0.057 155.2)",
+          "oklch(82% 0.057 155.2)",
+          "oklch(95% 0.030 155.2)"
+        ]
+      },
+      "pass-diff": {
+        "role": "state",
+        "displayName": "Pass Diff",
+        "canonical": "oklch(44.4% 0.111 150.6)",
+        "tonalRamp": [
+          "oklch(15% 0.111 150.6)",
+          "oklch(26% 0.111 150.6)",
+          "oklch(37% 0.111 150.6)",
+          "oklch(48% 0.111 150.6)",
+          "oklch(59% 0.111 150.6)",
+          "oklch(70% 0.111 150.6)",
+          "oklch(82% 0.111 150.6)",
+          "oklch(95% 0.030 150.6)"
+        ],
+        "note": "Added diff lines and the read-only lane tag's text."
+      },
+      "fail": {
+        "role": "state",
+        "displayName": "Fail Red",
+        "canonical": "oklch(57.6% 0.209 29.5)",
+        "tonalRamp": [
+          "oklch(15% 0.209 29.5)",
+          "oklch(26% 0.209 29.5)",
+          "oklch(37% 0.209 29.5)",
+          "oklch(48% 0.209 29.5)",
+          "oklch(59% 0.209 29.5)",
+          "oklch(70% 0.209 29.5)",
+          "oklch(82% 0.209 29.5)",
+          "oklch(95% 0.030 29.5)"
+        ]
+      },
+      "fail-soft": {
+        "role": "state",
+        "displayName": "Fail Wash",
+        "canonical": "oklch(97.2% 0.012 23.7)",
+        "tonalRamp": [
+          "oklch(15% 0.012 23.7)",
+          "oklch(26% 0.012 23.7)",
+          "oklch(37% 0.012 23.7)",
+          "oklch(48% 0.012 23.7)",
+          "oklch(59% 0.012 23.7)",
+          "oklch(70% 0.012 23.7)",
+          "oklch(82% 0.012 23.7)",
+          "oklch(95% 0.012 23.7)"
+        ]
+      },
+      "fail-line": {
+        "role": "state",
+        "displayName": "Fail Line",
+        "canonical": "oklch(87.5% 0.054 25.3)",
+        "tonalRamp": [
+          "oklch(15% 0.054 25.3)",
+          "oklch(26% 0.054 25.3)",
+          "oklch(37% 0.054 25.3)",
+          "oklch(48% 0.054 25.3)",
+          "oklch(59% 0.054 25.3)",
+          "oklch(70% 0.054 25.3)",
+          "oklch(82% 0.054 25.3)",
+          "oklch(95% 0.030 25.3)"
+        ]
+      },
+      "fail-ink": {
+        "role": "state",
+        "displayName": "Fail Ink",
+        "canonical": "oklch(42.5% 0.151 29.4)",
+        "tonalRamp": [
+          "oklch(15% 0.151 29.4)",
+          "oklch(26% 0.151 29.4)",
+          "oklch(37% 0.151 29.4)",
+          "oklch(48% 0.151 29.4)",
+          "oklch(59% 0.151 29.4)",
+          "oklch(70% 0.151 29.4)",
+          "oklch(82% 0.151 29.4)",
+          "oklch(95% 0.030 29.4)"
+        ]
+      },
+      "fail-diff": {
+        "role": "state",
+        "displayName": "Fail Diff",
+        "canonical": "oklch(45.5% 0.167 29.6)",
+        "tonalRamp": [
+          "oklch(15% 0.167 29.6)",
+          "oklch(26% 0.167 29.6)",
+          "oklch(37% 0.167 29.6)",
+          "oklch(48% 0.167 29.6)",
+          "oklch(59% 0.167 29.6)",
+          "oklch(70% 0.167 29.6)",
+          "oklch(82% 0.167 29.6)",
+          "oklch(95% 0.030 29.6)"
+        ]
+      },
+      "hold": {
+        "role": "state",
+        "displayName": "Hold Amber",
+        "canonical": "oklch(55.5% 0.146 49.0)",
+        "tonalRamp": [
+          "oklch(15% 0.146 49.0)",
+          "oklch(26% 0.146 49.0)",
+          "oklch(37% 0.146 49.0)",
+          "oklch(48% 0.146 49.0)",
+          "oklch(59% 0.146 49.0)",
+          "oklch(70% 0.146 49.0)",
+          "oklch(82% 0.146 49.0)",
+          "oklch(95% 0.030 49.0)"
+        ]
+      },
+      "hold-soft": {
+        "role": "state",
+        "displayName": "Hold Wash",
+        "canonical": "oklch(98.1% 0.019 83.1)",
+        "tonalRamp": [
+          "oklch(15% 0.019 83.1)",
+          "oklch(26% 0.019 83.1)",
+          "oklch(37% 0.019 83.1)",
+          "oklch(48% 0.019 83.1)",
+          "oklch(59% 0.019 83.1)",
+          "oklch(70% 0.019 83.1)",
+          "oklch(82% 0.019 83.1)",
+          "oklch(95% 0.019 83.1)"
+        ]
+      },
+      "hold-line": {
+        "role": "state",
+        "displayName": "Hold Line",
+        "canonical": "oklch(90.4% 0.072 84.0)",
+        "tonalRamp": [
+          "oklch(15% 0.072 84.0)",
+          "oklch(26% 0.072 84.0)",
+          "oklch(37% 0.072 84.0)",
+          "oklch(48% 0.072 84.0)",
+          "oklch(59% 0.072 84.0)",
+          "oklch(70% 0.072 84.0)",
+          "oklch(82% 0.072 84.0)",
+          "oklch(95% 0.030 84.0)"
+        ]
+      },
+      "code-bg": {
+        "role": "neutral",
+        "displayName": "Code Black",
+        "canonical": "oklch(15.1% 0.004 285.9)",
+        "tonalRamp": [
+          "oklch(15% 0.004 285.9)",
+          "oklch(26% 0.004 285.9)",
+          "oklch(37% 0.004 285.9)",
+          "oklch(48% 0.004 285.9)",
+          "oklch(59% 0.004 285.9)",
+          "oklch(70% 0.004 285.9)",
+          "oklch(82% 0.004 285.9)",
+          "oklch(95% 0.004 285.9)"
+        ],
+        "note": "Dark readback panels inside visual and result cards."
+      },
+      "code-ink": {
+        "role": "neutral",
+        "displayName": "Code Ink",
+        "canonical": "oklch(87.1% 0.005 286.3)",
+        "tonalRamp": [
+          "oklch(15% 0.005 286.3)",
+          "oklch(26% 0.005 286.3)",
+          "oklch(37% 0.005 286.3)",
+          "oklch(48% 0.005 286.3)",
+          "oklch(59% 0.005 286.3)",
+          "oklch(70% 0.005 286.3)",
+          "oklch(82% 0.005 286.3)",
+          "oklch(95% 0.005 286.3)"
+        ]
+      },
+      "code-strong": {
+        "role": "neutral",
+        "displayName": "Code Strong",
+        "canonical": "oklch(98.5% 0.000 0.0)",
+        "tonalRamp": [
+          "oklch(15% 0.000 0.0)",
+          "oklch(26% 0.000 0.0)",
+          "oklch(37% 0.000 0.0)",
+          "oklch(48% 0.000 0.0)",
+          "oklch(59% 0.000 0.0)",
+          "oklch(70% 0.000 0.0)",
+          "oklch(82% 0.000 0.0)",
+          "oklch(95% 0.000 0.0)"
+        ]
+      },
+      "code-key": {
+        "role": "neutral",
+        "displayName": "Code Key",
+        "canonical": "oklch(78.5% 0.104 274.7)",
+        "tonalRamp": [
+          "oklch(15% 0.104 274.7)",
+          "oklch(26% 0.104 274.7)",
+          "oklch(37% 0.104 274.7)",
+          "oklch(48% 0.104 274.7)",
+          "oklch(59% 0.104 274.7)",
+          "oklch(70% 0.104 274.7)",
+          "oklch(82% 0.104 274.7)",
+          "oklch(95% 0.030 274.7)"
+        ]
+      },
+      "code-ok": {
+        "role": "state",
+        "displayName": "Code OK",
+        "canonical": "oklch(87.1% 0.136 154.4)",
+        "tonalRamp": [
+          "oklch(15% 0.136 154.4)",
+          "oklch(26% 0.136 154.4)",
+          "oklch(37% 0.136 154.4)",
+          "oklch(48% 0.136 154.4)",
+          "oklch(59% 0.136 154.4)",
+          "oklch(70% 0.136 154.4)",
+          "oklch(82% 0.136 154.4)",
+          "oklch(95% 0.030 154.4)"
+        ]
+      },
+      "code-err": {
+        "role": "state",
+        "displayName": "Code Error",
+        "canonical": "oklch(80.8% 0.103 19.6)",
+        "tonalRamp": [
+          "oklch(15% 0.103 19.6)",
+          "oklch(26% 0.103 19.6)",
+          "oklch(37% 0.103 19.6)",
+          "oklch(48% 0.103 19.6)",
+          "oklch(59% 0.103 19.6)",
+          "oklch(70% 0.103 19.6)",
+          "oklch(82% 0.103 19.6)",
+          "oklch(95% 0.030 19.6)"
+        ]
+      },
+      "code-note": {
+        "role": "neutral",
+        "displayName": "Code Note",
+        "canonical": "oklch(55.2% 0.014 285.9)",
+        "tonalRamp": [
+          "oklch(15% 0.014 285.9)",
+          "oklch(26% 0.014 285.9)",
+          "oklch(37% 0.014 285.9)",
+          "oklch(48% 0.014 285.9)",
+          "oklch(59% 0.014 285.9)",
+          "oklch(70% 0.014 285.9)",
+          "oklch(82% 0.014 285.9)",
+          "oklch(95% 0.014 285.9)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Hero Headline",
+        "purpose": "The hero headline only; Geist 650, three lines at 1440 wide, 12ch."
+      },
+      "headline": {
+        "displayName": "Section Headline",
+        "purpose": "Landing section heads and the rules band's head."
+      },
+      "band-headline": {
+        "displayName": "Band Headline",
+        "purpose": "The closing band's head."
+      },
+      "stats-headline": {
+        "displayName": "Stats Headline",
+        "purpose": "The centered sentence over the stats grid."
+      },
+      "page-title": {
+        "displayName": "Page Title",
+        "purpose": "App page heads and the studio inside the app."
+      },
+      "doc-title": {
+        "displayName": "Doc Title",
+        "purpose": "Docs, reviewer and standalone studio heads."
+      },
+      "feature-title": {
+        "displayName": "Feature Title",
+        "purpose": "The three product rows' headings."
+      },
+      "numeral-xl": {
+        "displayName": "Numeral XL",
+        "purpose": "The live finalized head in the app's hero card, rolling as an odometer."
+      },
+      "numeral": {
+        "displayName": "Numeral",
+        "purpose": "The approval block in the hero's approval card."
+      },
+      "stat": {
+        "displayName": "Stat",
+        "purpose": "The four indigo counters in the stats band."
+      },
+      "tile-numeral": {
+        "displayName": "Tile Numeral",
+        "purpose": "Overview tiles; the lifecycle panel's block number is 1.9rem."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Studio step title, docs section heads, reviewer empty state, create dialog."
+      },
+      "title-md": {
+        "displayName": "Title Medium",
+        "purpose": "The lifecycle panel's stage name; rule cards at 1.1875rem."
+      },
+      "title-sm": {
+        "displayName": "Title Small",
+        "purpose": "Card heads, lifecycle tab items, doors."
+      },
+      "title-xs": {
+        "displayName": "Title Extra Small",
+        "purpose": "Panel headings, the approval card's release name, module and stage names."
+      },
+      "lede": {
+        "displayName": "Lede",
+        "purpose": "The hero subhead in ink-3 at 34rem."
+      },
+      "intro": {
+        "displayName": "Intro",
+        "purpose": "Section-head and rules-band paragraphs, docs ledes."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Default text; descriptive copy at 46 to 72ch."
+      },
+      "ui": {
+        "displayName": "UI",
+        "purpose": "Buttons and arrow links."
+      },
+      "nav": {
+        "displayName": "Nav",
+        "purpose": "Header nav links, mega-item titles, sidebar links, feature bullets, step briefs."
+      },
+      "note": {
+        "displayName": "Note",
+        "purpose": "Descriptions, table cells, key-value lists, form labels, tab text."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Chips, pills, footer links, chain links, labels over numerals, signer lines."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Badges, kind chips, lane tags, table heads, copy buttons. Sentence case, never uppercase."
+      },
+      "wordmark": {
+        "displayName": "Wordmark",
+        "purpose": "ReviveCheck beside the mark in the header, app bar and footer."
+      },
+      "mono": {
+        "displayName": "Chain Mono",
+        "purpose": "Hashes, addresses, block links, mono inputs, contract chips."
+      },
+      "mono-sm": {
+        "displayName": "Chain Mono Small",
+        "purpose": "Stage references, step tags, rail sublines, the cost chip."
+      },
+      "code": {
+        "displayName": "Code",
+        "purpose": "Dark readback panels; light code blocks run 0.8125rem at 1.7."
+      }
+    },
+    "shadows": [
+      {
+        "name": "shadow-sm",
+        "value": "0 1px 2px rgba(11, 12, 15, .04)",
+        "purpose": "Hairline shadow: cards, tiles, panels, stage nodes at rest, secondary buttons, chips, selected tabs, the stats grid."
+      },
+      {
+        "name": "shadow",
+        "value": "0 1px 2px rgba(11, 12, 15, .04), 0 6px 18px -8px rgba(11, 12, 15, .12)",
+        "purpose": "Card shadow: the selected lifecycle tab item, hovered and selected stage nodes."
+      },
+      {
+        "name": "shadow-lg",
+        "value": "0 2px 6px rgba(11, 12, 15, .04), 0 24px 48px -16px rgba(11, 12, 15, .2)",
+        "purpose": "Raised: the approval card, the transaction card, the hero toast, visual cards, mega-menus, dialogs, toasts."
+      },
+      {
+        "name": "primary-glow",
+        "value": "0 1px 2px color-mix(in srgb, var(--accent) 25%, transparent), 0 8px 20px -8px color-mix(in srgb, var(--accent) 55%, transparent)",
+        "purpose": "The primary button at rest."
+      },
+      {
+        "name": "primary-glow-hover",
+        "value": "0 1px 2px color-mix(in srgb, var(--accent) 30%, transparent), 0 12px 26px -8px color-mix(in srgb, var(--accent) 60%, transparent)",
+        "purpose": "The primary button on hover, with a 1px lift."
+      },
+      {
+        "name": "primary-on-band",
+        "value": "0 10px 28px -10px rgba(0, 0, 0, .6)",
+        "purpose": "The inverted white primary on the dark band; on the gradient band it is ink at 45%."
+      },
+      {
+        "name": "selected-ring",
+        "value": "0 0 0 1px var(--line), var(--shadow-sm)",
+        "purpose": "The current studio step and the selected workbench project; a ring so layout does not shift."
+      },
+      {
+        "name": "ink-ring",
+        "value": "0 0 0 1px var(--ink), var(--shadow)",
+        "purpose": "The selected pipeline stage; segmented cards ring with 0 0 0 1px var(--ink) alone."
+      },
+      {
+        "name": "indigo-halo",
+        "value": "0 0 0 4px var(--accent-soft)",
+        "purpose": "The current and live transaction dots in the hero's status card."
+      },
+      {
+        "name": "live-halo",
+        "value": "0 0 0 3px color-mix(in srgb, var(--pass) 18%, transparent)",
+        "purpose": "The live network dot and the wallet dot (16%); breathes to 5px at 6%."
+      },
+      {
+        "name": "focus-ring-input",
+        "value": "0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent)",
+        "purpose": "Focused inputs, with an indigo border."
+      },
+      {
+        "name": "active-underline",
+        "value": "inset 0 -2px var(--ink)",
+        "purpose": "Active lifecycle step in the workbench strip."
+      },
+      {
+        "name": "scrim",
+        "value": "rgba(11, 12, 15, .32)",
+        "purpose": "Dialog backdrop with a 2px blur (background, not a shadow)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "Fast-out settle for every transition and keyframe except the odometer."
+      },
+      {
+        "name": "odometer-ease",
+        "value": "cubic-bezier(.2, .75, .2, 1)",
+        "purpose": "The digit columns' roll."
+      },
+      {
+        "name": "state",
+        "value": ".16s",
+        "purpose": "Background, border, color, shadow and transform on buttons, inputs, nav links, chevron markers."
+      },
+      {
+        "name": "quick",
+        "value": ".14s",
+        "purpose": "Sidebar links and mega-menu items."
+      },
+      {
+        "name": "chevron",
+        "value": ".18s to .2s",
+        "purpose": "Arrow-link slide (3px), primary arrow slide (2px), chevron rotation, tab items, doors."
+      },
+      {
+        "name": "stage",
+        "value": ".2s to .3s",
+        "purpose": "Stage node border, shadow, lift and opacity; hero status dots and connectors."
+      },
+      {
+        "name": "connector",
+        "value": "transform .5s",
+        "purpose": "Pipeline connectors fill with the Portaldot gradient as a stage is reached."
+      },
+      {
+        "name": "reveal",
+        "value": "opacity .7s, transform .8s; from translateY(14px); sibling delay ≤ 300ms",
+        "purpose": "Blocks rise as 12% of them enters the viewport; audience cards 70ms apart, the activity card 80ms."
+      },
+      {
+        "name": "hero-rise",
+        "value": "rise .7s, 60ms per child; the approval stack .8s after .2s",
+        "purpose": "The hero copy and stack on load."
+      },
+      {
+        "name": "odometer",
+        "value": "1.1s, 45ms per column (capped at the ninth)",
+        "purpose": "Every chain number rolls digit by digit; counters roll as their band enters."
+      },
+      {
+        "name": "hero-sequence",
+        "value": "700ms delay, 650ms gap, 4 steps",
+        "purpose": "The transaction card's steps check off after the records load."
+      },
+      {
+        "name": "meter-fill",
+        "value": "width 1.2s ease, .5s delay",
+        "purpose": "The approval card's replay meter."
+      },
+      {
+        "name": "hero-toast",
+        "value": "opacity .45s, transform .55s from 10px",
+        "purpose": "The Listing allowed toast fades up."
+      },
+      {
+        "name": "tab-advance",
+        "value": "6.5s per stage; tab-fill linear forwards",
+        "purpose": "The lifecycle tabber's progress rule and auto-advance; selection stops the clock."
+      },
+      {
+        "name": "mega-menu",
+        "value": "opacity .18s, transform .22s from translateY(6px) scale(.98)",
+        "purpose": "Mega-menu open and close; origin 40px from the left."
+      },
+      {
+        "name": "dialog",
+        "value": "fade .18s; rise .22s (8px, scale .985)",
+        "purpose": "Dialog entrance."
+      },
+      {
+        "name": "spin",
+        "value": "1.1s linear infinite",
+        "purpose": "Working spinner."
+      },
+      {
+        "name": "breathe",
+        "value": "2.4s ease-in-out infinite",
+        "purpose": "The live network dot's halo."
+      },
+      {
+        "name": "breathe-dot",
+        "value": "1s ease-in-out infinite (1.6s on the hero's live step core)",
+        "purpose": "The running badge's dot and the live transaction step."
+      },
+      {
+        "name": "sweep",
+        "value": "1.6s infinite",
+        "purpose": "Indeterminate progress: a gradient sliver across the working panel and progress track."
+      },
+      {
+        "name": "pulse",
+        "value": "1.4s ease-in-out infinite",
+        "purpose": "Skeleton blocks and the waiting numeral."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation/transition none; Reveal in place; meter at value; progress rule hidden; hooks start at their final state",
+        "purpose": "All motion removed under prefers-reduced-motion; the page renders complete."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "desktop-narrow",
+        "value": "1240px",
+        "purpose": "max-width: reviewer aside narrows to 300px."
+      },
+      {
+        "name": "laptop",
+        "value": "1180px",
+        "purpose": "max-width: tighter header, 210px studio rail, ledger drops below, 10px pipeline gaps, overview side column as a row."
+      },
+      {
+        "name": "landing-stack",
+        "value": "1100px",
+        "purpose": "max-width: hero and tabber stack, 2x2 stats, audience, doors and modules, single-column product rows, two-column footer."
+      },
+      {
+        "name": "tablet",
+        "value": "1024px",
+        "purpose": "max-width: vertical pipeline, scrollable studio step row, docs select jump bar, app studio grid stacks."
+      },
+      {
+        "name": "menu",
+        "value": "900px",
+        "purpose": "max-width: nav behind a menu button and paper sheet, app sidebar as a masked horizontal strip, single-column tiles."
+      },
+      {
+        "name": "mobile",
+        "value": "720px",
+        "purpose": "max-width: header CTA hidden, icon-only wallet button, hero without measure cap, full-width buttons, single-column grids."
+      }
+    ],
+    "zIndex": [
+      {
+        "name": "mega",
+        "value": 5
+      },
+      {
+        "name": "header",
+        "value": 30
+      },
+      {
+        "name": "modal",
+        "value": 50
+      },
+      {
+        "name": "toast",
+        "value": 60
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one indigo pill per view, with a soft indigo glow; deepens, lifts 1px and slides its arrow on hover.",
+      "html": "<button class=\"ds-btn ds-btn-primary ds-btn-lg\">Open the app <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button> <button class=\"ds-btn ds-btn-primary ds-btn-sm\">Open app <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button>",
+      "css": ":host{--ground:#f5f6f8;--bg:#ffffff;--bg-subtle:#fafafb;--bg-muted:#f0f1f4;--line:#e6e8ec;--line-strong:#d4d7de;--line-hover:#bfc3cc;--ink:#0b0c0f;--ink-2:#3b3f48;--ink-3:#646a76;--ink-4:#9aa0ab;--on-ink:#fff;--accent:#4353ff;--accent-hover:#2f3ee0;--accent-soft:#eef0ff;--accent-ink:#2a36c8;--pass:#15803d;--pass-soft:#effbf3;--pass-line:#bfe8cc;--pass-diff:#136431;--fail:#d92d20;--fail-soft:#fef3f2;--fail-line:#f8c9c4;--hold:#b45309;--hold-soft:#fff8eb;--hold-line:#f6dca9;--band:#0b0b0d;--band-2:#15161a;--band-line:rgba(255,255,255,.1);--on-band:#fff;--on-band-2:rgba(255,255,255,.72);--on-band-3:rgba(255,255,255,.5);--band-accent:#8b96ff;--pd-violet:#6a1fe6;--pd-azure:#1a72ff;--live-ink:#4c1d95;--portaldot:linear-gradient(90deg,#6a1fe6,#4148f5 55%,#1a72ff);--shadow-sm:0 1px 2px rgba(11,12,15,.04);--shadow:0 1px 2px rgba(11,12,15,.04),0 6px 18px -8px rgba(11,12,15,.12);--shadow-lg:0 2px 6px rgba(11,12,15,.04),0 24px 48px -16px rgba(11,12,15,.2);--ease:cubic-bezier(.16,1,.3,1);--font:'Geist Variable',ui-sans-serif,system-ui,sans-serif;--mono:'Geist Mono Variable',ui-monospace,Menlo,monospace;} .ds-btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;height:40px;padding:0 1.1rem;border-radius:999px;border:1px solid transparent;font-family:var(--font);font-size:.9375rem;font-weight:550;letter-spacing:-.005em;white-space:nowrap;cursor:pointer;transition:background-color .16s var(--ease),border-color .16s var(--ease),color .16s var(--ease),box-shadow .16s var(--ease),transform .16s var(--ease);} .ds-btn:active{transform:translateY(1px);} .ds-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;} .ds-btn-sm{height:32px;padding:0 .85rem;font-size:.875rem;} .ds-btn-lg{height:48px;padding:0 1.5rem;font-size:1rem;font-weight:600;} .ds-btn-primary{background:var(--accent);color:var(--on-ink);box-shadow:0 1px 2px color-mix(in srgb,var(--accent) 25%,transparent),0 8px 20px -8px color-mix(in srgb,var(--accent) 55%,transparent);} .ds-btn-primary svg{transition:transform .18s var(--ease);} .ds-btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 1px 2px color-mix(in srgb,var(--accent) 30%,transparent),0 12px 26px -8px color-mix(in srgb,var(--accent) 60%,transparent);} .ds-btn-primary:hover svg{transform:translateX(2px);} @media (prefers-reduced-motion:reduce){.ds-btn,.ds-btn svg{transition:none;}}"
+    },
+    {
+      "name": "Secondary, Muted and Ghost Buttons",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Paper pills: a strong-hairline secondary, a paper-muted fill, and a borderless ghost.",
+      "html": "<button class=\"ds-btn ds-btn-secondary ds-btn-lg\">How it is enforced</button> <button class=\"ds-btn ds-btn-secondary\">Look up a release</button> <button class=\"ds-btn ds-btn-muted\">Retry</button> <button class=\"ds-btn ds-btn-ghost\">Docs</button>",
+      "css": ":host{--ground:#f5f6f8;--bg:#ffffff;--bg-subtle:#fafafb;--bg-muted:#f0f1f4;--line:#e6e8ec;--line-strong:#d4d7de;--line-hover:#bfc3cc;--ink:#0b0c0f;--ink-2:#3b3f48;--ink-3:#646a76;--ink-4:#9aa0ab;--on-ink:#fff;--accent:#4353ff;--accent-hover:#2f3ee0;--accent-soft:#eef0ff;--accent-ink:#2a36c8;--pass:#15803d;--pass-soft:#effbf3;--pass-line:#bfe8cc;--pass-diff:#136431;--fail:#d92d20;--fail-soft:#fef3f2;--fail-line:#f8c9c4;--hold:#b45309;--hold-soft:#fff8eb;--hold-line:#f6dca9;--band:#0b0b0d;--band-2:#15161a;--band-line:rgba(255,255,255,.1);--on-band:#fff;--on-band-2:rgba(255,255,255,.72);--on-band-3:rgba(255,255,255,.5);--band-accent:#8b96ff;--pd-violet:#6a1fe6;--pd-azure:#1a72ff;--live-ink:#4c1d95;--portaldot:linear-gradient(90deg,#6a1fe6,#4148f5 55%,#1a72ff);--shadow-sm:0 1px 2px rgba(11,12,15,.04);--shadow:0 1px 2px rgba(11,12,15,.04),0 6px 18px -8px rgba(11,12,15,.12);--shadow-lg:0 2px 6px rgba(11,12,15,.04),0 24px 48px -16px rgba(11,12,15,.2);--ease:cubic-bezier(.16,1,.3,1);--font:'Geist Variable',ui-sans-serif,system-ui,sans-serif;--mono:'Geist Mono Variable',ui-monospace,Menlo,monospace;} .ds-btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;height:40px;padding:0 1.1rem;border-radius:999px;border:1px solid transparent;font-family:var(--font);font-size:.9375rem;font-weight:550;letter-spacing:-.005em;white-space:nowrap;cursor:pointer;transition:background-color .16s var(--ease),border-color .16s var(--ease),color .16s var(--ease),box-shadow .16s var(--ease),transform .16s var(--ease);} .ds-btn:active{transform:translateY(1px);} .ds-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;} .ds-btn-sm{height:32px;padding:0 .85rem;font-size:.875rem;} .ds-btn-lg{height:48px;padding:0 1.5rem;font-size:1rem;font-weight:600;} .ds-btn-secondary{background:var(--bg);color:var(--ink);border-color:var(--line-strong);box-shadow:var(--shadow-sm);} .ds-btn-secondary:hover{background:var(--bg-subtle);border-color:var(--line-hover);} .ds-btn-muted{background:var(--bg-muted);color:var(--ink);} .ds-btn-muted:hover{background:var(--line);} .ds-btn-ghost{color:var(--ink-2);} .ds-btn-ghost:hover{background:var(--bg-muted);color:var(--ink);}"
+    },
+    {
+      "name": "Status Badges and Kind Chips",
+      "kind": "chip",
+      "refersTo": "badge",
+      "description": "A dot and a soft tint: pass, fail, hold, run (breathing), quiet; kind chips drop the dot and border for activity rows.",
+      "html": "<span class=\"ds-badge ds-pass\"><i></i>Approved</span> <span class=\"ds-badge ds-fail\"><i></i>Refused</span> <span class=\"ds-badge ds-hold\"><i></i>Pending</span> <span class=\"ds-badge ds-run\"><i></i>Running</span> <span class=\"ds-badge ds-quiet\"><i></i>Not yet</span> <span class=\"ds-kind ds-kind-stored\">stored</span> <span class=\"ds-kind ds-kind-listed\">listed</span> <span class=\"ds-kind ds-kind-submitted\">submitted</span>",
+      "css": ":host{--ground:#f5f6f8;--bg:#ffffff;--bg-subtle:#fafafb;--bg-muted:#f0f1f4;--line:#e6e8ec;--line-strong:#d4d7de;--line-hover:#bfc3cc;--ink:#0b0c0f;--ink-2:#3b3f48;--ink-3:#646a76;--ink-4:#9aa0ab;--on-ink:#fff;--accent:#4353ff;--accent-hover:#2f3ee0;--accent-soft:#eef0ff;--accent-ink:#2a36c8;--pass:#15803d;--pass-soft:#effbf3;--pass-line:#bfe8cc;--pass-diff:#136431;--fail:#d92d20;--fail-soft:#fef3f2;--fail-line:#f8c9c4;--hold:#b45309;--hold-soft:#fff8eb;--hold-line:#f6dca9;--band:#0b0b0d;--band-2:#15161a;--band-line:rgba(255,255,255,.1);--on-band:#fff;--on-band-2:rgba(255,255,255,.72);--on-band-3:rgba(255,255,255,.5);--band-accent:#8b96ff;--pd-violet:#6a1fe6;--pd-azure:#1a72ff;--live-ink:#4c1d95;--portaldot:linear-gradient(90deg,#6a1fe6,#4148f5 55%,#1a72ff);--shadow-sm:0 1px 2px rgba(11,12,15,.04);--shadow:0 1px 2px rgba(11,12,15,.04),0 6px 18px -8px rgba(11,12,15,.12);--shadow-lg:0 2px 6px rgba(11,12,15,.04),0 24px 48px -16px rgba(11,12,15,.2);--ease:cubic-bezier(.16,1,.3,1);--font:'Geist Variable',ui-sans-serif,system-ui,sans-serif;--mono:'Geist Mono Variable',ui-monospace,Menlo,monospace;} .ds-badge{display:inline-flex;align-items:center;gap:.4rem;height:24px;padding:0 .55rem;border-radius:999px;border:1px solid var(--line);background:var(--bg-subtle);color:var(--ink-2);font-family:var(--font);font-size:.75rem;font-weight:550;white-space:nowrap;font-variant-numeric:tabular-nums;} .ds-badge i{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none;} .ds-pass{background:var(--pass-soft);border-color:var(--pass-line);color:var(--pass);} .ds-fail{background:var(--fail-soft);border-color:var(--fail-line);color:var(--fail);} .ds-hold{background:var(--hold-soft);border-color:var(--hold-line);color:var(--hold);} .ds-run{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 28%,white);color:var(--accent);} .ds-run i{animation:ds-breathe 1s ease-in-out infinite;} @keyframes ds-breathe{50%{opacity:.25;}} .ds-quiet{color:var(--ink-3);} .ds-quiet i{background:var(--ink-4);} .ds-kind{display:inline-flex;align-items:center;height:24px;padding:0 .6rem;border-radius:999px;background:var(--bg-muted);color:var(--ink-2);font-family:var(--font);font-size:.75rem;font-weight:550;} .ds-kind-stored{background:var(--accent-soft);color:var(--accent-ink);} .ds-kind-listed{background:var(--pass-soft);color:var(--pass);} .ds-kind-submitted{background:var(--hold-soft);color:var(--hold);} @media (prefers-reduced-motion:reduce){.ds-run i{animation:none;}}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "8px strong-hairline field on paper; hover hairline, indigo border and 16% ring on focus.",
+      "html": "<label class=\"ds-label\">Report hash <small>64 hex characters</small><input class=\"ds-input ds-mono\" placeholder=\"0x…\"/></label>",
+      "css": ":host{--ground:#f5f6f8;--bg:#ffffff;--bg-subtle:#fafafb;--bg-muted:#f0f1f4;--line:#e6e8ec;--line-strong:#d4d7de;--line-hover:#bfc3cc;--ink:#0b0c0f;--ink-2:#3b3f48;--ink-3:#646a76;--ink-4:#9aa0ab;--on-ink:#fff;--accent:#4353ff;--accent-hover:#2f3ee0;--accent-soft:#eef0ff;--accent-ink:#2a36c8;--pass:#15803d;--pass-soft:#effbf3;--pass-line:#bfe8cc;--pass-diff:#136431;--fail:#d92d20;--fail-soft:#fef3f2;--fail-line:#f8c9c4;--hold:#b45309;--hold-soft:#fff8eb;--hold-line:#f6dca9;--band:#0b0b0d;--band-2:#15161a;--band-line:rgba(255,255,255,.1);--on-band:#fff;--on-band-2:rgba(255,255,255,.72);--on-band-3:rgba(255,255,255,.5);--band-accent:#8b96ff;--pd-violet:#6a1fe6;--pd-azure:#1a72ff;--live-ink:#4c1d95;--portaldot:linear-gradient(90deg,#6a1fe6,#4148f5 55%,#1a72ff);--shadow-sm:0 1px 2px rgba(11,12,15,.04);--shadow:0 1px 2px rgba(11,12,15,.04),0 6px 18px -8px rgba(11,12,15,.12);--shadow-lg:0 2px 6px rgba(11,12,15,.04),0 24px 48px -16px rgba(11,12,15,.2);--ease:cubic-bezier(.16,1,.3,1);--font:'Geist Variable',ui-sans-serif,system-ui,sans-serif;--mono:'Geist Mono Variable',ui-monospace,Menlo,monospace;} .ds-label{display:block;font-family:var(--font);font-size:.875rem;font-weight:500;color:var(--ink-2);max-width:420px;} .ds-label small{display:block;font-size:.8125rem;font-weight:400;color:var(--ink-3);margin-top:.3rem;} .ds-input{display:block;width:100%;margin-top:.4rem;border:1px solid var(--line-strong);border-radius:8px;background:var(--bg);color:var(--ink);padding:.5rem .7rem;min-height:40px;font:inherit;font-size:.9375rem;line-height:1.35;transition:border-color .16s var(--ease),box-shadow .16s var(--ease);} .ds-mono{font-family:var(--mono);font-size:.8125rem;font-variant-numeric:tabular-nums;} .ds-input::placeholder{color:var(--ink-3);opacity:1;} .ds-input:hover{border-color:var(--line-hover);} .ds-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 16%,transparent);} .ds-input:disabled{background:var(--bg-subtle);color:var(--ink-3);}"
+    },
+    {
+      "name": "Site Header with Mega-menu",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Sticky blurred header: wordmark, menu triggers, links, the live network pill, GitHub and the small indigo Open app pill; an 18px mega-menu of icon tiles hangs below.",
+      "html": "<header class=\"ds-header\"><a class=\"ds-wordmark\" href=\"#\"><svg width=\"26\" height=\"26\" viewBox=\"0 0 32 32\"><rect width=\"32\" height=\"32\" rx=\"8\" fill=\"#0a0a0b\"/><path d=\"M5.8 20.6c4.4 0 5.6-4.6 9.2-4.6\" fill=\"none\" stroke=\"#fff\" stroke-opacity=\".5\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><path d=\"M5.8 11.4c4.4 0 5.6 4.6 9.2 4.6\" fill=\"none\" stroke=\"#6f7bff\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><path d=\"M15 16l3.4 3.4 7.4-8.6\" fill=\"none\" stroke=\"#fff\" stroke-width=\"2.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg><span>ReviveCheck</span></a><nav><span class=\"ds-item ds-open\"><button class=\"ds-trigger\" aria-expanded=\"true\">Product <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m6 9 6 6 6-6\"/></svg></button><div class=\"ds-mega\"><a href=\"#\"><span class=\"ds-mega-icon\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"/></svg></span><span class=\"ds-mega-text\"><strong>Middleware</strong><span>A guard your contracts call before they act.</span></span></a><a href=\"#\"><span class=\"ds-mega-icon\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><ellipse cx=\"12\" cy=\"5\" rx=\"9\" ry=\"3\"/><path d=\"M3 5v14a9 3 0 0 0 18 0V5\"/><path d=\"M3 12a9 3 0 0 0 18 0\"/></svg></span><span class=\"ds-mega-text\"><strong>Storage</strong><span>Sealed reports kept in Portaldot blocks.</span></span></a><div class=\"ds-mega-foot\"><span>Recorded on the V3 testnet.</span><a href=\"#\">See the proof →</a></div></div></span><a href=\"#\">Docs</a><a href=\"#\">Proof</a></nav><span class=\"ds-pill\"><i class=\"ds-dot\"></i><span class=\"ds-net\">V3 Testnet</span><span class=\"ds-value\">#174,425</span></span><a class=\"ds-cta\" href=\"#\">Open app <svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a></header>",
+      "css": ":host{--ground:#f5f6f8;--bg:#ffffff;--bg-subtle:#fafafb;--bg-muted:#f0f1f4;--line:#e6e8ec;--line-strong:#d4d7de;--line-hover:#bfc3cc;--ink:#0b0c0f;--ink-2:#3b3f48;--ink-3:#646a76;--ink-4:#9aa0ab;--on-ink:#fff;--accent:#4353ff;--accent-hover:#2f3ee0;--accent-soft:#eef0ff;--accent-ink:#2a36c8;--pass:#15803d;--pass-soft:#effbf3;--pass-line:#bfe8cc;--pass-diff:#136431;--fail:#d92d20;--fail-soft:#fef3f2;--fail-line:#f8c9c4;--hold:#b45309;--hold-soft:#fff8eb;--hold-line:#f6dca9;--band:#0b0b0d;--band-2:#15161a;--band-line:rgba(255,255,255,.1);--on-band:#fff;--on-band-2:rgba(255,255,255,.72);--on-band-3:rgba(255,255,255,.5);--band-accent:#8b96ff;--pd-violet:#6a1fe6;--pd-azure:#1a72ff;--live-ink:#4c1d95;--portaldot:linear-gradient(90deg,#6a1fe6,#4148f5 55%,#1a72ff);--shadow-sm:0 1px 2px rgba(11,12,15,.04);--shadow:0 1px 2px rgba(11,12,15,.04),0 6px 18px -8px rgba(11,12,15,.12);--shadow-lg:0 2px 6px rgba(11,12,15,.04),0 24px 48px -16px rgba(11,12,15,.2);--ease:cubic-bezier(.16,1,.3,1);--font:'Geist Variable',ui-sans-serif,system-ui,sans-serif;--mono:'Geist Mono Variable',ui-monospace,Menlo,monospace;} .ds-header{position:relative;display:flex;align-items:center;gap:1.25rem;height:64px;padding:0 24px;background:color-mix(in srgb,var(--bg) 78%,transparent);backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid var(--line);font-family:var(--font);} .ds-wordmark{display:inline-flex;align-items:center;gap:.55rem;font-weight:650;font-size:1.0625rem;letter-spacing:-.025em;color:var(--ink);text-decoration:none;} .ds-header nav{display:flex;align-items:center;gap:.1rem;} .ds-header nav>a,.ds-trigger{display:inline-flex;align-items:center;gap:.3rem;height:36px;padding:0 .75rem;border:0;border-radius:8px;background:none;font:inherit;font-size:.9375rem;font-weight:500;color:var(--ink-2);text-decoration:none;cursor:pointer;transition:color .16s var(--ease),background-color .16s var(--ease);} .ds-header nav>a:hover,.ds-trigger:hover,.ds-trigger[aria-expanded=\"true\"]{color:var(--ink);background:var(--bg-muted);} .ds-trigger svg{color:var(--ink-4);transition:transform .18s var(--ease);} .ds-trigger[aria-expanded=\"true\"] svg{transform:rotate(180deg);} .ds-item{position:relative;} .ds-mega{position:absolute;top:calc(100% + 10px);left:-8px;z-index:5;width:580px;padding:.5rem;display:grid;grid-template-columns:1fr 1fr;gap:.15rem;background:var(--bg);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);} .ds-mega::before{content:'';position:absolute;top:-7px;left:32px;width:12px;height:12px;background:var(--bg);border-left:1px solid var(--line);border-top:1px solid var(--line);transform:rotate(45deg);} .ds-mega>a{display:grid;grid-template-columns:42px minmax(0,1fr);gap:.8rem;align-items:start;padding:.65rem .7rem;border-radius:12px;text-decoration:none;color:var(--ink);transition:background-color .14s var(--ease);} .ds-mega>a:hover{background:var(--bg-subtle);} .ds-mega-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--bg-subtle);color:var(--ink);} .ds-mega-text strong{display:block;font-size:.9375rem;font-weight:600;line-height:1.3;} .ds-mega-text span{display:block;font-size:.8125rem;color:var(--ink-3);margin-top:.1rem;line-height:1.4;} .ds-mega-foot{grid-column:1/-1;display:flex;justify-content:space-between;margin:.35rem .25rem 0;padding:.7rem .5rem .3rem;border-top:1px solid var(--line);font-size:.8125rem;color:var(--ink-3);} .ds-mega-foot a{color:var(--ink-2);font-weight:500;text-decoration:none;} .ds-mega-foot a:hover{color:var(--accent-hover);} .ds-pill{margin-left:auto;display:inline-flex;align-items:center;gap:.45rem;height:32px;padding:0 .7rem;border:1px solid var(--line);border-radius:999px;font-size:.8125rem;color:var(--ink-2);background:var(--bg);} .ds-dot{width:7px;height:7px;border-radius:50%;background:var(--pass);box-shadow:0 0 0 3px color-mix(in srgb,var(--pass) 18%,transparent);animation:ds-breathe-halo 2.4s ease-in-out infinite;} @keyframes ds-breathe-halo{50%{box-shadow:0 0 0 5px color-mix(in srgb,var(--pass) 6%,transparent);}} .ds-net{color:var(--ink-3);} .ds-value{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--ink);} .ds-cta{display:inline-flex;align-items:center;gap:.5rem;height:32px;padding:0 .85rem;border-radius:999px;background:var(--accent);color:#fff;font-size:.875rem;font-weight:550;text-decoration:none;box-shadow:0 1px 2px color-mix(in srgb,var(--accent) 25%,transparent),0 8px 20px -8px color-mix(in srgb,var(--accent) 55%,transparent);transition:background-color .16s var(--ease);} .ds-cta:hover{background:var(--accent-hover);} .ds-header a:focus-visible,.ds-trigger:focus-visible{outline:2px solid var(--accent);outline-offset:2px;} @media (prefers-reduced-motion:reduce){.ds-dot{animation:none;}}"
+    },
+    {
+      "name": "App Sidebar",
+      "kind": "nav",
+      "refersTo": "side-link",
+      "description": "40px 10px-radius links; the current page is indigo wash with indigo ink; count pills; contract chips with a gradient dot.",
+      "html": "<nav class=\"ds-side\"><a href=\"#\" aria-current=\"page\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect width=\"7\" height=\"7\" x=\"3\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"7\" x=\"14\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"7\" x=\"14\" y=\"14\" rx=\"1\"/><rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\"/></svg>Overview</a><a href=\"#\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><ellipse cx=\"12\" cy=\"5\" rx=\"9\" ry=\"3\"/><path d=\"M3 5v14a9 3 0 0 0 18 0V5\"/><path d=\"M3 12a9 3 0 0 0 18 0\"/></svg>Releases<span class=\"ds-count\">1</span></a><a href=\"#\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2\"/></svg>Activity<span class=\"ds-count\">5</span></a><div class=\"ds-group\"><span class=\"ds-side-label\">Contracts on the V3 testnet</span><span class=\"ds-contract\"><i></i>Registry<code>0xe94…7d339</code></span><span class=\"ds-contract\"><i></i>Token list<code>0xd0b…65819</code></span></div></nav>",
+      "css": ":host{--ground:#f5f6f8;--bg:#ffffff;--bg-subtle:#fafafb;--bg-muted:#f0f1f4;--line:#e6e8ec;--line-strong:#d4d7de;--line-hover:#bfc3cc;--ink:#0b0c0f;--ink-2:#3b3f48;--ink-3:#646a76;--ink-4:#9aa0ab;--on-ink:#fff;--accent:#4353ff;--accent-hover:#2f3ee0;--accent-soft:#eef0ff;--accent-ink:#2a36c8;--pass:#15803d;--pass-soft:#effbf3;--pass-line:#bfe8cc;--pass-diff:#136431;--fail:#d92d20;--fail-soft:#fef3f2;--fail-line:#f8c9c4;--hold:#b45309;--hold-soft:#fff8eb;--hold-line:#f6dca9;--band:#0b0b0d;--band-2:#15161a;--band-line:rgba(255,255,255,.1);--on-band:#fff;--on-band-2:rgba(255,255,255,.72);--on-band-3:rgba(255,255,255,.5);--band-accent:#8b96ff;--pd-violet:#6a1fe6;--pd-azure:#1a72ff;--live-ink:#4c1d95;--portaldot:linear-gradient(90deg,#6a1fe6,#4148f5 55%,#1a72ff);--shadow-sm:0 1px 2px rgba(11,12,15,.04);--shadow:0 1px 2px rgba(11,12,15,.04),0 6px 18px -8px rgba(11,12,15,.12);--shadow-lg:0 2px 6px rgba(11,12,15,.04),0 24px 48px -16px rgba(11,12,15,.2);--ease:cubic-bezier(.16,1,.3,1);--font:'Geist Variable',ui-sans-serif,system-ui,sans-serif;--mono:'Geist Mono Variable',ui-monospace,Menlo,monospace;} .ds-side{display:grid;gap:.2rem;width:232px;font-family:var(--font);} .ds-side>a{display:flex;align-items:center;gap:.6rem;height:40px;padding:0 .75rem;border-radius:10px;color:var(--ink-2);font-size:.9375rem;font-weight:500;text-decoration:none;transition:background-color .14s var(--ease),color .14s var(--ease);} .ds-side>a svg{color:var(--ink-3);} .ds-side>a:hover{background:color-mix(in srgb,var(--bg) 70%,transparent);color:var(--ink);} .ds-side>a[aria-current=\"page\"]{background:var(--accent-soft);color:var(--accent-ink);} .ds-side>a[aria-current=\"page\"] svg{color:var(--accent);} .ds-side>a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;} .ds-count{margin-left:auto;display:grid;place-items:center;min-width:22px;height:22px;padding:0 .4rem;border-radius:999px;background:var(--bg-muted);color:var(--ink-2);font-size:.75rem;font-weight:550;} .ds-group{display:grid;gap:.35rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--line);} .ds-side-label{font-size:.75rem;color:var(--ink-3);margin:0 .75rem .25rem;} .ds-contract{display:flex;align-items:center;gap:.4rem;height:36px;padding:0 .6rem 0 .7rem;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-size:.8125rem;color:var(--ink-2);} .ds-contract i{width:8px;height:8px;border-radius:50%;background:var(--portaldot);} .ds-contract code{margin-left:auto;font-family:var(--mono);font-size:.75rem;color:var(--ink);font-variant-numeric:tabular-nums;}"
+    },
+    {
+      "name": "Tabs and Filter",
+      "kind": "nav",
+      "refersTo": "tabs",
+      "description": "A 10px paper-muted track; the selected option lifts to paper with the hairline shadow.",
+      "html": "<div class=\"ds-tabs\" role=\"tablist\"><button role=\"tab\" aria-selected=\"true\">MCP</button><button role=\"tab\" aria-selected=\"false\">REST</button><button role=\"tab\" aria-selected=\"false\">JavaScript</button><button role=\"tab\" aria-selected=\"false\">CLI</button></div>",
+      "css": ":host{--ground:#f5f6f8;--bg:#ffffff;--bg-subtle:#fafafb;--bg-muted:#f0f1f4;--line:#e6e8ec;--line-strong:#d4d7de;--line-hover:#bfc3cc;--ink:#0b0c0f;--ink-2:#3b3f48;--ink-3:#646a76;--ink-4:#9aa0ab;--on-ink:#fff;--accent:#4353ff;--accent-hover:#2f3ee0;--accent-soft:#eef0ff;--accent-ink:#2a36c8;--pass:#15803d;--pass-soft:#effbf3;--pass-line:#bfe8cc;--pass-diff:#136431;--fail:#d92d20;--fail-soft:#fef3f2;--fail-line:#f8c9c4;--hold:#b45309;--hold-soft:#fff8eb;--hold-line:#f6dca9;--band:#0b0b0d;--band-2:#15161a;--band-line:rgba(255,255,255,.1);--on-band:#fff;--on-band-2:rgba(255,255,255,.72);--on-band-3:rgba(255,255,255,.5);--band-accent:#8b96ff;--pd-violet:#6a1fe6;--pd-azure:#1a72ff;--live-ink:#4c1d95;--portaldot:linear-gradient(90deg,#6a1fe6,#4148f5 55%,#1a72ff);--shadow-sm:0 1px 2px rgba(11,12,15,.04);--shadow:0 1px 2px rgba(11,12,15,.04),0 6px 18px -8px rgba(11,12,15,.12);--shadow-lg:0 2px 6px rgba(11,12,15,.04),0 24px 48px -16px rgba(11,12,15,.2);--ease:cubic-bezier(.16,1,.3,1);--font:'Geist Variable',ui-sans-serif,system-ui,sans-serif;--mono:'Geist Mono Variable',ui-monospace,Menlo,monospace;} .ds-tabs{display:flex;gap:.25rem;padding:3px;border-radius:10px;background:var(--bg-muted);width:max-content;font-family:var(--font);} .ds-tabs button{height:30px;padding:0 .85rem;border:0;border-radius:7px;background:none;font:inherit;font-size:.875rem;color:var(--ink-3);white-space:nowrap;cursor:pointer;} .ds-tabs button:hover{color:var(--ink);} .ds-tabs button[aria-selected=\"true\"]{background:var(--bg);color:var(--ink);font-weight:550;box-shadow:var(--shadow-sm);} .ds-tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}"
+    },
+    {
+      "name": "Card and Tile",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "A 16px white card on the paper ground with a hairline head; a tile puts a 2rem numeral under a term.",
+      "html": "<div class=\"ds-ground\"><section class=\"ds-card\"><header><h2>Rules the registry enforces</h2><span>live values</span></header><ul><li>Approval names one exact hash<span><i></i>revision 1 · cbd78…ed427</span></li><li>Only the owner lists, while approved<span><i></i>pUSD listed · #164,313</span></li></ul><footer><a href=\"#\">How each rule works →</a></footer></section><dl class=\"ds-tile\"><dt>Approvals standing</dt><dd>1</dd><p>Current revisions a reviewer approved</p></dl></div>",
+      "css": ":host{--ground:#f5f6f8;--bg:#ffffff;--bg-subtle:#fafafb;--bg-muted:#f0f1f4;--line:#e6e8ec;--line-strong:#d4d7de;--line-hover:#bfc3cc;--ink:#0b0c0f;--ink-2:#3b3f48;--ink-3:#646a76;--ink-4:#9aa0ab;--on-ink:#fff;--accent:#4353ff;--accent-hover:#2f3ee0;--accent-soft:#eef0ff;--accent-ink:#2a36c8;--pass:#15803d;--pass-soft:#effbf3;--pass-line:#bfe8cc;--pass-diff:#136431;--fail:#d92d20;--fail-soft:#fef3f2;--fail-line:#f8c9c4;--hold:#b45309;--hold-soft:#fff8eb;--hold-line:#f6dca9;--band:#0b0b0d;--band-2:#15161a;--band-line:rgba(255,255,255,.1);--on-band:#fff;--on-band-2:rgba(255,255,255,.72);--on-band-3:rgba(255,255,255,.5);--band-accent:#8b96ff;--pd-violet:#6a1fe6;--pd-azure:#1a72ff;--live-ink:#4c1d95;--portaldot:linear-gradient(90deg,#6a1fe6,#4148f5 55%,#1a72ff);--shadow-sm:0 1px 2px rgba(11,12,15,.04);--shadow:0 1px 2px rgba(11,12,15,.04),0 6px 18px -8px rgba(11,12,15,.12);--shadow-lg:0 2px 6px rgba(11,12,15,.04),0 24px 48px -16px rgba(11,12,15,.2);--ease:cubic-bezier(.16,1,.3,1);--font:'Geist Variable',ui-sans-serif,system-ui,sans-serif;--mono:'Geist Mono Variable',ui-monospace,Menlo,monospace;} .ds-ground{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:1rem;padding:1.25rem;background:var(--ground);font-family:var(--font);color:var(--ink);} .ds-card{background:var(--bg);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-sm);min-width:0;} .ds-card header{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.95rem 1.25rem;border-bottom:1px solid var(--line);} .ds-card h2{margin:0;font-size:1.0625rem;font-weight:600;letter-spacing:-.015em;} .ds-card header span{font-size:.8125rem;color:var(--ink-3);} .ds-card ul{list-style:none;margin:0;padding:.35rem 1.25rem .5rem;} .ds-card li{display:grid;gap:.25rem;padding:.65rem 0;border-top:1px solid var(--line);font-size:.875rem;color:var(--ink-2);} .ds-card li:first-child{border-top:0;} .ds-card li span{display:inline-flex;align-items:center;gap:.45rem;color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums;} .ds-card li i{width:6px;height:6px;border-radius:50%;background:var(--pass);} .ds-card footer{padding:.75rem 1.25rem .9rem;border-top:1px solid var(--line);font-size:.875rem;} .ds-card footer a{color:var(--accent);font-weight:550;text-decoration:none;} .ds-card footer a:hover{color:var(--accent-hover);} .ds-tile{margin:0;background:var(--bg);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-sm);padding:1.1rem 1.25rem 1.15rem;} .ds-tile dt{font-size:.875rem;color:var(--ink-3);} .ds-tile dd{margin:.4rem 0 0;font-size:2rem;font-weight:650;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums;} .ds-tile p{margin:.55rem 0 0;font-size:.8125rem;color:var(--ink-3);}"
+    },
+    {
+      "name": "Approval Stack",
+      "kind": "custom",
+      "refersTo": "approval-card",
+      "description": "The hero's recorded release: an 18px raised card with the approval block as a large numeral and a replay meter, overlapped by the 16px on-chain status card and a toast.",
+      "html": "<div class=\"ds-stack\"><div class=\"ds-approval\"><div class=\"ds-ac-head\"><strong>pusd-token-list <code>revision 1</code></strong><span class=\"ds-badge ds-pass\"><i></i>Approved</span></div><p class=\"ds-ac-label\">Approved at block</p><p class=\"ds-ac-number\"><span class=\"ds-hash\">#</span>163,489</p><p class=\"ds-ac-caption\">In the ReleaseRegistry on the V3 testnet, read back through the EVM RPC and ReviveApi</p><div class=\"ds-meter\"><div><span>Replayed at its own block</span><strong>13 of 13 observations reproduced</strong></div><div class=\"ds-track\"><i></i></div></div></div><div class=\"ds-tx\"><h3>On-chain status</h3><ol><li class=\"ds-done\"><span class=\"ds-step\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 6 9 17l-5-5\"/></svg></span><div><strong>Submitted to the registry</strong><span>Revision 1 · <a href=\"#\">#163,485 ↗</a></span></div></li><li class=\"ds-done\"><span class=\"ds-step\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 6 9 17l-5-5\"/></svg></span><div><strong>Approved by its reviewer</strong><span>Exact report hash · <a href=\"#\">#163,489 ↗</a></span></div></li><li class=\"ds-live\"><span class=\"ds-step\"></span><div><strong>Verified through both interfaces</strong><span>Both interfaces agree at #163,561 · standing</span></div></li></ol></div><div class=\"ds-toast\"><span class=\"ds-toast-icon\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 6 9 17l-5-5\"/></svg></span><div><strong>Listing allowed</strong><span>pUSD · VerifiedTokenList · #164,313</span></div></div></div>",
+      "css": ":host{--ground:#f5f6f8;--bg:#ffffff;--bg-subtle:#fafafb;--bg-muted:#f0f1f4;--line:#e6e8ec;--line-strong:#d4d7de;--line-hover:#bfc3cc;--ink:#0b0c0f;--ink-2:#3b3f48;--ink-3:#646a76;--ink-4:#9aa0ab;--on-ink:#fff;--accent:#4353ff;--accent-hover:#2f3ee0;--accent-soft:#eef0ff;--accent-ink:#2a36c8;--pass:#15803d;--pass-soft:#effbf3;--pass-line:#bfe8cc;--pass-diff:#136431;--fail:#d92d20;--fail-soft:#fef3f2;--fail-line:#f8c9c4;--hold:#b45309;--hold-soft:#fff8eb;--hold-line:#f6dca9;--band:#0b0b0d;--band-2:#15161a;--band-line:rgba(255,255,255,.1);--on-band:#fff;--on-band-2:rgba(255,255,255,.72);--on-band-3:rgba(255,255,255,.5);--band-accent:#8b96ff;--pd-violet:#6a1fe6;--pd-azure:#1a72ff;--live-ink:#4c1d95;--portaldot:linear-gradient(90deg,#6a1fe6,#4148f5 55%,#1a72ff);--shadow-sm:0 1px 2px rgba(11,12,15,.04);--shadow:0 1px 2px rgba(11,12,15,.04),0 6px 18px -8px rgba(11,12,15,.12);--shadow-lg:0 2px 6px rgba(11,12,15,.04),0 24px 48px -16px rgba(11,12,15,.2);--ease:cubic-bezier(.16,1,.3,1);--font:'Geist Variable',ui-sans-serif,system-ui,sans-serif;--mono:'Geist Mono Variable',ui-monospace,Menlo,monospace;} .ds-stack{position:relative;max-width:560px;padding-top:44px;font-family:var(--font);color:var(--ink);} .ds-approval{position:relative;background:var(--bg);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);padding:1.35rem 1.5rem 1.3rem;} .ds-ac-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;} .ds-ac-head strong{font-size:1rem;font-weight:600;} .ds-ac-head code{font-family:var(--mono);font-weight:500;font-size:.8125rem;color:var(--ink-3);margin-left:.35rem;} .ds-badge{display:inline-flex;align-items:center;gap:.4rem;height:24px;padding:0 .55rem;border-radius:999px;border:1px solid var(--line);background:var(--bg-subtle);color:var(--ink-2);font-family:var(--font);font-size:.75rem;font-weight:550;white-space:nowrap;font-variant-numeric:tabular-nums;} .ds-badge i{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none;} .ds-pass{background:var(--pass-soft);border-color:var(--pass-line);color:var(--pass);} .ds-fail{background:var(--fail-soft);border-color:var(--fail-line);color:var(--fail);} .ds-hold{background:var(--hold-soft);border-color:var(--hold-line);color:var(--hold);} .ds-run{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 28%,white);color:var(--accent);} .ds-run i{animation:ds-breathe 1s ease-in-out infinite;} @keyframes ds-breathe{50%{opacity:.25;}} .ds-quiet{color:var(--ink-3);} .ds-quiet i{background:var(--ink-4);} .ds-ac-label{margin:1.1rem 0 0;font-size:.8125rem;color:var(--ink-3);} .ds-ac-number{margin:.15rem 0 0;font-size:clamp(2.3rem,1.9rem + 1.6vw,3.3rem);font-weight:650;letter-spacing:-.045em;line-height:1;font-variant-numeric:tabular-nums;} .ds-hash{color:var(--ink-4);} .ds-ac-caption{margin:.6rem 0 0;font-size:.8125rem;color:var(--ink-3);} .ds-meter{margin-top:1.1rem;} .ds-meter>div:first-child{display:flex;justify-content:space-between;gap:1rem;font-size:.8125rem;color:var(--ink-3);} .ds-meter strong{color:var(--ink);font-weight:550;} .ds-track{height:6px;margin-top:.45rem;border-radius:999px;background:var(--bg-muted);overflow:hidden;} .ds-track i{display:block;height:100%;width:100%;border-radius:999px;background:var(--accent);animation:ds-fill 1.2s var(--ease) .5s both;} @keyframes ds-fill{from{width:0;}} .ds-tx{position:relative;z-index:2;width:min(360px,calc(100% - 20px));margin:-16px 0 0 20px;background:var(--bg);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-lg);padding:1rem 1.15rem 1.05rem;} .ds-tx h3{margin:0;font-size:.9375rem;font-weight:600;letter-spacing:-.01em;} .ds-tx ol{list-style:none;margin:.55rem 0 0;padding:0;display:grid;} .ds-tx li{position:relative;display:grid;grid-template-columns:22px minmax(0,1fr);column-gap:.7rem;align-items:start;padding:.38rem 0;color:var(--ink-3);} .ds-tx li+li::before{content:'';position:absolute;left:10.5px;top:-8px;width:1.5px;height:16px;background:var(--line-strong);} .ds-tx li.ds-done+li::before{background:var(--pass);} .ds-step{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line-strong);background:var(--bg);color:var(--ink-3);position:relative;} .ds-done .ds-step{background:var(--pass);border-color:var(--pass);color:var(--on-ink);} .ds-live .ds-step{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft);} .ds-live .ds-step::after{content:'';position:absolute;width:8px;height:8px;border-radius:50%;background:var(--accent);animation:ds-breathe 1.6s ease-in-out infinite;} .ds-tx strong{display:block;font-size:.875rem;font-weight:600;color:var(--ink);} .ds-tx div>span{font-size:.78rem;color:var(--ink-3);} .ds-tx a{font-family:var(--mono);color:var(--accent);text-decoration:none;} .ds-toast{position:absolute;top:0;right:-10px;z-index:3;display:flex;align-items:center;gap:.75rem;padding:.7rem 1rem .7rem .8rem;background:var(--bg);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-lg);} .ds-toast-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--pass-soft);color:var(--pass);} .ds-toast strong{display:block;font-size:.9rem;font-weight:600;} .ds-toast span{display:block;font-size:.78rem;color:var(--ink-3);} @media (prefers-reduced-motion:reduce){.ds-track i,.ds-live .ds-step::after{animation:none;}}"
+    },
+    {
+      "name": "Dark Band and Lifecycle Panel",
+      "kind": "custom",
+      "refersTo": "tab-panel",
+      "description": "The one dark surface: a 24px rules band with band-2 rule cards and dark chips; the 20px lifecycle panel uses the same materials with an inverted primary.",
+      "html": "<section class=\"ds-band\"><h2>Four permissions the registry enforces.</h2><div class=\"ds-rules\"><div class=\"ds-rule\"><h3>Approval names one exact hash</h3><p>A reviewer approves a report fingerprint, not a release name.</p><div class=\"ds-chips\"><span class=\"ds-chip-dark ds-ok\">approved</span><span class=\"ds-chip-dark\"><code>#163,489</code></span></div></div><div class=\"ds-rule\"><h3>Only the owner lists, while approved</h3><p>The token list reads the registry through the guard before it lists.</p><div class=\"ds-chips\"><span class=\"ds-chip-dark ds-ok\">listed</span><span class=\"ds-chip-dark\"><code>#164,313</code></span></div></div></div><div class=\"ds-actions\"><button class=\"ds-btn ds-btn-on-band ds-btn-lg\">See the registry live <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button><button class=\"ds-btn ds-btn-ghost-band ds-btn-lg\">Integrate the guard <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button></div></section>",
+      "css": ":host{--ground:#f5f6f8;--bg:#ffffff;--bg-subtle:#fafafb;--bg-muted:#f0f1f4;--line:#e6e8ec;--line-strong:#d4d7de;--line-hover:#bfc3cc;--ink:#0b0c0f;--ink-2:#3b3f48;--ink-3:#646a76;--ink-4:#9aa0ab;--on-ink:#fff;--accent:#4353ff;--accent-hover:#2f3ee0;--accent-soft:#eef0ff;--accent-ink:#2a36c8;--pass:#15803d;--pass-soft:#effbf3;--pass-line:#bfe8cc;--pass-diff:#136431;--fail:#d92d20;--fail-soft:#fef3f2;--fail-line:#f8c9c4;--hold:#b45309;--hold-soft:#fff8eb;--hold-line:#f6dca9;--band:#0b0b0d;--band-2:#15161a;--band-line:rgba(255,255,255,.1);--on-band:#fff;--on-band-2:rgba(255,255,255,.72);--on-band-3:rgba(255,255,255,.5);--band-accent:#8b96ff;--pd-violet:#6a1fe6;--pd-azure:#1a72ff;--live-ink:#4c1d95;--portaldot:linear-gradient(90deg,#6a1fe6,#4148f5 55%,#1a72ff);--shadow-sm:0 1px 2px rgba(11,12,15,.04);--shadow:0 1px 2px rgba(11,12,15,.04),0 6px 18px -8px rgba(11,12,15,.12);--shadow-lg:0 2px 6px rgba(11,12,15,.04),0 24px 48px -16px rgba(11,12,15,.2);--ease:cubic-bezier(.16,1,.3,1);--font:'Geist Variable',ui-sans-serif,system-ui,sans-serif;--mono:'Geist Mono Variable',ui-monospace,Menlo,monospace;} .ds-btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;height:40px;padding:0 1.1rem;border-radius:999px;border:1px solid transparent;font-family:var(--font);font-size:.9375rem;font-weight:550;letter-spacing:-.005em;white-space:nowrap;cursor:pointer;transition:background-color .16s var(--ease),border-color .16s var(--ease),color .16s var(--ease),box-shadow .16s var(--ease),transform .16s var(--ease);} .ds-btn:active{transform:translateY(1px);} .ds-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;} .ds-btn-sm{height:32px;padding:0 .85rem;font-size:.875rem;} .ds-btn-lg{height:48px;padding:0 1.5rem;font-size:1rem;font-weight:600;} .ds-band{position:relative;isolation:isolate;overflow:hidden;max-width:640px;background:var(--band);color:var(--on-band);border-radius:24px;padding:clamp(36px,5vw,64px) clamp(24px,4vw,56px);font-family:var(--font);} .ds-band::before{content:'';position:absolute;inset:0;z-index:-1;background:radial-gradient(42% 55% at 92% 95%,color-mix(in srgb,var(--accent) 28%,transparent),transparent 70%),radial-gradient(32% 45% at 6% 0%,color-mix(in srgb,var(--pd-violet) 22%,transparent),transparent 70%);} .ds-band h2{margin:0;font-size:clamp(1.9rem,1.4rem + 1.8vw,2.9rem);font-weight:600;letter-spacing:-.04em;line-height:1.08;max-width:20ch;} .ds-rules{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:2.25rem;} .ds-rule{display:flex;flex-direction:column;background:color-mix(in srgb,var(--band-2) 85%,transparent);border:1px solid var(--band-line);border-radius:16px;padding:1.4rem 1.5rem 1.3rem;} .ds-rule h3{margin:0;font-size:1.1875rem;font-weight:600;letter-spacing:-.02em;} .ds-rule p{margin:.5rem 0 0;font-size:.9375rem;color:var(--on-band-2);} .ds-chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:auto;padding-top:1.1rem;} .ds-chips::before{content:'';display:block;width:100%;height:1px;background:var(--band-line);margin-bottom:.7rem;} .ds-chip-dark{display:inline-flex;align-items:center;gap:.4rem;height:28px;padding:0 .7rem;border-radius:999px;background:rgba(255,255,255,.08);color:var(--on-band);font-size:.8125rem;font-weight:500;} .ds-chip-dark.ds-ok::before{content:'';width:6px;height:6px;border-radius:50%;background:#4ade80;} .ds-chip-dark code{font-family:var(--mono);font-size:.75rem;} .ds-actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:2rem;} .ds-btn-on-band{background:var(--on-band);color:var(--ink);box-shadow:0 10px 28px -10px rgba(0,0,0,.6);} .ds-btn-on-band:hover{background:#f0f1f4;} .ds-btn-ghost-band{color:var(--on-band-2);} .ds-btn-ghost-band:hover{background:rgba(255,255,255,.08);color:var(--on-band);} .ds-band :focus-visible{outline-color:var(--on-band);}"
+    },
+    {
+      "name": "Lifecycle Stage Node",
+      "kind": "custom",
+      "refersTo": "stage-node",
+      "description": "Pipeline nodes joined by connectors; a reached connector and the running node take the Portaldot gradient; the selected node rings in ink.",
+      "html": "<ol class=\"ds-track\"><li class=\"ds-stage ds-reached\"><button class=\"ds-node\"><span class=\"ds-top\"><span class=\"ds-icon\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 6 9 17l-5-5\"/></svg></span><span class=\"ds-name\">Recheck</span></span><span class=\"ds-summary\">v1.0.1 passes 13/13 at its pinned block.</span><span class=\"ds-badge ds-pass\"><i></i>Passed</span><span class=\"ds-ref\">#164,335</span></button></li><li class=\"ds-stage ds-reached ds-running\"><button class=\"ds-node\"><span class=\"ds-top\"><span class=\"ds-icon ds-write\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z\"/></svg></span><span class=\"ds-name\">Submit</span></span><span class=\"ds-summary\">Commit the report hash to the registry.</span><span class=\"ds-badge ds-run\"><i></i>Running</span><span class=\"ds-ref\">Revive.call</span></button></li><li class=\"ds-stage\" data-status=\"pending\"><button class=\"ds-node\"><span class=\"ds-top\"><span class=\"ds-icon\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m9 12 2 2 4-4\"/></svg></span><span class=\"ds-name\">Approve</span></span><span class=\"ds-summary\">The reviewer signs on the exact hash.</span><span class=\"ds-badge ds-quiet\"><i></i>Not yet</span><span class=\"ds-ref\">—</span></button></li></ol>",
+      "css": ":host{--ground:#f5f6f8;--bg:#ffffff;--bg-subtle:#fafafb;--bg-muted:#f0f1f4;--line:#e6e8ec;--line-strong:#d4d7de;--line-hover:#bfc3cc;--ink:#0b0c0f;--ink-2:#3b3f48;--ink-3:#646a76;--ink-4:#9aa0ab;--on-ink:#fff;--accent:#4353ff;--accent-hover:#2f3ee0;--accent-soft:#eef0ff;--accent-ink:#2a36c8;--pass:#15803d;--pass-soft:#effbf3;--pass-line:#bfe8cc;--pass-diff:#136431;--fail:#d92d20;--fail-soft:#fef3f2;--fail-line:#f8c9c4;--hold:#b45309;--hold-soft:#fff8eb;--hold-line:#f6dca9;--band:#0b0b0d;--band-2:#15161a;--band-line:rgba(255,255,255,.1);--on-band:#fff;--on-band-2:rgba(255,255,255,.72);--on-band-3:rgba(255,255,255,.5);--band-accent:#8b96ff;--pd-violet:#6a1fe6;--pd-azure:#1a72ff;--live-ink:#4c1d95;--portaldot:linear-gradient(90deg,#6a1fe6,#4148f5 55%,#1a72ff);--shadow-sm:0 1px 2px rgba(11,12,15,.04);--shadow:0 1px 2px rgba(11,12,15,.04),0 6px 18px -8px rgba(11,12,15,.12);--shadow-lg:0 2px 6px rgba(11,12,15,.04),0 24px 48px -16px rgba(11,12,15,.2);--ease:cubic-bezier(.16,1,.3,1);--font:'Geist Variable',ui-sans-serif,system-ui,sans-serif;--mono:'Geist Mono Variable',ui-monospace,Menlo,monospace;} .ds-badge{display:inline-flex;align-items:center;gap:.4rem;height:24px;padding:0 .55rem;border-radius:999px;border:1px solid var(--line);background:var(--bg-subtle);color:var(--ink-2);font-family:var(--font);font-size:.75rem;font-weight:550;white-space:nowrap;font-variant-numeric:tabular-nums;} .ds-badge i{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none;} .ds-pass{background:var(--pass-soft);border-color:var(--pass-line);color:var(--pass);} .ds-fail{background:var(--fail-soft);border-color:var(--fail-line);color:var(--fail);} .ds-hold{background:var(--hold-soft);border-color:var(--hold-line);color:var(--hold);} .ds-run{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 28%,white);color:var(--accent);} .ds-run i{animation:ds-breathe 1s ease-in-out infinite;} @keyframes ds-breathe{50%{opacity:.25;}} .ds-quiet{color:var(--ink-3);} .ds-quiet i{background:var(--ink-4);} .ds-track{--gap:14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:var(--gap);list-style:none;margin:0;padding:0;max-width:600px;font-family:var(--font);} .ds-stage{position:relative;display:flex;min-width:0;} .ds-stage+.ds-stage::before{content:'';position:absolute;top:31px;right:100%;width:var(--gap);height:2px;background:var(--line-strong);} .ds-stage+.ds-stage::after{content:'';position:absolute;top:31px;right:100%;width:var(--gap);height:2px;background:var(--portaldot);transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease);} .ds-reached+.ds-reached::after{transform:scaleX(1);} .ds-node{display:flex;flex-direction:column;align-items:flex-start;gap:.45rem;width:100%;padding:.75rem .7rem .7rem;border:1px solid var(--line);border-radius:12px;background:var(--bg);text-align:left;box-shadow:var(--shadow-sm);font:inherit;color:var(--ink);cursor:pointer;transition:border-color .2s var(--ease),box-shadow .2s var(--ease),transform .2s var(--ease),opacity .3s var(--ease);} .ds-node:hover{border-color:var(--line-strong);box-shadow:var(--shadow);transform:translateY(-1px);} .ds-node:focus-visible{outline:2px solid var(--accent);outline-offset:2px;} .ds-stage[data-status=\"pending\"] .ds-node{opacity:.55;box-shadow:none;} .ds-running .ds-node{border:1.5px solid transparent;background:linear-gradient(var(--bg),var(--bg)) padding-box,var(--portaldot) border-box;} .ds-top{display:flex;align-items:center;gap:.45rem;} .ds-icon{display:grid;place-items:center;width:26px;height:26px;border-radius:7px;background:var(--bg-muted);color:var(--ink);} .ds-write{background:var(--ink);color:#fff;} .ds-name{font-weight:600;font-size:.9375rem;letter-spacing:-.015em;} .ds-summary{font-size:.78rem;line-height:1.4;color:var(--ink-3);min-height:2.8em;} .ds-ref{font-family:var(--mono);font-size:.6875rem;color:var(--ink-3);} @media (prefers-reduced-motion:reduce){.ds-run i{animation:none;} .ds-stage::after,.ds-node{transition:none;}}"
+    },
+    {
+      "name": "Code Block",
+      "kind": "custom",
+      "refersTo": "code-block",
+      "description": "Light docs code block with a figcaption and copy button; the dark readback panel is the code surface inside visual cards.",
+      "html": "<figure class=\"ds-code\"><figcaption><span>curl</span><button class=\"ds-copy\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\"/><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"/></svg>Copy</button></figcaption><pre>curl -s https://…/api/registry.json | jq '.releases[0]'</pre></figure><pre class=\"ds-dark\"><code><span><i>releaseOf</i>(id)      → (0x48b…6a71b, 1, 0xcbd7…8ed427)</span><span><i>isListed</i>(pUSD)     → <b>true</b>   <em>VerifiedTokenList, via ReviveCheckGuard</em></span><span class=\"ds-ok\">✓ EVM RPC and ReviveApi agree at #164,313</span></code></pre>",
+      "css": ":host{--ground:#f5f6f8;--bg:#ffffff;--bg-subtle:#fafafb;--bg-muted:#f0f1f4;--line:#e6e8ec;--line-strong:#d4d7de;--line-hover:#bfc3cc;--ink:#0b0c0f;--ink-2:#3b3f48;--ink-3:#646a76;--ink-4:#9aa0ab;--on-ink:#fff;--accent:#4353ff;--accent-hover:#2f3ee0;--accent-soft:#eef0ff;--accent-ink:#2a36c8;--pass:#15803d;--pass-soft:#effbf3;--pass-line:#bfe8cc;--pass-diff:#136431;--fail:#d92d20;--fail-soft:#fef3f2;--fail-line:#f8c9c4;--hold:#b45309;--hold-soft:#fff8eb;--hold-line:#f6dca9;--band:#0b0b0d;--band-2:#15161a;--band-line:rgba(255,255,255,.1);--on-band:#fff;--on-band-2:rgba(255,255,255,.72);--on-band-3:rgba(255,255,255,.5);--band-accent:#8b96ff;--pd-violet:#6a1fe6;--pd-azure:#1a72ff;--live-ink:#4c1d95;--portaldot:linear-gradient(90deg,#6a1fe6,#4148f5 55%,#1a72ff);--shadow-sm:0 1px 2px rgba(11,12,15,.04);--shadow:0 1px 2px rgba(11,12,15,.04),0 6px 18px -8px rgba(11,12,15,.12);--shadow-lg:0 2px 6px rgba(11,12,15,.04),0 24px 48px -16px rgba(11,12,15,.2);--ease:cubic-bezier(.16,1,.3,1);--font:'Geist Variable',ui-sans-serif,system-ui,sans-serif;--mono:'Geist Mono Variable',ui-monospace,Menlo,monospace;} .ds-code{margin:0 0 1rem;max-width:560px;border:1px solid var(--line);border-radius:12px;background:var(--bg-subtle);overflow:hidden;font-family:var(--font);} .ds-code figcaption{display:flex;align-items:center;justify-content:space-between;height:38px;padding:0 .5rem 0 .9rem;border-bottom:1px solid var(--line);font-size:.8125rem;color:var(--ink-3);background:var(--bg);} .ds-copy{display:inline-flex;align-items:center;gap:.3rem;height:26px;padding:0 .5rem;border:0;border-radius:6px;background:none;font:inherit;font-size:.75rem;color:var(--ink-3);cursor:pointer;} .ds-copy:hover{background:var(--bg-muted);color:var(--ink);} .ds-copy:focus-visible{outline:2px solid var(--accent);outline-offset:2px;} .ds-code pre{margin:0;padding:.9rem 1rem 1rem;overflow-x:auto;font-family:var(--mono);font-size:.8125rem;line-height:1.7;color:var(--ink);font-variant-numeric:tabular-nums;} .ds-dark{margin:0;max-width:560px;padding:.8rem 1rem;border-radius:8px;background:#0b0b0d;color:#d4d4d8;font-family:var(--mono);font-size:.78rem;line-height:1.8;overflow-x:auto;} .ds-dark code{display:grid;} .ds-dark span{white-space:pre;} .ds-dark i{font-style:normal;color:#a5b4fc;} .ds-dark b{font-weight:500;color:#fafafa;} .ds-dark em{font-style:normal;color:#86efac;} .ds-dark .ds-ok{color:#86efac;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Registry Desk",
+    "overview": "ReviveCheck sells on-chain release approvals as permissions a contract enforces, and the site is built like a commercial infrastructure product: a marketing landing that opens into a live dashboard. The ground is cool paper, never white; everything that carries content is a white card on a 1px hairline, so the page reads as a desk of records rather than a document. The hero does not describe the product, it shows the recorded approval: a card with the approval block as a large rolling numeral, a transaction-status card whose steps check off on load, and a \"Listing allowed\" toast overlapping its corner, all over a faint masked grid and two soft Portaldot glows. The app keeps the same desk at operating restraint: a 60px bar, a sidebar, cards, tiles, and the live finalized head rolling in the overview's hero card.\n\nColor is scarce and means something. One indigo does the action and the live number: the primary pill button, links and chain references, the counters in the stats band, the current nav item, the \"App\" tag. Three status triads (green pass, red fail, amber hold) appear as a dot and a soft tint, or as status-colored text, never as a block. One near-black band holds what is enforced: the rules band on the landing, the lifecycle tab panel, the \"Run it with your own wallet\" card, and the dark readback panels. The Portaldot violet-to-azure gradient is the co-brand and the live signal: hero glows, the contract dots in the sidebar, the running stage's border, the current transaction pill, the indeterminate sweep, and the closing band.\n\nMotion is one fast-out settle ease applied sparingly: blocks rise 14px as they enter, every chain number rolls in as an odometer, the hero's status steps fire in sequence, the lifecycle tabber advances under a linear progress rule, and mega-menus scale-fade in. Under `prefers-reduced-motion` every animation and transition is removed and the finished state is rendered at once. The world is light only (`color-scheme: light`, `theme-color #f5f6f8`); selection, caret, scrollbar, focus ring and the native select chevron are themed to match.",
+    "keyCharacteristics": [
+      "Cool paper ground with white hairline cards; near-black ink and four grays; two hairline weights.",
+      "Geist on its weight axis for every text role (650 display, 600 titles, 550 UI, 400 body); Geist Mono with tabular figures only for chain data and code.",
+      "Indigo pill buttons (40/32/48px) with a soft indigo glow; white hairline pills as the secondary.",
+      "Status is a dot plus a soft tint; the running state breathes.",
+      "One dark band for the rules; the Portaldot gradient only as glows, co-brand and live progress, plus the closing band.",
+      "Every chain number is a rolling odometer; cards rise 14px on entry; nothing moves under reduced motion."
+    ],
+    "rules": [
+      {
+        "name": "The Paper-And-Card Rule",
+        "body": "The page ground is cool paper and content lives on white hairline cards. A white page ground, or a card drawn directly on another card without a hairline, breaks the desk.",
+        "section": "colors"
+      },
+      {
+        "name": "The Indigo-Leads Rule",
+        "body": "Indigo means the action or the live number: the one primary button in a view, links and chain references, counters, the current item, the running state. Its washes mark \"current\" or \"product\" and nothing else; indigo never fills a heading, a card body or a status.",
+        "section": "colors"
+      },
+      {
+        "name": "The One-Dark-Band Rule",
+        "body": "Near-black surfaces hold what is enforced or recorded: the rules band, the lifecycle panel, the wallet card and the readback panel. There is no dark theme and no dark section outside these.",
+        "section": "colors"
+      },
+      {
+        "name": "The Gradient-Is-Live Rule",
+        "body": "The Portaldot gradient reads as soft glows behind the hero and the app's hero card, as the co-brand dot, on live progress (the running stage, the current transaction pill, the sweep), and as the closing band. A static card, heading or button never carries it.",
+        "section": "colors"
+      },
+      {
+        "name": "The Dot-And-Tint Rule",
+        "body": "Status is a 6px dot plus a soft tint badge with a matching line, or status-colored text. No status ever fills a solid block.",
+        "section": "colors"
+      },
+      {
+        "name": "The Chain-In-Mono Rule",
+        "body": "Every hash, address, block link, runtime version, command and code sample is Geist Mono with tabular figures. Headline numerals (the approval block, the live head, the counters) are Geist, not mono: the number is the headline, its link is the chain reference. Prose, labels and headings are never mono.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tighter-As-Larger Rule",
+        "body": "Tracking tightens with size: −0.045em at display and numerals, −0.04em at headline and stats, −0.035em at page titles, −0.03em at titles, −0.015em at small titles, −0.005em on buttons, zero on labels, captions and mono.",
+        "section": "typography"
+      },
+      {
+        "name": "The Number-Is-The-Headline Rule",
+        "body": "A recorded block number is set as the largest type on its card, with a caption above it and a chain link beside or below it; a block number never appears only as small mono.",
+        "section": "typography"
+      },
+      {
+        "name": "The Card-Not-Band Rule",
+        "body": "Rhythm comes from cards on the paper ground and hairlines, not from alternating page bands. The only full-width tints are the stats band (paper subtle) and the closing band (gradient); the dark band is a card inside the column.",
+        "section": "layout"
+      },
+      {
+        "name": "The Raised-Means-Evidence-Or-Overlay Rule",
+        "body": "The raised shadow belongs to the hero's recorded cards, product visuals, and anything that overlays the page (mega-menus, dialogs, toasts). Working cards and tiles stay on the hairline shadow; hover may lift a stage node one step and 1px.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Radius Ladder Rule",
+        "body": "Controls are pills; fields 8px; tracks and sidebar links 10px; code, tables and nodes 12px; cards 16px; the hero's recorded cards 18px; the dark panel 20px; the dark band 24px. Pick the step by what the element is; do not invent intermediate radii.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do keep the ground cool paper and every content surface a white card on a 1px hairline; use the four text grays (ink, ink-2, ink-3, ink-4) and the three hairlines (line, line-strong, line-hover) for every neutral need.",
+      "Do set every hash, address, block link, runtime version, command and code sample in Geist Mono with tabular figures, link chain values to the official explorer in indigo, and set a card's headline block number as a large Geist numeral that rolls in as an odometer.",
+      "Do express status as a dot plus a soft tint badge (pass, fail, hold, run, quiet), a kind chip, or status-colored text.",
+      "Do use pills for every button and chip, 8px for fields, 10px for tracks and sidebar links, 12px for code and nodes, 16px for cards, 18px for the hero's recorded cards, 20px for the dark panel and 24px for the dark band.",
+      "Do keep the raised shadow for the hero's recorded cards, product visuals, mega-menus, dialogs and toasts; working cards and tiles sit on the hairline shadow.",
+      "Do put the Portaldot gradient only on glows, the co-brand dot, live progress and the closing band, and show the official Portaldot mark unaltered, only as \"Built on … Portaldot V3\", with clear space of at least a quarter of its height.",
+      "Do focus with the 2px indigo outline at a 2px offset (white on the band and the gradient; inputs take an indigo border plus a 16% ring), and remove every animation and transition under `prefers-reduced-motion` while rendering the finished state."
+    ],
+    "donts": [
+      "Don't set the page ground white, place a card on a card without a hairline, or alternate page-wide bands; the stats band and the closing band are the only full-width tints.",
+      "Don't fill a heading, a card body or a status with indigo, or use its wash for anything but \"current\" and \"product\"; one indigo primary per view.",
+      "Don't fill status as a solid block; a badge is a soft tint with a line and a dot.",
+      "Don't add a dark theme or a dark section beyond the rules band, the lifecycle panel, the wallet card and the readback panel (`color-scheme: light`).",
+      "Don't apply the Portaldot gradient to a static card, a heading or a button, and don't recolor, outline, crop or animate the Portaldot mark or imply endorsement.",
+      "Don't introduce a third face, uppercase tracking-out labels or kickers, a display weight above 650, a hard offset shadow, or a second easing beyond the settle ease and the odometer's roll.",
+      "Don't let an entry stagger exceed 300ms or an odometer roll longer than 1.1s, and don't animate anything that has not finished loading its real value."
+    ]
+  }
+}

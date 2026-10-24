@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  test:
+    name: Tests and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Unit tests run offline: the compiled contracts execute in an in-memory EVM,
+      # the sealed-report and evidence checks use recorded fixtures, and the MCP
+      # server is driven over stdio. No network, no wallet, no testnet calls.
+      - run: npm test
+      - run: npx vite build
+      - name: Feed and lifecycle records parse
+        run: node -e "for (const f of ['public/api/registry.json','public/lifecycle/registry.json','public/lifecycle/token-list.json','public/lifecycle/evidence.json']) JSON.parse(require('fs').readFileSync(f,'utf8')); console.log('records ok')"

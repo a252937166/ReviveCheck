@@ -1,14 +1,67 @@
 # ReviveCheck
 
-Release acceptance and reviewer handoff for Portaldot V3 applications.
+Release attestation middleware for Portaldot V3: a registry other contracts can trust, evidence stored on-chain, and a verification API for agents, apps and CI.
+
+[![CI](https://github.com/a252937166/ReviveCheck/actions/workflows/ci.yml/badge.svg)](https://github.com/a252937166/ReviveCheck/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![Deployed on Portaldot V3 testnet](https://img.shields.io/badge/deployed-Portaldot%20V3%20testnet-6a1fe6)](https://scanner-testnet-v3.portaldot.dev/#/extrinsics/0xc099451a308eab45a2a29c1f1d628290d067c69250f129ad7aab145235c8aeea) [![Track](https://img.shields.io/badge/track-Modular%20Cloud%20%26%20Middleware-1a72ff)](https://dorahacks.io/hackathon/portaldot-hacker-house-2026/detail)
 
 [DoraHacks submission: Under Review](https://dorahacks.io/build/50176) · [Current baseline reviewer](https://a252937166.github.io/ReviveCheck/?report=0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5#/review) · [Verified v0.2 lifecycle walkthrough](https://a252937166.github.io/ReviveCheck/lifecycle-demo-v0.2.mp4) · [Original Check-in video](https://a252937166.github.io/ReviveCheck/check-in.mp4) · [Original Check-in deck](artifacts/ReviveCheck-Check-in-Deck.pdf)
 
 **Define the release checks, inspect the real target, correct a failure, and hand the exact report to a reviewer.** Preserve that review with its report; create a new check when the release, plan, deployment, or runtime changes.
 
-The v0.2 workbench uses the real V3 testnet. Its static public reviewer verifies report integrity without a backend or wallet. The included public pUSD report verifies an existing native asset against its ERC-20 precompile; it does not claim we created that asset or have an independent customer. Anonymous browser checks have verified the current report, its official native block detail, and a review receipt created, downloaded and imported into an isolated demo workspace. That is an internal workflow demonstration, not independent adoption.
+## What it is
 
-The new **120-second, 1080p/30 fps, silent English-captioned walkthrough** uses actual current UI screenshots and has passed local render/QA, including decoding its two displayed QR codes. The anonymous public download matched the local video SHA-256, and its public browser player loaded the correct duration and dimensions. Own ReleaseGate deployment, state writes and finalized dual-interface readback remain pending test-token funding; the latest account check at **2026-10-23 09:00:19.771 UTC / 05:00 EDT** still found **0 tPOT**, with no signing or broadcast. Revalidation after an actual environment change also remains unobserved. The original 78-second Check-in video/deck and organizer form are unchanged. See [the video evidence and publication record](docs/DEMO_V2.md) and [v0.2 validation](docs/RELEASE_V2.md).
+ReviveCheck provides three components, all built on Portaldot V3's runtime modules and all deployed and recorded on the V3 testnet:
+
+| Component | What it is | On the V3 testnet |
+| --- | --- | --- |
+| **Decentralized middleware** | `ReleaseRegistry`, an open contract where a release owner commits a sealed report's hash and reviewers approve that exact hash, with every new submission opening an unapproved revision. `ReviveCheckGuard`, a Solidity library any contract uses to act on those approvals. `VerifiedTokenList`, the reference consumer. | Registry `0xe949b200edf070b9d425b206ed24dc8fe5b7d339` (block 162962). Token list `0xd0bd833b4b8658b1230a0e9a99640935b3c65819` (block 164220). pUSD listed on an approved release in block 164313, read back through both interfaces. |
+| **Storage and data** | Sealed reports stored on the chain itself through the native Remark module (`remark.store`), retrievable and verifiable from any node by two hashes. A public feed, `public/api/registry.json`, built from chain events. | Reports stored in blocks 164266 and 164335 (7,404 bytes, about 0.75 tPOT each). |
+| **APIs** | Twelve read-only tools that check releases through both V3 interfaces at one finalized block, assess promotion against V3 Live, and read every contract back through both interfaces. Served over MCP, REST, JavaScript and the CLI from one implementation. Writes are dry-run, then signed in the user's own wallet. | `npm run mcp`, `npm run rc -- <tool>`, `POST /api/tools/<name>` on the local workbench. |
+
+Portaldot modules used: **Revive** (the contracts, reachable as EVM transactions or native `revive.call`), **ReviveApi** (account and block mapping between the interfaces), **Assets and its ERC-20 precompile** (the demo release's parity checks), and **Remark** (evidence storage).
+
+## See it live
+
+The public site, <https://a252937166.github.io/ReviveCheck/>, opens into an app (`#/app`) with the registry's releases, listings, stored reports and activity, each row linked to its block, plus live lookups through the same service the MCP server uses. The landing shows the lifecycle as eight stages on the recorded run of the pUSD token list, each linked to its block: check (v1.0.0 fails on decimals), recheck (v1.0.1 passes), store (the report on-chain), submit and approve (the registry), consume (the token list acts on the approval), promote (V3 Live refuses the release: chain 780780777, runtime 3001, no asset 7777) and watch (both runtimes, live).
+
+**Run the lifecycle** (`#/app/run`, inside the app at `#/app`) runs every stage on the real testnet from the browser. Reads need nothing. Storing, submitting, approving, listing and the review remark are signed in a Polkadot wallet (EVM wallets cover the two registry calls), each after a dry-run, and paid with the visitor's own testnet tPOT: the site holds no key and spends nothing. On 2026-10-23 a full run through the studio UI signed submit (block 163485), approve (163489) and a remark (163493) with the project test wallet.
+
+```sh
+claude mcp add revivecheck -- node "$PWD/mcp/server.js"      # Claude Code
+npm run rc -- token_list_status --token 0x00001E6100000000000000000000000000010000
+```
+
+The full record, with every hash and link, is in [docs/LIFECYCLE.md](docs/LIFECYCLE.md). The integration guide is [docs/INTEGRATION.md](docs/INTEGRATION.md), also at `#/docs`. The mark and the "Built on Portaldot V3" co-brand are described in [docs/BRAND.md](docs/BRAND.md).
+
+## Why it is different
+
+| | Today | With ReviveCheck |
+| --- | --- | --- |
+| Where the approval lives | A JSON token list, a spreadsheet or a chat thread. No contract can read it. | A hash in the `ReleaseRegistry`. Any V3 contract reads it through the `ReviveCheckGuard` library in three lines of Solidity. |
+| What was approved | "The release", with no record of what the reviewer saw. | The exact report hash the reviewer named. A new revision clears every decision, so nothing carries over silently. |
+| The evidence | A screenshot, or a link whose content can change. | The sealed report itself, stored on Portaldot through the native Remark module and retrievable from any node by its SHA-256 and its blake2 content hash. |
+| Checking the chain | Someone opens an explorer and reads one interface. | One API reads the native runtime and the EVM RPC at the same finalized block, and the two must agree. Served over MCP, REST, JavaScript and the CLI. |
+| Going to V3 Live | A testnet pass is assumed to carry over. | V3 Live itself is read first; a different chain ID, runtime or missing asset refuses the release. |
+
+What V3 makes possible here, and what the design leans on: the same contract is reached as an EVM transaction or a native `revive.call`, and read back through both `eth_call` and `ReviveApi.call`; the evidence store is a runtime module (`remark.store`), not a contract; and the promotion check is a read of a second Portaldot network.
+
+## Who it is for
+
+- **Token issuers and listing teams.** Publish a token-list release with proof that the chain agrees, and let wallets and DEX allow-lists read the approval on-chain instead of trusting a file. The pUSD release on the testnet is the worked example.
+- **Protocol teams gating launches.** Put a launchpad, a router allow-list or an upgrade behind an approved release. `VerifiedTokenList` is the reference consumer; the guard works for any contract.
+- **Reviewers, auditors, agents and CI.** Check a release through both V3 interfaces, replay it at its block, and sign a decision from a wallet or a pipeline. The MCP server gives an agent the same twelve tools.
+
+**Business model, as a hypothesis.** The contracts, the library and the API stay open source under MIT. What a team would pay for: a hosted verification and indexing service so they do not run the API and the event indexer themselves, curated reviewer registries operated for an ecosystem (a chain, a launchpad, a wallet's listing desk), and CI integrations with retention of reports. None of this is validated with a paying customer yet; the next product test is an external builder bringing their own contract.
+
+## Roadmap
+
+- A second, independent reviewer account for the recorded demo, so owner and reviewer are no longer one test account.
+- A curated `VerifiedTokenList` deployment with a pinned reviewer, and a second consumer beyond token lists (a launchpad or DEX allow-list).
+- Gasless reviewer decisions through V3's `MetaTx` module, so a reviewer signs without holding tPOT.
+- A GitHub Action that rechecks a release when the runtime changes, and a published npm package for the API.
+- Retries and failover for the public RPC nodes, and an EVM-wallet signed run recorded end to end.
+
+Contributions are welcome through issues and pull requests; `npm test` runs offline, including the compiled contracts in an in-memory EVM, and CI runs the same on every push.
 
 ## Run it
 
@@ -112,27 +165,53 @@ node scripts/execute-release.js --broadcast --max-cost-tpot 100
 
 The isolated test signer occupies both roles in this facilitated contract demonstration. It is not independent review or adoption. Maximum storage deposits plus a conservative fee reserve are checked cumulatively against the estimate cap; actual fee changes cannot be strictly capped by this helper. A pending journal entry stops automatic retries after an uncertain outcome. Deployment, writes and readback are only complete when the actual receipts and passing report exist.
 
+The v0.3 middleware uses the same helpers and caps:
+
+```sh
+node scripts/compile-release-registry.js && node scripts/compile-token-list.js
+node scripts/deploy-registry.js --wallet .private/wallet.json                 # estimate; --broadcast --max-cost-tpot <n> to sign
+node scripts/deploy-token-list.js --wallet .private/wallet.json [--curator 0x…] # the registry's reference consumer
+node scripts/store-evidence.js --report <published report hash>                # remark.store estimate; --broadcast --max-fee-tpot <n>
+node scripts/list-token.js --wallet .private/wallet.json                       # list pUSD on your approved release; dry-run by default
+node scripts/index-registry.js                                                 # rebuild public/api/registry.json from chain events
+node scripts/record-studio-run.js <session.json>                               # publish a studio session after re-reading the chain
+```
+
+Deployed on 2026-10-23: ReleaseRegistry at block 162962, VerifiedTokenList at 164220 (code deposit 178.158 tPOT), reports stored at 164266 and 164335, pUSD listed at 164313. Every record is in [docs/LIFECYCLE.md](docs/LIFECYCLE.md) with its extrinsic.
+
+
 ## Architecture and materials
 
 ```mermaid
 flowchart LR
-    Developer[Developer's project and release] --> UI[React workbench]
-    UI --> API[Local acceptance API]
-    API --> Live[Read-only V3 inspector]
-    Live --> Native[Native RPC and ReviveApi]
-    Live --> EVM[Ethereum RPC]
-    API --> Fixture[Synthetic rehearsal adapter]
-    API --> Store[Append-only saved runs]
-    Store --> Diff[Same-target comparison]
-    Store --> Export[JSON and HTML evidence]
-    CLI[Explicit testnet deployment helper] -. real receipts .-> Live
+    subgraph Routes[APIs: one implementation, four routes]
+        MCP[MCP server] --> Service[lib/service.js]
+        REST[REST on the local workbench] --> Service
+        JS[JavaScript module] --> Service
+        CLI[npm run rc] --> Service
+    end
+    Studio[Public site: studio, reviewer, docs] --> Service
+    Service --> ReviveApi[ReviveApi + native RPC]
+    Service --> EVM[Ethereum RPC]
+    Service -. prepares, dry-runs .-> Wallet[User's wallet signs]
+    Wallet --> Registry[ReleaseRegistry]
+    Wallet --> Remark[Remark module: stored reports]
+    Wallet --> List[VerifiedTokenList]
+    List -- ReviveCheckGuard --> Registry
+    Consumer[Any V3 contract] -- ReviveCheckGuard --> Registry
+    Explorer[Explorer event index] --> Feed[public/api/registry.json]
+    Registry -.-> Explorer
+    Remark -.-> Explorer
+    List -.-> Explorer
 ```
 
+- [How the project maps to the judging criteria, with gaps](docs/JUDGING_FIT.md)
 - [Product, innovation hypothesis, lifecycle, adoption gates](docs/PRODUCT.md)
 - [Check-in description and honest progress ledger](docs/CHECK_IN.md)
 - [Delivered 78-second demonstration and captions](docs/DEMO_SCRIPT.md)
 - [Verified 120-second v0.2 UI walkthrough](https://a252937166.github.io/ReviveCheck/lifecycle-demo-v0.2.mp4) and [scene/evidence/QA record](docs/DEMO_V2.md)
 - [Test-token request and manual support follow-up](docs/TOKEN_REQUEST.md)
+- [Integration guide: middleware, storage, API](docs/INTEGRATION.md)
 - [API contract](docs/API.md)
 - [Manual acceptance record](docs/VALIDATION.md)
 
