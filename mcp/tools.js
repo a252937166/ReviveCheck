@@ -133,6 +133,17 @@ export const TOOLS = [
     run: (args) => service.readRegistry(args),
   },
   {
+    name: 'evaluate_policy', title: 'Evaluate a policy binding',
+    description: 'Decide whether a consumer may act on a release right now. A policy (revivecheck.policy.v1) binds acceptance to a network and genesis, a subject (native asset or contract, with code identity where applicable), a plan fingerprint, supported runtimes, evidence age and an explicit trusted reviewer set; a binding (revivecheck.binding.v1) names the exact report, release and revision. The tool reads the network, the registry for every trusted reviewer and, when required, the consumer listing and the stored report, then returns valid, recheck-required, expired or unknown with every reason. Anything but valid blocks; a read that fails yields unknown, never valid.',
+    inputSchema: {
+      policy: z.record(z.any()).describe('The policy envelope (revivecheck.policy.v1)'),
+      binding: z.record(z.any()).describe('The binding of one report to the policy subject (revivecheck.binding.v1)'),
+      ...reportInput,
+    },
+    annotations: read,
+    run: async ({ policy, binding, ...args }) => service.evaluatePolicy({ policy, binding, report: await loadReport(args.report ? args : { reportHash: args.reportHash || binding?.reportHash }) }),
+  },
+  {
     name: 'prepare_transaction', title: 'Prepare a transaction',
     description: 'Build an unsigned transaction for the user to sign in their own wallet: a ReleaseRegistry submit or review, a VerifiedTokenList list, a remark.store that puts a sealed report on-chain, or a System.remark_with_event review attestation. With `from` (SS58 or H160) a contract call is dry-run: weight, storage deposit, and the revert reason if it would fail (EmptyName, EmptyReport, UnknownRelease, StaleReport, ReleaseNotApproved, ReportMismatch, NotReleaseOwner, DecimalsMismatch). This tool never signs.',
     inputSchema: {
