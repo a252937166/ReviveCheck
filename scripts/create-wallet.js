@@ -8,7 +8,8 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const privateDirectory = path.join(root, '.private');
 const walletPath = path.join(privateDirectory, 'wallet.json');
-const notePath = process.env.REVIVECHECK_OBSIDIAN_WALLET_NOTE || path.join(homedir(), 'Documents/Obsidian Vault/Hackathons/DoraHacks/portaldot-hacker-house-2026/ReviveCheck 测试网钱包（私密）.md');
+// The note written on 2026-10-23 carried an earlier, non-English name; point REVIVECHECK_OBSIDIAN_WALLET_NOTE at it to reuse it.
+const notePath = process.env.REVIVECHECK_OBSIDIAN_WALLET_NOTE || path.join(homedir(), 'Documents/Obsidian Vault/Hackathons/DoraHacks/portaldot-hacker-house-2026/ReviveCheck testnet wallet (private).md');
 await cryptoWaitReady();
 await mkdir(privateDirectory, { recursive: true, mode: 0o700 });
 let wallet;
@@ -22,7 +23,7 @@ catch (error) {
 }
 await chmod(walletPath, 0o600);
 await mkdir(path.dirname(notePath), { recursive: true });
-const note = `---\ntitle: ReviveCheck 测试网钱包（私密）\nprivate: true\nnetwork: portaldot-v3-testnet\ncreated: ${wallet.createdAt}\n---\n\n# ReviveCheck 测试网钱包（私密）\n\n按用户 2026-10-23 的明确要求，完整钱包信息在本笔记明文保存。仅用于本次 Portaldot V3 测试网开发与测试代币；不用于主网或真实资产。请勿复制到公开仓库、提交材料或工单。\n\n## 完整钱包信息\n\n- 钱包名称：${wallet.name}\n- 类型：${wallet.type}\n- SS58 format：${wallet.ss58Format}\n- 原生公开地址：\`${wallet.ss58Address}\`\n- 公钥：\`${wallet.publicKey}\`\n- 创建时间：${wallet.createdAt}\n- 助记词（明文，拥有账户控制权）：\n\n\`\`\`text\n${wallet.mnemonic}\n\`\`\`\n\n该原生钱包不具有单独的 Ethereum secp256k1 私钥；由上述助记词派生 sr25519 密钥。EVM映射地址须通过本链runtime核验，不从同私钥Ethereum地址推断。\n\n## 本地使用\n\n- 本地钱包文件：\`${walletPath}\`（权限600，已被Git忽略）\n- 私密目录权限：700\n- 代码仓库仅保留公开地址和公钥；UI不会读取助记词。\n\n## 当前状态\n\n- 钱包：已创建并本地保存。\n- 领币：尚未提交/待工单实证更新。\n- 测试币到账：尚未验证。\n- 原生/EVM映射：待实时核验。\n- 部署：尚未完成。\n\n工单仅提供公开原生地址及比赛要求的报名截图，绝不提供助记词或本笔记。\n`;
+const note = `---\ntitle: ReviveCheck testnet wallet (private)\nprivate: true\nnetwork: portaldot-v3-testnet\ncreated: ${wallet.createdAt}\n---\n\n# ReviveCheck testnet wallet (private)\n\nAt the user's explicit request on 2026-10-23, the complete wallet is kept in this note in plain text. It is for Portaldot V3 testnet development and test tokens only, never for mainnet or real assets. Do not copy it into a public repository, submission material or a support ticket.\n\n## Complete wallet\n\n- Wallet name: ${wallet.name}\n- Type: ${wallet.type}\n- SS58 format: ${wallet.ss58Format}\n- Native public address: \`${wallet.ss58Address}\`\n- Public key: \`${wallet.publicKey}\`\n- Created: ${wallet.createdAt}\n- Mnemonic (plain text; controls the account):\n\n\`\`\`text\n${wallet.mnemonic}\n\`\`\`\n\nThis native wallet has no separate Ethereum secp256k1 private key; the sr25519 key is derived from the mnemonic above. The mapped EVM address must be read from this chain's runtime, never inferred from a same-key Ethereum address.\n\n## Local use\n\n- Local wallet file: \`${walletPath}\` (mode 600, ignored by Git)\n- Private directory mode: 700\n- The repository keeps only the public address and public key; the UI never reads the mnemonic.\n\n## Status\n\n- Wallet: created and saved locally.\n- Token request: not submitted; update when the ticket is filed.\n- Testnet tokens received: not verified.\n- Native/EVM mapping: to be verified live.\n- Deployment: not done.\n\nA support ticket receives only the public native address and the registration screenshot the contest asks for, never the mnemonic or this note.\n`;
 try { await writeFile(notePath, note, { mode: 0o600, flag: 'wx' }); } catch (error) { if (error.code !== 'EEXIST') throw error; }
 await chmod(notePath, 0o600);
 await mkdir(path.join(root, 'docs'), { recursive: true });
