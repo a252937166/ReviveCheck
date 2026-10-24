@@ -27,7 +27,7 @@ export const SETUP = [
   {
     id: 'mcp', title: 'MCP server',
     body: [
-      'mcp/server.js speaks the Model Context Protocol over stdio. It exposes twelve read-only tools and two resources: the recorded lifecycle and the ReleaseRegistry record with its ABI. Reports produced in a session can be referenced by hash in later calls.',
+      'mcp/server.js speaks the Model Context Protocol over stdio. It exposes thirteen read-only tools and two resources: the recorded lifecycle and the ReleaseRegistry record with its ABI. Reports produced in a session can be referenced by hash in later calls.',
       'A call that reaches a slow public node sends progress notifications every 8 seconds, so clients that reset their timeout on progress keep waiting.',
     ],
     code: [
@@ -93,12 +93,12 @@ contract MyLaunchpad {
     ],
   },
   {
-    id: 'api', title: 'API: twelve tools, four routes',
+    id: 'api', title: 'API: thirteen tools, four routes',
     body: [
       'Checks read the native runtime through ReviveApi and the EVM RPC at one finalized block, and seal the result. Promotion reads V3 Live itself. Registry, token-list and evidence reads come back through both interfaces with an interfacesAgree flag. Every write is a prepared, dry-run transaction for the user’s wallet.',
-      'The same twelve tools are exposed over MCP, as POST /api/tools/<name> on the local workbench, as lib/service.js, and as npm run rc. See the tool reference below for arguments.',
+      'The same thirteen tools are exposed over MCP, as POST /api/tools/<name> on the local workbench, as lib/service.js, and as npm run rc. See the tool reference below for arguments.',
     ],
-    rows: [['Read', 'network_status, check_release, get_report, replay_report, compare_reports, assess_promotion, read_registry, token_list_status, retrieve_evidence, list_releases, verify_attestation'], ['Prepare', 'prepare_transaction: submit, review, list, store, remark'], ['Never', 'signs, holds a key, or writes to the chain on its own']],
+    rows: [['Read', 'network_status, check_release, get_report, replay_report, compare_reports, assess_promotion, read_registry, token_list_status, retrieve_evidence, list_releases, verify_attestation, evaluate_policy'], ['Prepare', 'prepare_transaction: submit, review, list, store, remark'], ['Never', 'signs, holds a key, or writes to the chain on its own']],
     code: [{ title: 'Claude Code', code: 'claude mcp add revivecheck -- node "$PWD/mcp/server.js"' }],
   },
 ];
@@ -236,6 +236,20 @@ export const FEATURES = [
     output: JSON.stringify({ network: 'testnet', chainId: 420420777, genesisMatches: true, runtime: 'portaldot-v3/3002', finalized: { number: '163027', nativeHash: '0x886cdd66…15ff' }, evm: { chainId: 420420777, finalizedHash: '0x79870ea5…c12a' } }, null, 2),
   },
   {
+    id: 'policy', title: 'Decide with a policy', tool: 'evaluate_policy',
+    summary: 'A policy binds a business action to a network and genesis, a subject, a plan fingerprint, supported runtimes, evidence age and an explicit trusted reviewer set; a binding names one exact report, release and revision. The evaluation checks both against fresh reads and returns valid, recheck-required, expired or unknown.',
+    needs: ['A policy (revivecheck.policy.v1) and a binding (revivecheck.binding.v1)', 'The bound report, by hash or as JSON', 'Network access; no wallet'],
+    shows: 'Whether the consumer may act right now, with every check and reason, the checkpoints read and who the trusted reviewers are.',
+    limits: 'Only valid enables; an unavailable read is unknown, never a pass. Expiry is a policy clock and runtime drift is seen only in the observation supplied; nothing watches continuously. A valid result is not independent review: the trusted set is the policy author’s choice.',
+    tabs: {
+      MCP: mcp('evaluate_policy', { policy: { schema: 'revivecheck.policy.v1', name: 'pUSD catalog policy (testnet)', network: { key: 'testnet', chainId: 420420777, genesisHash: '0xd4f9acbc…5283bd' }, runtime: { specName: 'portaldot-v3', specVersions: ['3002'] }, subject: { kind: 'native-asset', assetId: '7777', address: PUSD }, planHash: 'ce76c98f…222191', evidence: { scope: 'portaldot-testnet-readonly', maxAgeSeconds: 604800, requireStoredOnChain: true }, reviewers: { trusted: [OWNER], threshold: 1, basis: 'The project test account; not independent review.' }, registry: { address: REG, owner: OWNER }, consumer: { address: LIST, requireListed: true } }, binding: { schema: 'revivecheck.binding.v1', reportHash: STUDIO_REPORT, releaseId: RELEASE, revision: '1', '…': '…' } }),
+      REST: rest('evaluate_policy', { policy: '…', binding: '…', reportHash: STUDIO_REPORT }),
+      JavaScript: "import { evaluatePolicy } from './lib/service.js';\n\nconst evaluation = await evaluatePolicy({ policy, binding, report });\nif (evaluation.enable) enable(); else console.log(evaluation.status, evaluation.reasons);",
+      CLI: 'node examples/token-catalog/catalog.js acceptance --config examples/token-catalog/config/testnet.json   # exit 1 unless every token is valid\nnpm run rc -- evaluate_policy --policy "$(jq -c .policy examples/token-catalog/config/testnet.json)" --binding "$(jq -c \'.bindings[-1]\' examples/token-catalog/data/testnet/bindings.json)"',
+    },
+    output: JSON.stringify({ status: 'valid', enable: true, reasons: [], policyName: 'pUSD catalog policy (testnet)', reportHash: STUDIO_REPORT, releaseId: RELEASE, revision: '1', checkpoint: { registry: { number: '176662' }, observation: { number: '176662' } }, checks: 24, reviewerTrust: 'The project’s isolated test account, which is also the release owner…', nextAction: 'Enable the subject under this policy. Validity is a point-in-time result: evaluate again before each use.' }, null, 2),
+  },
+  {
     id: 'reports', title: 'Reports, the feed and review', tool: 'get_report',
     summary: 'Load a sealed report by fingerprint and recompute its SHA-256, list every release and stored report from the feed, or open a report in the browser reviewer.',
     needs: ['The report hash: published on this site, from this session, stored on-chain, or as JSON'],
@@ -260,7 +274,7 @@ export const REFERENCE = {
   },
   tokenlist: {
     title: 'VerifiedTokenList contract and ReviveCheckGuard',
-    rows: [['Address', LIST], ['Deployed', 'block #164,220 · extrinsic 0xe3efb1e7…56570 · code deposit 178.158 tPOT'], ['Curator', 'open: 0x0000…0000, so each lister names the reviewer their listing relies on'], ['Version', 'v1 deployed: any release owner can replace an entry (review F-02); v2 in contracts/ adds entry ownership, delist and a curator override, awaiting deployment'], ['Compiler', 'solc 0.8.24, Paris, optimizer 1 (size)'], ['Sources', 'contracts/ReviveCheckGuard.sol + contracts/VerifiedTokenList.sol · sha-256 7febe106…be31c69'], ['Runtime code', '2,116 bytes'], ['First listing', `pUSD in #164,313 · extrinsic ${LIST_TX.slice(0, 14)}…`]],
+    rows: [['Address', LIST], ['Deployed', 'block #164,220 · extrinsic 0xe3efb1e7…56570 · code deposit 178.158 tPOT'], ['Curator', 'open: 0x0000…0000, so each lister names the reviewer their listing relies on'], ['Version', 'v1 deployed: any release owner can replace an entry (review F-02); v2 in contracts/ adds entry ownership, delist and a curator override; its deployment is pending about 148 tPOT of funding (estimate 2026-10-24: 225.738 tPOT held, 0.316 tPOT fee)'], ['Compiler', 'solc 0.8.24, Paris, optimizer 1 (size)'], ['Sources', 'contracts/ReviveCheckGuard.sol + contracts/VerifiedTokenList.sol · sha-256 7febe106…be31c69'], ['Runtime code', '2,116 bytes'], ['First listing', `pUSD in #164,313 · extrinsic ${LIST_TX.slice(0, 14)}…`]],
     code: `library ReviveCheckGuard {\n  function isApproved(IReleaseRegistry, bytes32 id, address reviewer, bytes32 reportHash) internal view returns (bool);\n  function approvals(IReleaseRegistry, bytes32 id, address[] memory reviewers) internal view returns (uint256);                     // distinct reviewers\n  function approvals(IReleaseRegistry, bytes32 id, bytes32 reportHash, address[] memory reviewers) internal view returns (uint256); // bound to the exact report\n  function requireApproved(IReleaseRegistry, bytes32 id, address reviewer, bytes32 reportHash) internal view;\n  error ReleaseNotApproved(bytes32 id); error ReportMismatch(bytes32 id, bytes32 expected, bytes32 current);\n}\ncontract VerifiedTokenList {\n  function list(address token, bytes32 releaseId, bytes32 reportHash, address reviewer, uint8 decimals)\n  function isListed(address token) view returns (bool)\n  function entryOf(address token) view returns (bytes32 releaseId, bytes32 reportHash, address reviewer)\n  function delist(address token)                                   // v2: the entry's release owner, or the curator\n  event Listed(address indexed token, bytes32 indexed releaseId, address indexed reviewer, bytes32 reportHash, uint8 decimals)\n  error ReviewerNotAllowed(address); error NotReleaseOwner(); error DecimalsMismatch(uint8 chainDecimals);\n  error EntryOwnedByAnother(address owner); error NoEntry();       // v2\n}`,
   },
   networks: {

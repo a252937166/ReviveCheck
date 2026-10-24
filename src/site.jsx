@@ -65,7 +65,7 @@ export const MENUS = {
     label: 'Developers',
     items: [
       { icon: Rocket, title: 'Quickstart', text: 'Clone, test and run in minutes', href: '#/docs/start' },
-      { icon: Plug, title: 'MCP server', text: 'Twelve tools for agents', href: '#/docs/mcp' },
+      { icon: Plug, title: 'MCP server', text: 'Thirteen tools for agents', href: '#/docs/mcp' },
       { icon: Braces, title: 'REST API', text: 'POST /api/tools/<name>', href: '#/docs/rest' },
       { icon: SquareTerminal, title: 'CLI', text: 'npm run rc, from a terminal or CI', href: '#/docs/cli' },
       { icon: BookOpen, title: 'JavaScript', text: 'lib/service.js in Node or the browser', href: '#/docs/js' },

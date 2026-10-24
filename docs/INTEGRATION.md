@@ -37,7 +37,7 @@ contract MyLaunchpad {
 }
 ```
 
-`VerifiedTokenList` at `0xd0bd833b4b8658b1230a0e9a99640935b3c65819` is the reference consumer: `list(token, releaseId, reportHash, reviewer, decimals)` and `isListed(token)`. Its curator is open, so each lister names the reviewer the listing relies on; a curated deployment passes a reviewer to the constructor. The testnet deployment is v1: it never checked who owned an existing entry, so any release owner could replace any token's entry with their own approved release (2026-10-24 review, finding F-02). The v2 source in `contracts/` lets only the owner of the release an entry names, or the curator, replace or `delist` it, with regression tests in `test/verified-token-list.test.js`; the v1 sources stay under `contracts/deployed/v1` and still hash to the deployment record. v2 awaits its own deployment and code deposit.
+`VerifiedTokenList` at `0xd0bd833b4b8658b1230a0e9a99640935b3c65819` is the reference consumer: `list(token, releaseId, reportHash, reviewer, decimals)` and `isListed(token)`. Its curator is open, so each lister names the reviewer the listing relies on; a curated deployment passes a reviewer to the constructor. The testnet deployment is v1: it never checked who owned an existing entry, so any release owner could replace any token's entry with their own approved release (2026-10-24 review, finding F-02). The v2 source in `contracts/` lets only the owner of the release an entry names, or the curator, replace or `delist` it, with regression tests in `test/verified-token-list.test.js`; the v1 sources stay under `contracts/deployed/v1` and still hash to the deployment record. v2 awaits its own deployment and code deposit; the deployment is driven by a validated manifest, estimated on 2026-10-24 at 226.37 tPOT committed (225.738 held, 0.316 fee) against 78.79 tPOT available, see [DEPLOYMENT.md](DEPLOYMENT.md). A consumer built on these interfaces, the Token Catalog, is under `examples/token-catalog/`.
 
 ### Storage: evidence on Portaldot
 
@@ -52,7 +52,7 @@ A report is stored with `remark.store`; `Remark.Stored` carries the publisher an
 
 ### API
 
-The twelve tools below. `prepare_transaction` covers `submit`, `review`, `list`, `store` and `remark`.
+The thirteen tools below. `prepare_transaction` covers `submit`, `review`, `list`, `store` and `remark`; `evaluate_policy` decides whether a consumer may act on a release ([POLICY.md](POLICY.md)).
 
 ## MCP server
 
@@ -65,7 +65,7 @@ claude mcp add revivecheck -- node /absolute/path/to/ReviveCheck/mcp/server.js
 { "mcpServers": { "revivecheck": { "command": "node", "args": ["/absolute/path/to/ReviveCheck/mcp/server.js"] } } }
 ```
 
-The server exposes twelve read-only tools and two resources:
+The server exposes thirteen read-only tools and two resources:
 
 - `revivecheck://lifecycle/reference`: the recorded run.
 - `revivecheck://registry`: the ReleaseRegistry record with its ABI.
@@ -99,6 +99,7 @@ The request body is the tool's arguments, validated by the same schema as MCP. U
 | `token_list_status` | Reads a token's listing in the VerifiedTokenList through both interfaces. | `token` |
 | `list_releases` | The public feed: releases, decisions, listings and stored reports. | `owner`, `label` |
 | `verify_attestation` | Verifies a review remark from chain data alone. | `extrinsicHash`, `blockHash` |
+| `evaluate_policy` | Decides whether a consumer may act on a release: a policy (network and genesis, subject, plan fingerprint, supported runtimes, evidence age, trusted reviewers, consumer, stored report) and a binding (exact report, release, revision) against fresh reads. Returns `valid`, `recheck-required`, `expired` or `unknown`; only `valid` enables. | `policy`, `binding`, `reportHash` or `report` |
 
 ## Capabilities
 
@@ -205,6 +206,21 @@ npm run rc -- network_status | grep -q '"runtime": "portaldot-v3/3002"'
 
 There is no background watcher. A recheck runs when you or your CI start it.
 
+### Decide with a policy
+
+```sh
+npm run rc -- evaluate_policy --policy "$(cat examples/token-catalog/config/testnet.json | jq -c .policy)" \
+  --binding "$(jq -c '.bindings[-1]' examples/token-catalog/data/testnet/bindings.json)"
+```
+
+```js
+import { evaluatePolicy } from './lib/service.js';
+const evaluation = await evaluatePolicy({ policy, binding, report });
+// evaluation.status: valid | recheck-required | expired | unknown; evaluation.enable; evaluation.reasons
+```
+
+The service reads the network observation, the registry for every trusted reviewer, the consumer listing when the policy requires it and the stored report when it requires that, in one call, then evaluates. A read that fails comes back as `unknown` rather than throwing. The policy, binding and evaluation formats, every reason code and the rules (explicit reviewer trust, new approval plus explicit rebinding for a new report, expiry as a policy clock, drift detected only from a fresh observation) are in [POLICY.md](POLICY.md). The Token Catalog under `examples/token-catalog/` is the worked consumer.
+
 ## VerifiedTokenList and ReviveCheckGuard
 
 | | |
@@ -225,6 +241,8 @@ contract VerifiedTokenList {
   function list(address token, bytes32 releaseId, bytes32 reportHash, address reviewer, uint8 decimals) external;
   function isListed(address token) external view returns (bool);
   function entryOf(address token) external view returns (bytes32 releaseId, bytes32 reportHash, address reviewer);
+  function delist(address token) external;                                  // v2: the entry's release owner, or the curator
+  function version() external pure returns (uint8);                         // v2
 }
 ```
 
