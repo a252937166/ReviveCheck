@@ -1,0 +1,222 @@
+{
+  "schema": "revivecheck.value-benchmark.v1",
+  "startedAt": "2026-10-24T15:55:46.922Z",
+  "finishedAt": "2026-10-24T15:57:04.235Z",
+  "node": "v22.23.1",
+  "task": "Decide whether pUSD (asset 7777) may be enabled in a token catalog with the entry below, relying on the pusd-token-list release approved in the ReleaseRegistry, listed in the VerifiedTokenList and stored on-chain.",
+  "entry": {
+    "chainId": 420420777,
+    "address": "0x00001e6100000000000000000000000000010000",
+    "symbol": "pUSD",
+    "name": "Portaldot USD (test)",
+    "decimals": 6
+  },
+  "network": {
+    "evmRpc": "https://test-evm-rpc-v3.portaldot.dev",
+    "nativeRpc": "wss://test-node-v3.portaldot.dev",
+    "checkpoint": {
+      "number": "176665",
+      "nativeHash": "0x33c54b10bc27f659415093bf9c33894b1d59b0f976b6b4732b04aaa58fb49520"
+    },
+    "runtime": "portaldot-v3/3002"
+  },
+  "manual": {
+    "steps": [
+      {
+        "id": "m1",
+        "description": "eth_chainId and compare with the entry",
+        "intervention": "Know the expected chain ID and compare the hex value by hand.",
+        "ms": 2180,
+        "result": 420420777
+      },
+      {
+        "id": "m2",
+        "description": "finalized native head, its number, and the EVM block hash for that height",
+        "intervention": "Know that native and EVM block hashes differ and that ReviveApi.ethBlockHash maps them.",
+        "ms": 1933,
+        "result": {
+          "number": "176665",
+          "nativeHash": "0x33c54b10bc27f659415093bf9c33894b1d59b0f976b6b4732b04aaa58fb49520",
+          "evmHash": "0x0e72828d6b94a215e90875bccbb6365e23e9be88c068b9f816358cb7accc46ac"
+        }
+      },
+      {
+        "id": "m3",
+        "description": "native Assets metadata and asset record for 7777 at that block",
+        "intervention": "Decode SCALE storage with the right runtime types (the asset-fee decoding trap in docs/CHAIN_FINDINGS.md).",
+        "ms": 969,
+        "result": {
+          "exists": true,
+          "symbol": "pUSD",
+          "name": "Portaldot USD (test)",
+          "decimals": 6
+        }
+      },
+      {
+        "id": "m4",
+        "description": "derive the ERC-20 precompile address of asset 7777",
+        "intervention": "Know the runtime’s address scheme (u32 big-endian, 12 zero bytes, 00010000) and that it is verified for spec 3002 only.",
+        "ms": 0,
+        "result": "0x00001e6100000000000000000000000000010000"
+      },
+      {
+        "id": "m5",
+        "description": "eth_call symbol(), name(), decimals() on the precompile at the EVM block hash",
+        "intervention": "Encode three selectors and ABI-decode a string, a string and a uint8 by hand.",
+        "ms": 1466,
+        "result": {
+          "symbol": "pUSD",
+          "name": "Portaldot USD (test)",
+          "decimals": 6
+        }
+      },
+      {
+        "id": "m6",
+        "description": "compare the five entry fields with native and EVM values",
+        "intervention": "Compare five fields across three sources and notice any disagreement.",
+        "ms": 0,
+        "result": {
+          "mismatches": []
+        }
+      },
+      {
+        "id": "m7",
+        "description": "compute the release ID keccak256(abi.encode(owner, bytes32 label))",
+        "intervention": "Know the registry’s identifier scheme and pack the label as bytes32.",
+        "ms": 3,
+        "result": "0xe3f6ab7784cbaa8f60171e5201fea4e27fa5cec3d6682e06d8fcb7d89181f808"
+      },
+      {
+        "id": "m8",
+        "description": "eth_call releaseOf and decisionOf on the ReleaseRegistry",
+        "intervention": "Know the ABI, decode the tuples, and decide whether this reviewer is one you trust.",
+        "ms": 974,
+        "result": {
+          "owner": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+          "revision": "1",
+          "reportHash": "0xcbd78faa85f8759860d88366794e0c70052b74f9ed775be5bb37ad20118ed427",
+          "reviewed": true,
+          "approved": true
+        }
+      },
+      {
+        "id": "m9",
+        "description": "eth_call isListed and entryOf on the VerifiedTokenList and compare with the release",
+        "intervention": "Know the consumer ABI and check that the entry names the same release, report and reviewer.",
+        "ms": 967,
+        "result": {
+          "listed": true,
+          "releaseId": "0xe3f6ab7784cbaa8f60171e5201fea4e27fa5cec3d6682e06d8fcb7d89181f808",
+          "reportHash": "0xcbd78faa85f8759860d88366794e0c70052b74f9ed775be5bb37ad20118ed427",
+          "reviewer": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+          "matchesRelease": true
+        }
+      },
+      {
+        "id": "m10",
+        "description": "fetch the block of the stored report, find the remark.store extrinsic, decode the bytes, recompute both hashes",
+        "intervention": "Locate the extrinsic, decode hex to JSON, recompute blake2-256 of the bytes and the canonical SHA-256 of the report; not feasible by hand without the project’s canonicalization.",
+        "ms": 1460,
+        "result": {
+          "bytes": 7404,
+          "contentHash": "0x99c9307f94420db10ebab5bcc9f1a511906add6b0a7383c6d6c011c89e5a4e3e",
+          "reportHash": "cbd78faa85f8759860d88366794e0c70052b74f9ed775be5bb37ad20118ed427",
+          "sha256Verifies": true,
+          "matchesRegistry": true,
+          "completedAt": "2026-10-23T17:48:58.155Z",
+          "runtime": "portaldot-v3/3002"
+        }
+      },
+      {
+        "id": "m11",
+        "description": "check the report’s age and the runtime it pinned against the current runtime",
+        "intervention": "Compare dates by hand and know the current runtime version.",
+        "ms": 0,
+        "result": {
+          "ageDays": 0.92,
+          "reportRuntime": "portaldot-v3/3002",
+          "currentRuntime": "portaldot-v3/3002"
+        }
+      },
+      {
+        "id": "m12",
+        "description": "decide",
+        "intervention": "Weigh eleven partial results; nothing records the decision or its basis.",
+        "ms": 0,
+        "result": {
+          "enable": true,
+          "mismatches": []
+        }
+      }
+    ],
+    "totalMs": 9952,
+    "operatorSteps": 12,
+    "interventions": 12,
+    "decision": {
+      "enable": true,
+      "mismatches": []
+    },
+    "recordOfDecision": "none: the maintainer would have to write it down"
+  },
+  "revivecheck": {
+    "steps": [
+      {
+        "id": "r1",
+        "description": "npm run rc -- check_release --release v1.0.1 (the entry against both interfaces, sealed)",
+        "intervention": null,
+        "ms": 17590,
+        "result": {
+          "status": "passed",
+          "reportHash": "408bb51f9b68a725c8754cb37c1134d2e2fbebf74b672ba8ff3e6c05fe2a3262",
+          "checkpoint": "176667",
+          "checks": [
+            "network.chain-id:passed",
+            "network.finalized:passed",
+            "asset.native-erc20:passed",
+            "token.listing:passed"
+          ]
+        }
+      },
+      {
+        "id": "r2",
+        "description": "node examples/token-catalog/catalog.js acceptance --config examples/token-catalog/config/testnet.json (registry, listing, stored report, runtime, age, policy)",
+        "intervention": null,
+        "ms": 18600,
+        "result": {
+          "passed": true,
+          "line": "pUSD     0x00001e6100000000000000000000000000010000  AVAILABLE  valid  report cbd78faa85f8… revision 1"
+        }
+      }
+    ],
+    "totalMs": 36190,
+    "operatorSteps": 2,
+    "interventions": 0,
+    "decision": {
+      "enable": true,
+      "basis": "recorded in artifacts/local/token-catalog/benchmark/acceptance.json with every reason"
+    }
+  },
+  "failureDetection": {
+    "scenario": "The same entry with 18 decimals (release v1.0.0).",
+    "manual": "Detected only if the maintainer compares the decimals in step m6; nothing stops the process otherwise.",
+    "revivecheck": {
+      "steps": [
+        {
+          "id": "f1",
+          "description": "npm run rc -- check_release --release v1.0.0 (the entry with the Ethereum default of 18 decimals)",
+          "intervention": null,
+          "ms": 25160,
+          "result": {
+            "status": "failed",
+            "observed": "decimals: listed 18, chain 6",
+            "remediation": "Publish a release whose entry uses the chain's decimals (6), then recheck."
+          }
+        }
+      ],
+      "detected": true,
+      "observed": "decimals: listed 18, chain 6"
+    },
+    "totalMs": 25160
+  },
+  "scope": "Internal validation by the project author on the public testnet nodes. Path M is executed as code so its timings are reproducible; a person performing the same reads with a wallet UI, an explorer and a terminal would be slower at each intervention. Owner, reviewer and operator are the project test account. External adoption and willingness to pay are not measured here."
+}
