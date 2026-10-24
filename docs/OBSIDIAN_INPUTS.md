@@ -1,35 +1,35 @@
-# Obsidian 资料如何影响 ReviveCheck
+# How the Obsidian notes shaped ReviveCheck
 
-整理日期：2026-10-23。通过 Obsidian CLI 在 `Obsidian Vault` 中读取下列非私密产品复盘；未读取凭据、钱包资料或源码快照目录。本文件只保留可公开的设计原则与资料标题，不复制私人项目信息。
+Compiled on 2026-10-23. The non-private product retrospectives below were read through the Obsidian CLI in `Obsidian Vault`; no credentials, wallet material or source snapshot directories were read. This file keeps only the design principles that can be made public and the titles of the notes; it copies no private project information.
 
-CLI 的全文搜索本次返回空输出，随后用 `files` 定位笔记，并用 `read path=...` 阅读明确的产品复盘。空搜索结果没有被当成“没有相关资料”的证明。
+The CLI's full-text search returned empty output this time, so the notes were located with `files` and read with `read path=...`. The empty search result was not taken as proof that no relevant material exists.
 
-## 主要输入
+## Main inputs
 
-| 笔记在 vault 中的路径 | 本次采用的结论 | 对应的设计约束 |
+| Note path in the vault | Conclusion adopted | Resulting design constraint |
 | --- | --- | --- |
-| `Hackathons/DoraHacks/ArcPreflight · Arc Microgrants 产品与评审深度复盘.md` | 系统自己的演示闭环，不能代替外部开发者完成自己的工作；执行证明和采用价值是两项证据 | 从“创建我的项目”开始；让用户带入自己的目标；验证接入用时与作者介入，而不是只增加内部检查 |
-| `Hackathons/DoraHacks/Flare Summer Signal · 获奖项目复盘.md` | 一条能复述的完整往返、单个记忆点与分层评委路径，比技术清单更容易理解；线上可验证性属于交付 | 主演示固定为同一项目的失败→修复→重跑；30秒价值、约两分钟主流程、深层原始证据分层；不让观众先读架构 |
-| `Hackathons/DoraHacks/VeilGuard · WTF 获奖项目对照复盘.md` | 方向空缺不等于需求；技术必要性还需转换为用户采用理由；扩功能前做陌生读者复述 | 暂时把创新写成待验证假设；请陌生读者复述谁用、为什么用、为什么需要V3，再决定追加检查或页面 |
-| `Hackathons/通用/跨平台参赛通用经验.md` | 经验必须按本届规则校准；报告需进入下一项工作；资格、技术可信度、竞争优势与结果状态应分开 | 用保存历史和版本对比把证据交给下次发布/维护者复核；报名、申请、到账、部署、提交分别记录；不从旧赛制推断本届要求 |
+| `Hackathons/DoraHacks/ArcPreflight · Arc Microgrants 产品与评审深度复盘.md` | A system's own demo loop cannot stand in for an external developer doing their own work; execution proof and adoption value are two separate pieces of evidence | Start from "create my project"; let the user bring their own target; measure integration time and author intervention instead of only adding internal checks |
+| `Hackathons/DoraHacks/Flare Summer Signal · 获奖项目复盘.md` | One complete round trip that can be retold, one memorable point and a layered path for judges are easier to understand than a feature list; online verifiability is part of delivery | The main demo is fixed as fail, fix, rerun on the same project; a 30-second value statement, a two-minute main flow, raw evidence underneath; never make the audience read the architecture first |
+| `Hackathons/DoraHacks/VeilGuard · WTF 获奖项目对照复盘.md` | An empty niche is not demand; technical necessity still has to become a reason for users to adopt; before adding features, have a stranger retell the pitch | Write innovation as a hypothesis to be verified for now; ask a stranger to retell who uses it, why, and why V3 is needed before adding checks or pages |
+| `Hackathons/通用/跨平台参赛通用经验.md` | Experience must be recalibrated against this edition's rules; a report has to feed the next piece of work; eligibility, technical credibility, competitive edge and outcome status are separate | Hand evidence to the next release or maintainer through saved history and version comparison; record registration, request, receipt, deployment and submission separately; never infer this edition's rules from an old format |
 
-另读了 `Hackathons/DoraHacks/TEGATA · HashKey 落选复盘.md`，只吸收“用一个负向案例呈现增量价值，严谨度与商业价值需要同时证明”的原则。该笔记对其他比赛筛选偏好的推断，没有作为 Portaldot 的官方评分规则。
+`Hackathons/DoraHacks/TEGATA · HashKey 落选复盘.md` was also read; only one principle was taken from it: present incremental value through a negative case, and prove rigor and business value together. Its inferences about other contests' selection preferences were not treated as Portaldot's official scoring rules.
 
-## 生命周期为什么这样设计
+## Why the lifecycle is designed this way
 
-1. **新建项目**：核心对象应属于使用者。预置示例只用于理解；不能把用户改一个演示金额，当成用户已接入自己的工程。
-2. **网络、映射、资金检查**：从V3迁移的具体困难出发，先回答当前哪里不满足条件。无法确定的映射、资金或链状态必须保留未知。
-3. **运行验收**：检查围绕一个可复现的目标和版本；不是展示接口返回成功就结束。
-4. **修复重跑**：保留失败记录，用同一目标说明此次改动修好了什么。不能用换一个样例替代修复原问题。
-5. **保存证据**：保留模式、版本、时间、来源、观察与未完成项。导出本身不等于用户价值，也不等于独立验证。
-6. **版本对比**：让报告进入后续发布/维护决策。不同网络、模式、目标或断言定义的运行，应标明不可直接比较；本地通过不能消除测试网证据缺口。
+1. **New project.** The core object belongs to the user. The built-in sample is for understanding only; a user changing one demo amount does not mean the user has connected their own project.
+2. **Network, mapping and funding checks.** Start from the concrete difficulties of migrating to V3 and answer first where the current state falls short. A mapping, balance or chain state that cannot be determined must stay unknown.
+3. **Run the acceptance.** Checks revolve around one reproducible target and version; an interface returning success is not the end.
+4. **Fix and rerun.** Keep the failed record and use the same target to show what the change repaired. Swapping in another sample is not a fix for the original problem.
+5. **Save the evidence.** Keep the mode, version, time, source, observations and open items. An export is not user value by itself, nor independent verification.
+6. **Compare versions.** Let a report feed later release or maintenance decisions. Runs on different networks, modes, targets or assertion definitions must be marked as not directly comparable; a local pass does not close a testnet evidence gap.
 
-## 本次材料明确保留的边界
+## Boundaries these notes keep explicit
 
-- `live read-only`：从真实网络读取信息；没有因此执行签名、部署或写入。
-- `local rehearsal`：本地复现流程；没有因此完成 Portaldot V3 部署。
-- `testnet execution`：只有真实交易、目标与读回证据成立后才采用的状态。
-- 需求访谈、独立开发者使用、节省工时、商业付费意愿均为待验证，不能将自有演示运行计入。
-- 参赛材料的准备、正式平台提交、管理员审核、最终资格和获奖分别记录。
+- `live read-only`: information read from the real network, with no signing, deployment or write as a result.
+- `local rehearsal`: the flow reproduced locally; no Portaldot V3 deployment follows from it.
+- `testnet execution`: a state adopted only once a real transaction, target and read-back evidence exist.
+- Requirement interviews, use by independent developers, hours saved and willingness to pay are all unverified; the project's own demo runs do not count toward them.
+- Preparation of the contest material, the formal platform submission, admin review, final eligibility and any award are recorded separately.
 
-这些经验决定产品的取舍，不替代本届的实时官方规则。技术与比赛事实来源见仓库根目录的 [PARTICIPATION_RESEARCH.md](../PARTICIPATION_RESEARCH.md)。未因阅读笔记而对外联系、发布、报名或提交。
+These lessons decide the product's trade-offs; they do not replace this edition's live official rules. The technical and contest facts are in [PARTICIPATION_RESEARCH.md](../PARTICIPATION_RESEARCH.md) at the repository root. Reading the notes led to no outreach, publication, registration or submission.
