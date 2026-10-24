@@ -12,7 +12,9 @@
     "wallet:create": "node scripts/create-wallet.js",
     "check:live": "node scripts/check-live.js",
     "mcp": "node mcp/server.js",
-    "rc": "node scripts/revivecheck.js"
+    "rc": "node scripts/revivecheck.js",
+    "catalog": "node examples/token-catalog/catalog.js",
+    "release:status": "node scripts/release-status.js"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.3.0",

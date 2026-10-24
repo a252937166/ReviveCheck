@@ -16,7 +16,7 @@ ReviveCheck provides three components, all built on Portaldot V3's runtime modul
 | --- | --- | --- |
 | **Decentralized middleware** | `ReleaseRegistry`, an open contract where a release owner commits a sealed report's hash and reviewers approve that exact hash, with every new submission opening an unapproved revision. `ReviveCheckGuard`, a Solidity library any contract uses to act on those approvals. `VerifiedTokenList`, the reference consumer. | Registry `0xe949b200edf070b9d425b206ed24dc8fe5b7d339` (block 162962). Token list `0xd0bd833b4b8658b1230a0e9a99640935b3c65819` (block 164220). pUSD listed on an approved release in block 164313, read back through both interfaces. |
 | **Storage and data** | Sealed reports stored on the chain itself through the native Remark module (`remark.store`), retrievable and verifiable from any node by two hashes. A public feed, `public/api/registry.json`, built from chain events. | Reports stored in blocks 164266 and 164335 (7,404 bytes, about 0.75 tPOT each). |
-| **APIs** | Twelve read-only tools that check releases through both V3 interfaces at one finalized block, assess promotion against V3 Live, and read every contract back through both interfaces. Served over MCP, REST, JavaScript and the CLI from one implementation. Writes are dry-run, then signed in the user's own wallet. | `npm run mcp`, `npm run rc -- <tool>`, `POST /api/tools/<name>` on the local workbench. |
+| **APIs** | Thirteen read-only tools that check releases through both V3 interfaces at one finalized block, assess promotion against V3 Live, read every contract back through both interfaces, and evaluate a consumer's policy (network, subject, plan, runtime, evidence age, trusted reviewers) against fresh reads. Served over MCP, REST, JavaScript and the CLI from one implementation. Writes are dry-run, then signed in the user's own wallet. | `npm run mcp`, `npm run rc -- <tool>`, `POST /api/tools/<name>` on the local workbench. |
 
 Portaldot modules used: **Revive** (the contracts, reachable as EVM transactions or native `revive.call`), **ReviveApi** (account and block mapping between the interfaces), **Assets and its ERC-20 precompile** (the demo release's parity checks), and **Remark** (evidence storage).
 
@@ -49,16 +49,25 @@ What V3 makes possible here, and what the design leans on: the same contract is 
 
 - **Token issuers and listing teams.** Publish a token-list release with proof that the chain agrees, and let wallets and DEX allow-lists read the approval on-chain instead of trusting a file. The pUSD release on the testnet is the worked example.
 - **Protocol teams gating launches.** Put a launchpad, a router allow-list or an upgrade behind an approved release. `VerifiedTokenList` is the reference consumer; the guard works for any contract.
-- **Reviewers, auditors, agents and CI.** Check a release through both V3 interfaces, replay it at its block, and sign a decision from a wallet or a pipeline. The MCP server gives an agent the same twelve tools.
+- **Reviewers, auditors, agents and CI.** Check a release through both V3 interfaces, replay it at its block, and sign a decision from a wallet or a pipeline. The MCP server gives an agent the same thirteen tools.
 
 **Business model, as a hypothesis.** The contracts, the library and the API stay open source under MIT. What a team would pay for: a hosted verification and indexing service so they do not run the API and the event indexer themselves, curated reviewer registries operated for an ecosystem (a chain, a launchpad, a wallet's listing desk), and CI integrations with retention of reports. None of this is validated with a paying customer yet; the next product test is an external builder bringing their own contract.
+
+## Policies, the reference consumer and the value experiment
+
+Added 2026-10-24 after the independent review ([docs/2026-10-24_revivecheck-improvement-review.md](docs/2026-10-24_revivecheck-improvement-review.md)); the per-finding status is in [docs/JUDGING_FIT.md](docs/JUDGING_FIT.md).
+
+- **Policy envelopes** ([docs/POLICY.md](docs/POLICY.md)). The contracts say whether an approval of an exact hash stands. A policy says what else a business action needs: the right network and genesis, the subject (a native asset or a contract's code identity), the plan fingerprint, supported runtimes, evidence age, an explicit trusted reviewer set, the consumer's listing and the stored report, each checked against fresh finalized reads. `evaluate_policy` returns `valid`, `recheck-required`, `expired` or `unknown`; only `valid` enables, and an unavailable read is `unknown`, never a pass. A new report needs a new approval and an explicit rebinding; history is kept.
+- **Token Catalog** ([examples/token-catalog/README.md](examples/token-catalog/README.md)). A consumer built only on the documented interfaces, with its own entry point, configurations, README and acceptance workflow. Its 17-step lifecycle (A submits, B approves, A lists, a revision invalidates, recheck, reapproval, explicit rebinding, plus revocation, expiry, a wrong-target report, a runtime change, a node outage and a stranger's replacement attempt) runs on an in-memory chain with `VerifiedTokenList` v2 and is checked in CI; its testnet configuration evaluated the recorded pUSD release `valid` live on 2026-10-24. Roles and simulated evidence are labelled; real v2 transactions wait for funding.
+- **Value experiment** ([docs/VALUE_EXPERIMENT.md](docs/VALUE_EXPERIMENT.md)). The same maintainer decision done by hand (12 steps, 12 interventions, no record) and through ReviveCheck (2 commands, no interventions, a sealed report and a 24-check evaluation), with failure detection and costs split into deposits, fees and estimates. Wall-clock did not improve in that run; steps, interventions and the recorded decision did. Internal validation only.
+- **Deployment tooling and release status** ([docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), [docs/RELEASE_STATUS.md](docs/RELEASE_STATUS.md)). Versioned deployments from a validated manifest, estimated from a public address without reading a wallet, verified by code and dual-interface identity before activation; `node scripts/release-status.js` checks every published record and lists what is pending.
 
 ## Roadmap
 
 - A second, independent reviewer account for the recorded demo, so owner and reviewer are no longer one test account.
-- A curated `VerifiedTokenList` deployment with a pinned reviewer, and a second consumer beyond token lists (a launchpad or DEX allow-list).
+- Deploy and activate `VerifiedTokenList` v2 once the testnet wallet is funded (about 226 tPOT committed; see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)), then a curated deployment with a pinned reviewer and a second consumer beyond token lists (a launchpad or DEX allow-list).
 - Gasless reviewer decisions through V3's `MetaTx` module, so a reviewer signs without holding tPOT.
-- A GitHub Action that rechecks a release when the runtime changes, and a published npm package for the API.
+- A published npm package for the API. The Token Catalog's acceptance workflow (`examples/token-catalog/acceptance.workflow.yml`) is the first CI integration that re-evaluates a release on a schedule.
 - Retries and failover for the public RPC nodes, and an EVM-wallet signed run recorded end to end.
 
 Contributions are welcome through issues and pull requests; `npm test` runs offline, including the compiled contracts in an in-memory EVM, and CI runs the same on every push.
@@ -170,7 +179,9 @@ The v0.3 middleware uses the same helpers and caps:
 ```sh
 node scripts/compile-release-registry.js && node scripts/compile-token-list.js
 node scripts/deploy-registry.js --wallet .private/wallet.json                 # estimate; --broadcast --max-cost-tpot <n> to sign
-node scripts/deploy-token-list.js --wallet .private/wallet.json [--curator 0x…] # the registry's reference consumer
+node scripts/deploy-token-list.js                                              # v2 estimate from the manifest's public deployer address; no wallet read
+node scripts/deploy-token-list.js --broadcast --max-cost-tpot 240              # sign v2 with the isolated wallet; verified before it is recorded
+node scripts/activate-token-list.js --write                                    # re-verify from the chain, then make v2 the active deployment
 node scripts/store-evidence.js --report <published report hash>                # remark.store estimate; --broadcast --max-fee-tpot <n>
 node scripts/list-token.js --wallet .private/wallet.json                       # list pUSD on your approved release; dry-run by default
 node scripts/index-registry.js                                                 # rebuild public/api/registry.json from chain events
@@ -179,7 +190,7 @@ node scripts/record-studio-run.js <session.json>                               #
 
 Deployed on 2026-10-23: ReleaseRegistry at block 162962, VerifiedTokenList at 164220 (code deposit 178.158 tPOT), reports stored at 164266 and 164335, pUSD listed at 164313. Every record is in [docs/LIFECYCLE.md](docs/LIFECYCLE.md) with its extrinsic.
 
-**Versions and known issues.** The `VerifiedTokenList` on the testnet is v1. A review on 2026-10-24 ([docs/2026-10-24_revivecheck-improvement-review.md](docs/2026-10-24_revivecheck-improvement-review.md)) reproduced two defects in it offline: the guard library counted a reviewer passed twice as two approvals, and `list` never checked who owned an existing entry, so any release owner could replace any token's entry and un-list it with a new revision. The v2 sources in `contracts/` fix both (distinct reviewers, an exact-hash quorum overload, entry ownership, `delist`, a curator override) with regression tests; the v1 sources stay under `contracts/deployed/v1` and still hash to the deployment record. v2 needs its own deployment and code deposit; until then the site and the feed describe v1. The same review found that `replay_report` returned "reproduced" for contract reports it only checkpoint-checked; it now returns "partial" with the uncovered check ids.
+**Versions and known issues.** The `VerifiedTokenList` on the testnet is v1. A review on 2026-10-24 ([docs/2026-10-24_revivecheck-improvement-review.md](docs/2026-10-24_revivecheck-improvement-review.md)) reproduced two defects in it offline: the guard library counted a reviewer passed twice as two approvals, and `list` never checked who owned an existing entry, so any release owner could replace any token's entry and un-list it with a new revision. The v2 sources in `contracts/` fix both (distinct reviewers, an exact-hash quorum overload, entry ownership, `delist`, a curator override) with regression tests; the v1 sources stay under `contracts/deployed/v1` and still hash to the deployment record. v2 needs its own deployment and code deposit; until then the site and the feed describe v1. The deployment is driven by a validated manifest (`deployments/token-list-v2.manifest.json`, [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)); its estimate on 2026-10-24 was 225.738 tPOT of held deposit plus 0.316 tPOT of fees against 78.79 tPOT available, so it is pending funding. The same review found that `replay_report` returned "reproduced" for contract reports it only checkpoint-checked; it now returns "partial" with the uncovered check ids.
 
 ## Architecture and materials
 
@@ -213,6 +224,12 @@ flowchart LR
 - [Verified 120-second v0.2 UI walkthrough](https://a252937166.github.io/ReviveCheck/lifecycle-demo-v0.2.mp4) and [scene/evidence/QA record](docs/DEMO_V2.md)
 - [Test-token request and manual support follow-up](docs/TOKEN_REQUEST.md)
 - [Integration guide: middleware, storage, API](docs/INTEGRATION.md)
+- [Policy envelopes: when may a consumer act on a release](docs/POLICY.md)
+- [Token Catalog, the reference consumer](examples/token-catalog/README.md)
+- [Value experiment: the maintainer's decision, manually and through ReviveCheck](docs/VALUE_EXPERIMENT.md)
+- [Deployment tooling, v2 estimate and costs](docs/DEPLOYMENT.md)
+- [Release status: deployed, pending, preserved](docs/RELEASE_STATUS.md)
+- [Demo script v0.3 for the final video](docs/DEMO_SCRIPT_V3.md)
 - [API contract](docs/API.md)
 - [Manual acceptance record](docs/VALIDATION.md)
 

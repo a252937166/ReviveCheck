@@ -19,6 +19,7 @@ const TOOLS = [
   ['list_releases', 'The public feed: releases, decisions, listings and stored reports', 'owner, label'],
   ['prepare_transaction', 'Build and dry-run a submit, review, list, store or remark, unsigned', 'action, reportHash, label, releaseId, approved, decision, token, reviewer, decimals, from'],
   ['verify_attestation', 'Verify a review remark from chain data', 'extrinsicHash, blockHash'],
+  ['evaluate_policy', 'Decide whether a consumer may act on a release: network, subject, plan, runtime, evidence age, trusted reviewers, consumer listing and stored report against fresh reads; valid, recheck-required, expired or unknown', 'policy, binding, reportHash | report'],
 ];
 
 export function Tabs({ tabs, id }) {
@@ -87,7 +88,7 @@ export default function Docs() {
       {FEATURES.map((feature) => <Feature key={feature.id} feature={feature}/>)}
       <section className="doc-section" id="doc-tools" aria-labelledby="h-tools">
         <div className="doc-title"><h2 id="h-tools">Tool reference</h2></div>
-        <p>The same twelve tools over MCP, <code>POST /api/tools/&lt;name&gt;</code> and <code>npm run rc -- &lt;name&gt;</code>. All are read-only.</p>
+        <p>The same thirteen tools over MCP, <code>POST /api/tools/&lt;name&gt;</code> and <code>npm run rc -- &lt;name&gt;</code>. All are read-only.</p>
         <div className="table-wrap"><table className="data-table"><thead><tr><th scope="col">Tool</th><th scope="col">What it does</th><th scope="col">Arguments</th></tr></thead><tbody>{TOOLS.map(([name, what, args]) => <tr key={name}><th scope="row"><code>{name}</code></th><td>{what}</td><td className="mono small">{args}</td></tr>)}</tbody></table></div>
       </section>
       {['registry', 'tokenlist', 'networks'].map((id) => <section className="doc-section" id={`doc-${id}`} key={id} aria-labelledby={`h-${id}`}>
