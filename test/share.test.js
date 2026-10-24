@@ -6,7 +6,7 @@ import { PNG } from 'pngjs';
 import { sealRun } from '../lib/report.js';
 import { makeShareLink, reportFromHash, verifyReport, createReviewReceipt, verifyReviewReceipt, viewerUrl, MAX_QR_LENGTH } from '../lib/share.js';
 
-const makeRun = () => sealRun({ id: 'public-reference', projectId: 'asset-reference', projectName: '原生资产验收', release: 'v0.2.0', status: 'passed', mode: 'live', scope: 'portaldot-testnet-readonly', input: { profile: 'native-asset', nativeAsset: { assetId: '7777', holder: '' } }, checks: [{ id: 'asset.native-erc20', title: 'Native / ERC20 consistency', status: 'passed', observed: '100000000000', expected: 'Native state equals precompile' }], limitations: ['A point-in-time observation; not an audit.'] });
+const makeRun = () => sealRun({ id: 'public-reference', projectId: 'asset-reference', projectName: 'Native asset acceptance', release: 'v0.2.0', status: 'passed', mode: 'live', scope: 'portaldot-testnet-readonly', input: { profile: 'native-asset', nativeAsset: { assetId: '7777', holder: '' } }, checks: [{ id: 'asset.native-erc20', title: 'Native / ERC20 consistency', status: 'passed', observed: '100000000000', expected: 'Native state equals precompile' }], limitations: ['A point-in-time observation; not an audit.'] });
 
 test('browser and server agree on report integrity and compressed link round-trips', async () => {
   const run = makeRun();

@@ -1,0 +1,357 @@
+{
+  "schemaVersion": 2,
+  "id": "release-gate-revision-2-1792767974263",
+  "projectId": "release-gate-reference",
+  "projectName": "ReviveCheck release gate",
+  "release": "v1.0.1",
+  "input": {
+    "name": "ReviveCheck release gate",
+    "release": "v1.0.1",
+    "logicalContractId": "release-gate",
+    "sourceRevision": "8a8b703d64b65d918346aa7eb9a451b50cb8192e4a5421fddf2cf2d4568064e6",
+    "profile": "contract",
+    "expectedChainId": 420420777,
+    "account": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+    "contractAddress": "0xf062d47c63613da90e3573e0ee2bba126347f3d3",
+    "transactionHash": "0x8366c5aaf29078ad7bd2b5c1a054e47579842d8bfbf34e38c0e4a53df57d2f57",
+    "transactionBlockHash": "0x79a6660e2d826df7218083be86459500d8cb16deca45e3a494bc379fea5ffddd",
+    "assertions": [
+      {
+        "id": "owner",
+        "label": "Developer owns this release gate",
+        "signature": "owner()",
+        "returns": "address",
+        "args": [],
+        "expected": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b"
+      },
+      {
+        "id": "reviewer",
+        "label": "Configured test reviewer",
+        "signature": "reviewer()",
+        "returns": "address",
+        "args": [],
+        "expected": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b"
+      },
+      {
+        "id": "revision",
+        "label": "Submitted report revision",
+        "signature": "revision()",
+        "returns": "uint256",
+        "args": [],
+        "expected": "2"
+      },
+      {
+        "id": "approved",
+        "label": "Facilitated reviewer decision",
+        "signature": "approved()",
+        "returns": "bool",
+        "args": [],
+        "expected": true
+      },
+      {
+        "id": "report",
+        "label": "Exact submitted report commitment",
+        "signature": "reportHash()",
+        "returns": "bytes32",
+        "args": [],
+        "expected": "0x9707ec92029bc1708cab17989922aef4ccbabffb6333a80ef0d2bc300667c661"
+      }
+    ]
+  },
+  "mode": "live",
+  "scope": "portaldot-testnet-readonly",
+  "scenario": null,
+  "trigger": "gate-revision",
+  "startedAt": "2026-10-23T15:06:14.262Z",
+  "completedAt": "2026-10-23T15:06:14.262Z",
+  "previousRunId": null,
+  "status": "passed",
+  "checks": [
+    {
+      "id": "network.chain-id",
+      "title": "Expected testnet identity",
+      "status": "passed",
+      "observed": "EVM and native runtime identify 420420777; pinned native genesis matches",
+      "expected": "420420777",
+      "remediation": "",
+      "evidence": {
+        "evmChainIdHex": "0x190f1ca9",
+        "nativeGenesisHash": "0xd4f9acbcf7f52388d8b095abe3c198d19fc510e0343e643e87cfbccb155283bd",
+        "nativeRuntimeChainId": "420420777"
+      }
+    },
+    {
+      "id": "network.finalized",
+      "title": "Finalized cross-interface checkpoint",
+      "status": "passed",
+      "observed": "Both interfaces resolve finalized block 161858",
+      "expected": "One canonical finalized checkpoint across the two interfaces",
+      "remediation": "",
+      "evidence": {
+        "nativeBlockHash": "0xc9bdcd67cf088f0db7005926169e4837a9eb6b0a084ffad4935ccc413e63529d",
+        "nativeBlockNumber": "161858",
+        "evmBlockHash": "0xe1f02844c7f388c3e03701c0b2673c2e4d1720b4c2ef8e2202a2fb621c96a219",
+        "runtimeEvmBlockHash": "0xe1f02844c7f388c3e03701c0b2673c2e4d1720b4c2ef8e2202a2fb621c96a219"
+      }
+    },
+    {
+      "id": "account.mapping",
+      "title": "Native / EVM account mapping",
+      "status": "passed",
+      "observed": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt ↔ 0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+      "expected": "A chain-resolved native / EVM account pair",
+      "remediation": "",
+      "evidence": {
+        "nativeAccount": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+        "evmAccount": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+        "nativeToEvmAddress": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+        "source": "ReviveApi.account_id / address",
+        "checkpoint": "0xc9bdcd67cf088f0db7005926169e4837a9eb6b0a084ffad4935ccc413e63529d"
+      }
+    },
+    {
+      "id": "account.balance",
+      "title": "Test-token funding",
+      "status": "passed",
+      "observed": "407.20954731681162 tPOT conservatively available while preserving the native account",
+      "expected": "Nonzero available test-token balance",
+      "remediation": "",
+      "evidence": {
+        "nativeAccount": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+        "nativeFreeRaw": "40730954731681162",
+        "nativeFrozenRaw": "0",
+        "nativeExistentialDepositRaw": "10000000000000",
+        "nativeAvailableRaw": "40720954731681162",
+        "nativeDecimals": 14,
+        "nativeSymbol": "tPOT",
+        "evmBalanceRaw": "0x16132aedcbc62d5ea0",
+        "nativeToEthRatio": "10000",
+        "checkpoint": "0xc9bdcd67cf088f0db7005926169e4837a9eb6b0a084ffad4935ccc413e63529d"
+      }
+    },
+    {
+      "id": "contract.code",
+      "title": "Deployed contract code",
+      "status": "passed",
+      "observed": "870 bytes of deployed code",
+      "expected": "Nonempty deployed code on Portaldot V3 testnet",
+      "remediation": "",
+      "evidence": {
+        "address": "0xf062d47c63613da90e3573e0ee2bba126347f3d3",
+        "codeHash": "0xb0fecb8c20e7181430f62d5354fe37e8540bc1a54958dee83e738ec63a64c754",
+        "blockTag": "0x27842"
+      }
+    },
+    {
+      "id": "contract.assertions",
+      "title": "Configured cross-interface view assertions",
+      "status": "passed",
+      "observed": "5/5 configured views match",
+      "expected": "Every configured view equals its expected scalar through both interfaces",
+      "remediation": "",
+      "evidence": {
+        "assertions": [
+          {
+            "id": "owner",
+            "label": "Developer owns this release gate",
+            "signature": "owner()",
+            "returns": "address",
+            "args": [],
+            "expected": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+            "status": "passed",
+            "evmValue": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+            "nativeValue": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+            "calldata": "0x8da5cb5b",
+            "evmData": "0x00000000000000000000000048b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+            "nativeData": "0x00000000000000000000000048b9e37a2a2c9621172745dc377b9fc6b9a6a71b"
+          },
+          {
+            "id": "reviewer",
+            "label": "Configured test reviewer",
+            "signature": "reviewer()",
+            "returns": "address",
+            "args": [],
+            "expected": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+            "status": "passed",
+            "evmValue": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+            "nativeValue": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+            "calldata": "0xa54044f8",
+            "evmData": "0x00000000000000000000000048b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+            "nativeData": "0x00000000000000000000000048b9e37a2a2c9621172745dc377b9fc6b9a6a71b"
+          },
+          {
+            "id": "revision",
+            "label": "Submitted report revision",
+            "signature": "revision()",
+            "returns": "uint256",
+            "args": [],
+            "expected": "2",
+            "status": "passed",
+            "evmValue": "2",
+            "nativeValue": "2",
+            "calldata": "0x7cc96380",
+            "evmData": "0x0000000000000000000000000000000000000000000000000000000000000002",
+            "nativeData": "0x0000000000000000000000000000000000000000000000000000000000000002"
+          },
+          {
+            "id": "approved",
+            "label": "Facilitated reviewer decision",
+            "signature": "approved()",
+            "returns": "bool",
+            "args": [],
+            "expected": true,
+            "status": "passed",
+            "evmValue": true,
+            "nativeValue": true,
+            "calldata": "0x19d40b08",
+            "evmData": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "nativeData": "0x0000000000000000000000000000000000000000000000000000000000000001"
+          },
+          {
+            "id": "report",
+            "label": "Exact submitted report commitment",
+            "signature": "reportHash()",
+            "returns": "bytes32",
+            "args": [],
+            "expected": "0x9707ec92029bc1708cab17989922aef4ccbabffb6333a80ef0d2bc300667c661",
+            "status": "passed",
+            "evmValue": "0x9707ec92029bc1708cab17989922aef4ccbabffb6333a80ef0d2bc300667c661",
+            "nativeValue": "0x9707ec92029bc1708cab17989922aef4ccbabffb6333a80ef0d2bc300667c661",
+            "calldata": "0x3c81ba4f",
+            "evmData": "0x9707ec92029bc1708cab17989922aef4ccbabffb6333a80ef0d2bc300667c661",
+            "nativeData": "0x9707ec92029bc1708cab17989922aef4ccbabffb6333a80ef0d2bc300667c661"
+          }
+        ],
+        "nativeBlockHash": "0xc9bdcd67cf088f0db7005926169e4837a9eb6b0a084ffad4935ccc413e63529d",
+        "evmCheckpoint": {
+          "blockHash": "0xe1f02844c7f388c3e03701c0b2673c2e4d1720b4c2ef8e2202a2fb621c96a219",
+          "requireCanonical": true
+        }
+      }
+    },
+    {
+      "id": "transaction.finality",
+      "title": "Finalized contract transaction",
+      "status": "passed",
+      "observed": "Successful native contract transaction from the project account is finalized",
+      "expected": "A successful transaction for this contract in a canonical finalized block",
+      "remediation": "",
+      "evidence": {
+        "kind": "native-extrinsic",
+        "hash": "0x8366c5aaf29078ad7bd2b5c1a054e47579842d8bfbf34e38c0e4a53df57d2f57",
+        "blockHash": "0x79a6660e2d826df7218083be86459500d8cb16deca45e3a494bc379fea5ffddd",
+        "blockNumber": "161839",
+        "sender": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+        "senderMatches": true,
+        "extrinsicIndex": 1,
+        "events": [
+          "balances.Withdraw",
+          "revive.ContractEmitted",
+          "balances.TransferAndHold",
+          "balances.Deposit",
+          "transactionPayment.TransactionFeePaid",
+          "system.ExtrinsicSuccess"
+        ]
+      }
+    }
+  ],
+  "network": {
+    "name": "Portaldot V3 Testnet",
+    "chainId": 420420777,
+    "evmRpcUrl": "https://test-evm-rpc-v3.portaldot.dev",
+    "substrateRpcUrl": "wss://test-node-v3.portaldot.dev",
+    "genesisHash": "0xd4f9acbcf7f52388d8b095abe3c198d19fc510e0343e643e87cfbccb155283bd",
+    "observedChainId": 420420777,
+    "nativeGenesisHash": "0xd4f9acbcf7f52388d8b095abe3c198d19fc510e0343e643e87cfbccb155283bd",
+    "specVersion": "3002",
+    "finalizedBlockNumber": "161858",
+    "finalizedNativeBlockHash": "0xc9bdcd67cf088f0db7005926169e4837a9eb6b0a084ffad4935ccc413e63529d",
+    "finalizedEvmBlockHash": "0xe1f02844c7f388c3e03701c0b2673c2e4d1720b4c2ef8e2202a2fb621c96a219",
+    "specName": "portaldot-v3",
+    "transactionVersion": "2",
+    "stateVersion": "1",
+    "parameterSnapshot": {
+      "chainId": "420420777",
+      "nativeToEthRatio": "10000",
+      "allowEVMBytecode": "true",
+      "autoMap": "true",
+      "depositPerByte": "6000000000000",
+      "depositPerItem": "15000000000000",
+      "gasScale": "5",
+      "existentialDeposit": "10000000000000"
+    },
+    "constantsHash": "0xfb9b71dc034742bb9df2ee1e1e6c3a0f4e734b75898b7291ef8806a4b1e2b759",
+    "contractCodeHash": "0xb0fecb8c20e7181430f62d5354fe37e8540bc1a54958dee83e738ec63a64c754"
+  },
+  "limitations": [
+    "Read-only verification does not sign, deploy, or prove a complete product flow.",
+    "A funded balance does not prove that deployment fees and storage deposits are affordable.",
+    "Transaction evidence associates the project sender and contract; it does not prove that this historical transaction caused the currently observed value.",
+    "Configured ABI views are bounded RPC simulations; their declarations do not establish contract safety or independent review."
+  ],
+  "binding": {
+    "plan": {
+      "profile": "contract",
+      "logicalContractId": "release-gate",
+      "caller": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+      "assertions": [
+        {
+          "id": "owner",
+          "signature": "owner()",
+          "returns": "address",
+          "args": [],
+          "expected": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b"
+        },
+        {
+          "id": "reviewer",
+          "signature": "reviewer()",
+          "returns": "address",
+          "args": [],
+          "expected": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b"
+        },
+        {
+          "id": "revision",
+          "signature": "revision()",
+          "returns": "uint256",
+          "args": [],
+          "expected": "2"
+        },
+        {
+          "id": "approved",
+          "signature": "approved()",
+          "returns": "bool",
+          "args": [],
+          "expected": true
+        },
+        {
+          "id": "report",
+          "signature": "reportHash()",
+          "returns": "bytes32",
+          "args": [],
+          "expected": "0x9707ec92029bc1708cab17989922aef4ccbabffb6333a80ef0d2bc300667c661"
+        }
+      ]
+    },
+    "planHash": "b836b720b2a2f63563bebb04b8350bb565f4955b9997aec23818ebe43416d59a",
+    "logicalContractId": "release-gate",
+    "sourceRevision": "8a8b703d64b65d918346aa7eb9a451b50cb8192e4a5421fddf2cf2d4568064e6",
+    "contractAddress": "0xf062d47c63613da90e3573e0ee2bba126347f3d3",
+    "codeHash": "0xb0fecb8c20e7181430f62d5354fe37e8540bc1a54958dee83e738ec63a64c754",
+    "environment": {
+      "chainId": "420420777",
+      "genesisHash": "0xd4f9acbcf7f52388d8b095abe3c198d19fc510e0343e643e87cfbccb155283bd",
+      "specName": "portaldot-v3",
+      "specVersion": "3002",
+      "transactionVersion": "2",
+      "stateVersion": "1",
+      "constantsHash": "0xfb9b71dc034742bb9df2ee1e1e6c3a0f4e734b75898b7291ef8806a4b1e2b759"
+    },
+    "environmentHash": "585d0c8da2b0137796aea6acd09e814d8d2b970f5ec3bba917f9a010fa2c48d0",
+    "checkpoint": {
+      "number": "161858",
+      "nativeHash": "0xc9bdcd67cf088f0db7005926169e4837a9eb6b0a084ffad4935ccc413e63529d",
+      "evmHash": "0xe1f02844c7f388c3e03701c0b2673c2e4d1720b4c2ef8e2202a2fb621c96a219"
+    }
+  },
+  "evidenceHash": "bab546b408c92922b42c2a75e8e1d9facdc286622e702526f58a8303c9839fcc"
+}

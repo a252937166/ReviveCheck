@@ -1,0 +1,62 @@
+{
+  "schema": "revivecheck.release-gate.v1",
+  "network": "testnet",
+  "contract": "0xf062d47c63613da90e3573e0ee2bba126347f3d3",
+  "owner": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+  "reviewer": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+  "nativeAccount": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+  "sourceSha256": "8a8b703d64b65d918346aa7eb9a451b50cb8192e4a5421fddf2cf2d4568064e6",
+  "deployedCodeHash": "0xb0fecb8c20e7181430f62d5354fe37e8540bc1a54958dee83e738ec63a64c754",
+  "deploy": {
+    "extrinsicHash": "0x30642aa5bd5f11508189dfd1f9abfdd1c290386067761f01cf7a52b71d75188a",
+    "blockHash": "0x8cfaf3f1d3172aa7398cc96332010da204a9268890bc8ec36772425289f076b3",
+    "blockNumber": "160874",
+    "finalizedAt": "2026-10-23T13:27:13.415Z"
+  },
+  "scope": "Owner and reviewer are the same isolated test account. Each revision is a facilitated demonstration of the gate, not independent review.",
+  "revisions": [
+    {
+      "revision": 1,
+      "reportHash": "0x0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5",
+      "subject": "pUSD native asset baseline",
+      "submit": {
+        "extrinsicHash": "0x906d4a31647610d07a1dea0c30b75e944a2bc531703733ca4ba949e9a2683995",
+        "blockHash": "0x2b2b0c6bd40b4ed73b17327417a19359151f7f34de6bb6c23b04bb2755b79e7c",
+        "blockNumber": "160877",
+        "finalizedAt": "2026-10-23T13:27:30.776Z"
+      },
+      "review": {
+        "extrinsicHash": "0x4ccf5a1c1b53b2b5a174a696109a8c173adebde30efe85901bb7fe2a8fe241b7",
+        "blockHash": "0x8e2a63c2612ed6311108d1a5fdc0dade0bbf0965d8c3d8c06fe4784220d3357e",
+        "blockNumber": "160880",
+        "finalizedAt": "2026-10-23T13:27:49.477Z"
+      },
+      "readbackReportHash": "9dd04e0685d06a1a9a0525b2b8d6ac4b259d1618184789f345a7be5e55ae0645",
+      "readbackStatus": "passed"
+    },
+    {
+      "revision": 2,
+      "reportHash": "0x9707ec92029bc1708cab17989922aef4ccbabffb6333a80ef0d2bc300667c661",
+      "submit": {
+        "extrinsicHash": "0x9a28a9293b687ae299b01ffbb5658005ac6064742ae847d0805d0b00ca1fc407",
+        "blockHash": "0xa68b26e5a207a6d2846bd8b87639f9e3bdf40b327256d03e45a4c25156643cf2",
+        "blockNumber": "161790",
+        "finalizedAt": "2026-10-23T14:59:13.665Z"
+      },
+      "resetObserved": {
+        "blockNumber": "161790",
+        "approved": false,
+        "revision": "2"
+      },
+      "review": {
+        "extrinsicHash": "0x8366c5aaf29078ad7bd2b5c1a054e47579842d8bfbf34e38c0e4a53df57d2f57",
+        "blockHash": "0x79a6660e2d826df7218083be86459500d8cb16deca45e3a494bc379fea5ffddd",
+        "blockNumber": "161839",
+        "finalizedAt": "2026-10-23T15:04:07.253Z"
+      },
+      "readbackReportHash": "bab546b408c92922b42c2a75e8e1d9facdc286622e702526f58a8303c9839fcc",
+      "readbackStatus": "passed",
+      "actualNativeFeesRaw": "3592095535126"
+    }
+  ]
+}

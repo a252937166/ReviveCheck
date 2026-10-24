@@ -15,6 +15,86 @@
       "completedAt": "2026-10-23T08:17:25.008Z",
       "role": "upgrade-baseline",
       "baselineId": "current-2026-10-23"
+    },
+    {
+      "evidenceHash": "49ea0e93c6163cb37ed5e4a1dc1f2119c8fb4ec8cb5afc3a174df3a3098de71f",
+      "projectName": "pUSD token list",
+      "release": "v1.0.0",
+      "profile": "native-asset",
+      "completedAt": "2026-10-23T14:51:56.325Z",
+      "role": "lifecycle-check",
+      "lifecycle": true,
+      "network": "testnet"
+    },
+    {
+      "evidenceHash": "9707ec92029bc1708cab17989922aef4ccbabffb6333a80ef0d2bc300667c661",
+      "projectName": "pUSD token list",
+      "release": "v1.0.1",
+      "profile": "native-asset",
+      "completedAt": "2026-10-23T14:52:12.535Z",
+      "role": "lifecycle-recheck",
+      "lifecycle": true,
+      "network": "testnet"
+    },
+    {
+      "evidenceHash": "5dfe148e10b9084f5c7051a5098ed0d5902f10a2fbb2447dca48667500905966",
+      "projectName": "pUSD token list",
+      "release": "v1.0.1",
+      "profile": "native-asset",
+      "completedAt": "2026-10-23T14:52:47.649Z",
+      "role": "lifecycle-promotion",
+      "lifecycle": true,
+      "network": "live"
+    },
+    {
+      "evidenceHash": "bab546b408c92922b42c2a75e8e1d9facdc286622e702526f58a8303c9839fcc",
+      "projectName": "ReviveCheck release gate",
+      "release": "v1.0.1",
+      "profile": "contract",
+      "completedAt": "2026-10-23T15:06:14.262Z",
+      "role": "gate-revision",
+      "revision": "2",
+      "committedReportHash": "9707ec92029bc1708cab17989922aef4ccbabffb6333a80ef0d2bc300667c661"
+    },
+    {
+      "evidenceHash": "7f01ed85594c47523d44ecf4f87c3e42da920bff9925a33f4cd6fc0686b1dc14",
+      "projectName": "pUSD token list",
+      "release": "v1.0.0",
+      "profile": "native-asset",
+      "completedAt": "2026-10-23T17:48:49.641Z",
+      "role": "studio-check",
+      "studio": true,
+      "network": "testnet"
+    },
+    {
+      "evidenceHash": "cbd78faa85f8759860d88366794e0c70052b74f9ed775be5bb37ad20118ed427",
+      "projectName": "pUSD token list",
+      "release": "v1.0.1",
+      "profile": "native-asset",
+      "completedAt": "2026-10-23T17:48:58.155Z",
+      "role": "studio-recheck",
+      "studio": true,
+      "network": "testnet"
+    },
+    {
+      "evidenceHash": "189aa2e966070829412d586f4811b520c2e88a867c2d003f5ef260fd8a734612",
+      "projectName": "pUSD token list",
+      "release": "v1.0.1",
+      "profile": "native-asset",
+      "completedAt": "2026-10-23T17:53:21.946Z",
+      "role": "studio-promotion",
+      "studio": true,
+      "network": "live"
+    },
+    {
+      "evidenceHash": "17baad394b7c6df801a6c5d4e72d29202535d0e9f4b861623208f05fd2903377",
+      "projectName": "pUSD token list",
+      "release": "v1.0.1",
+      "profile": "native-asset",
+      "completedAt": "2026-10-23T17:53:31.360Z",
+      "role": "studio-watch",
+      "studio": true,
+      "network": "testnet"
     }
   ],
   "currentBaselineReportHash": "0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5"
