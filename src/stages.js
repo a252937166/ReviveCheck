@@ -1,0 +1,93 @@
+// The eight stages of a release on Portaldot V3. The landing diagram, the studio
+// and the docs all read from this list, so a stage says the same thing everywhere.
+// `kind: 'read'` runs in the browser against the public RPCs and signs nothing;
+// `kind: 'write'` is a transaction the visitor's own wallet signs and pays for.
+export const STAGES = [
+  {
+    id: 'check', name: 'Check', lane: 'testnet', kind: 'read', product: 'api',
+    title: 'Check a release against the chain',
+    summary: 'Both interfaces, one block',
+    description: 'The release is compared with what Portaldot V3 reports through the native runtime and the EVM RPC at one finalized block. Here the release is a token-list entry, read from native Assets storage and the ERC-20 precompile. The plan, observations and checkpoint are sealed into one SHA-256 report.',
+    why: 'A token list is only right if the chain agrees with it. One finalized block, read through the native runtime and the EVM RPC, catches a wrong decimals value before anyone ships it.',
+    proves: ['What both interfaces returned at that block', 'That the report has not changed since it was sealed'],
+    limits: 'It trusts the official RPC operators, and it does not judge whether the release is a good idea.',
+    tool: 'check_release', js: 'checkRelease(plan)', cli: 'npm run rc -- check_release --release v1.0.0',
+  },
+  {
+    id: 'recheck', name: 'Recheck', lane: 'testnet', kind: 'read', product: 'api',
+    title: 'Fix it and check again',
+    summary: 'Fix, check again, compare',
+    description: 'A corrected release gets a new report of its own, and the failed one stays exactly as it was. The comparison separates a repair of the same target from a changed plan, a new deployment or a runtime change.',
+    why: 'A fix needs evidence of its own. The failed report stays as it was, and the comparison shows exactly which checks changed and why that counts as a repair.',
+    proves: ['Which checks changed between two reports of one target'],
+    limits: 'An improved check records a difference, not its cause.',
+    tool: 'compare_reports', js: 'compare(baseline, candidate)', cli: 'npm run rc -- check_release --release v1.0.1 --previousReportHash <hash>',
+  },
+  {
+    id: 'store', name: 'Store', lane: 'testnet', kind: 'write', product: 'storage',
+    title: 'Store the sealed report on Portaldot',
+    summary: 'Evidence written to Portaldot',
+    description: 'The sealed report is written to Portaldot itself through the native Remark module. The chain keeps the bytes in the block and emits a content hash. Anyone can retrieve the report from any node, check both hashes, and replay every observation at its pinned block.',
+    why: 'A report on a website can vanish or be edited. Bytes in a Portaldot block, with their content hash in an event, can be fetched from any node and verified by anyone.',
+    proves: ['The exact report, retrievable from chain data alone', 'That the chain still returns the recorded values at that block'],
+    limits: 'Storage proves what was sealed and when, not that the sealer read honestly.',
+    tool: 'retrieve_evidence', js: 'retrieveEvidence({ extrinsicHash })', cli: 'node scripts/store-evidence.js --report <hash>',
+    chain: 'remark.store(bytes)', readback: 'retrieve_evidence', cost: 'fee ≈ 0.1 tPOT per KB',
+  },
+  {
+    id: 'submit', name: 'Submit', lane: 'testnet', kind: 'write', product: 'middleware',
+    title: 'Submit the report hash to the registry',
+    summary: 'Report hash into the registry',
+    description: 'The release owner commits the passed report’s hash to the ReleaseRegistry. Each submission opens a new revision and clears any earlier approval, so a decision never silently carries over to a newer report.',
+    why: 'The registry is what other contracts read: one owner, one label, one revision at a time. An approval can never silently carry over to a newer report.',
+    proves: ['Which account committed which report hash, in which block'],
+    limits: 'The contract stores a hash. It does not re-run the checks.',
+    tool: 'prepare_transaction', js: 'prepareTransaction({ action: "submit", … })', cli: 'npm run rc -- prepare_transaction --action submit --label pusd-token-list --reportHash <hash> --from <address>',
+    chain: 'ReleaseRegistry.submit(name, reportHash)', readback: 'read_registry', cost: 'fee ≈ 0.03 tPOT + a held deposit',
+  },
+  {
+    id: 'approve', name: 'Approve', lane: 'testnet', kind: 'write', product: 'middleware',
+    title: 'Approve the revision as its reviewer',
+    summary: 'Reviewer signs that hash',
+    description: 'A reviewer approves or requests changes on the current revision by naming the report hash they read. A decision on a superseded report reverts with StaleReport. A reviewer can also sign a System.remark_with_event attestation.',
+    why: 'A decision is bound to the exact report hash the reviewer read. A newer revision gets nothing from the approval of the one before it.',
+    proves: ['Which account decided on which revision and report hash'],
+    limits: 'It authenticates an account, not a person or an authority.',
+    tool: 'read_registry', js: 'readRegistry({ releaseId, reviewer })', cli: 'npm run rc -- read_registry --releaseId <id> --reviewer <address>',
+    chain: 'ReleaseRegistry.review(id, reportHash, approved)', readback: 'read_registry', cost: 'fee ≈ 0.03 tPOT + a held deposit',
+  },
+  {
+    id: 'consume', name: 'Consume', lane: 'testnet', kind: 'write', product: 'middleware',
+    title: 'Let a contract act on the approval',
+    summary: 'Contracts act on approvals',
+    description: 'Other contracts read the registry through the ReviveCheckGuard library. The VerifiedTokenList lists a token only from its release owner, only while the named reviewer’s approval of that exact report stands, and only if the token itself reports the claimed decimals. A new revision un-lists it until it is approved again.',
+    why: 'This is the middleware in use. The token list refuses a listing the moment the approval lapses, with no off-chain check anywhere in the path.',
+    proves: ['That a contract acted on a current approval, and stops when it lapses'],
+    limits: 'The guard enforces the registry’s state, not the quality of the review.',
+    tool: 'token_list_status', js: 'readTokenList({ token })', cli: 'npm run rc -- token_list_status --token 0x00001E6100000000000000000000000000010000',
+    chain: 'VerifiedTokenList.list(token, id, reportHash, reviewer, decimals)', readback: 'token_list_status', cost: 'fee ≈ 0.03 tPOT + a held deposit',
+  },
+  {
+    id: 'promote', name: 'Promote', lane: 'live', kind: 'read', product: 'api',
+    title: 'Ask V3 Live before promoting',
+    summary: 'Ask V3 Live first',
+    description: 'Before a release goes to V3 Live, ReviveCheck reads V3 Live itself: its identity, the chain the release names, the runtime, and whether the asset exists there. A testnet pass never stands in for V3 Live.',
+    why: 'A testnet pass says nothing about V3 Live. Reading the live network itself, before anything is deployed there, is what keeps a bad release from being promoted.',
+    proves: ['Where V3 Live differs from the network that accepted the release'],
+    limits: 'Read-only. It deploys and lists nothing.',
+    tool: 'assess_promotion', js: 'assessPromotion(report)', cli: 'npm run rc -- assess_promotion --reportHash <hash>',
+  },
+  {
+    id: 'watch', name: 'Watch', lane: 'both', kind: 'read', product: 'api',
+    title: 'Watch the runtime and recheck on change',
+    summary: 'Runtime change → recheck',
+    description: 'A report holds for the runtime and block it pinned. The site follows each network’s finalized head and runtime version live. When the runtime or the release changes, the next step is a recheck, and the loop starts again.',
+    why: 'A report pins a runtime version. When Portaldot upgrades, the evidence is stale until a recheck says otherwise.',
+    proves: ['Which runtime each report was taken at, against the current one'],
+    limits: 'There is no background watcher service. Rechecks run when you or your CI start them.',
+    tool: 'network_status', js: 'networkStatus("testnet")', cli: 'npm run rc -- network_status --network live',
+  },
+];
+export const stageById = Object.fromEntries(STAGES.map((stage) => [stage.id, stage]));
+export const LANES = { testnet: 'V3 Testnet', live: 'V3 Live', both: 'Both networks' };
+export const PRODUCTS = { middleware: 'Middleware', storage: 'Storage', api: 'API' };

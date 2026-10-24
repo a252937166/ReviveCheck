@@ -48,7 +48,7 @@ function TargetEvidence({item}){
     try{
       const identifier=String(item.identifier||item.kind).replace(/[^A-Za-z0-9-]/g,'').slice(0,18);
       const name=`revivecheck-${item.kind}-${identifier}-${qrKind}-qr.${format}`;
-      const source=format==='svg'?svg:await QRCode.toDataURL(qrValue,{type:'image/png',width:1024,errorCorrectionLevel:'M',margin:4,color:{dark:'#18357f',light:'#ffffff'}});
+      const source=format==='svg'?svg:await QRCode.toDataURL(qrValue,{type:'image/png',width:1024,errorCorrectionLevel:'M',margin:4,color:{dark:'#0f1428',light:'#ffffff'}});
       downloadBlob(dataUrlBlob(source,format==='svg'?'image/svg+xml':'image/png'),name);
       setNotice(`${format.toUpperCase()} QR downloaded. Encoded content: ${identifierOnly?'identifier only':'official explorer URL'}.`);
     }catch(e){setError(e.message||'The QR download failed. Copy the full identifier or link instead.');}

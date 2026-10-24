@@ -2,7 +2,24 @@
 
 ReviveCheck helps a Portaldot V3 application developer define release expectations, observe the real target, and hand the exact result to a maintainer for review. It is a developer acceptance and evidence-handoff tool. The decision it supports is: **“Does this version satisfy this plan in this observed environment, and what needs a new check?”**
 
-Status: implemented v0.2 workflow, reviewed 2026-10-23. Our own signed testnet deployment and state writes remain pending a reported balance of 0 tPOT. The original 78-second video and six-page deck show v0.1. See [v0.2 delivery evidence](RELEASE_V2.md); submission and organizer decisions remain separate in [SUBMISSION.md](SUBMISSION.md).
+Status: v0.3, reviewed 2026-10-23. ReviveCheck is positioned as release attestation middleware for the Modular Cloud & Middleware track: decentralized middleware (ReleaseRegistry, ReviveCheckGuard, VerifiedTokenList), storage and data components (reports stored through the native Remark module, a feed built from chain events), and APIs (twelve tools over MCP, REST, JavaScript and the CLI). The public site, the "Try it out" studio and wallet-signed writes carry that framing.
+
+- **ReleaseGate** (`0xf062d47c63613da90e3573e0ee2bba126347f3d3`, V3 testnet), one owner and one reviewer. Revision 1 approved the pUSD baseline report. Revision 2 committed the token-list v1.0.1 report; its submit cleared approval at #161790, and the review at #161839 re-approved it. Each revision has a finalized dual-interface readback.
+- **ReleaseRegistry** (`0xe949b200edf070b9d425b206ed24dc8fe5b7d339`, deployed at #162962), open to visitors. A run driven through the studio UI submitted at #163485, approved at #163489 and signed a review remark at #163493.
+- **VerifiedTokenList** (`0xd0bd833b4b8658b1230a0e9a99640935b3c65819`, deployed at #164220) consumes the registry through ReviveCheckGuard; pUSD was listed at #164313 and read back through both interfaces.
+- **Evidence store:** the studio and reference rechecks are stored on-chain with `remark.store` at #164266 and #164335, retrieved and verified from chain data.
+
+In both records, the owner and reviewer are one isolated test account; see [LIFECYCLE.md](LIFECYCLE.md). The original 78-second video and six-page deck show v0.1. See [v0.2 delivery evidence](RELEASE_V2.md); submission and organizer decisions remain separate in [SUBMISSION.md](SUBMISSION.md).
+
+## Positioning
+
+What ReviveCheck provides externally is decentralized middleware, storage/data components and APIs built on Portaldot's modular architecture. The developer workflow (studio, reviewer, workbench) is how people reach those components; it is not the product. MCP and the CLI are routes to the API, not products of their own.
+
+## Brand commitments
+
+- **Light only.** The user prefers light themes. Every surface, deck and video frame uses a light ground unless the user asks otherwise.
+- **A modern developer platform at Vercel's craft level.** The user judged the printed "custody record" world dated and took the category-standard path, naming Vercel as the bar. The world is recorded in DESIGN.md.
+- **Co-brand.** The official Portaldot mark appears unaltered, only as "Built on Portaldot V3", with no implied endorsement.
 
 ## The user and the task
 
@@ -10,7 +27,7 @@ The primary user is a Solidity developer migrating or releasing an application o
 
 Today this work often means reconciling a plan, RPC responses, account mappings, explorer references, and screenshots. ReviveCheck keeps the expected behavior, observed checkpoint, limitations, and review decision connected. It does not decide whether a business should launch or certify that a contract is secure.
 
-For example, a release plan can require `approved() == true`, `revision() == 1`, and a specific `reportHash()`. A report records what the supplied target returned through both V3 interfaces. If a new release changes the contract, a reviewer can inspect a new report without their previous acceptance silently following it. The included ReleaseGate application exercises this pattern locally; its own V3 deployment is still pending.
+For example, a release plan can require `approved() == true`, `revision() == 1`, and a specific `reportHash()`. A report records what the supplied target returned through both V3 interfaces. If a new release changes the contract, a reviewer can inspect a new report without their previous acceptance silently following it. The included ReleaseGate application exercises this pattern on the V3 testnet: a new submission clears approval until the reviewer signs again.
 
 ## Complete the implemented lifecycle
 
@@ -57,9 +74,9 @@ This is a concrete contribution beyond a collection of RPC checks: a portable ac
 
 The retained live report for public asset **7777/pUSD** records finalized block **157426**, runtime **3002**, and **3/3 passed checks**. Its SHA-256 is `15baa9e1d2e8746bdc94b873e314a3fd839fbd52ecc13dd99470bec8444ba544`; [the original JSON](../public/reports/15baa9e1d2e8746bdc94b873e314a3fd839fbd52ecc13dd99470bec8444ba544.json) verifies locally. This is an existing external asset, not our deployment, state write, customer or independent adoption.
 
-ReleaseGate's compiled bytecode has executed in a local in-memory EVM: constructor, first report submission, reviewer approval, and a second submission that clears approval and increments revision. Nonowner submission and nonreviewer decisions revert. This establishes local contract behavior only; it does not establish revive execution, testnet fees, finality, or our own live write/readback.
+ReleaseGate's compiled bytecode has executed in a local in-memory EVM: constructor, first report submission, reviewer approval, and a second submission that clears approval and increments revision. Nonowner submission and nonreviewer decisions revert. Those local tests cover contract behavior. The testnet record adds revive execution, actual fees, finality and live readback: deploy, two submit/review revisions, and passing 7/7 readbacks through both interfaces. Owner and reviewer are the same test account, so it shows the mechanism, not independent review.
 
-The UI/API stay read-only. An explicitly invoked developer helper exists for testnet deployment and writes, but implementation readiness is not execution evidence. There is no hosted team workspace, authenticated reviewer identity, automatic promotion, background watcher, security audit, or production guarantee. Archive/restore and importing/exporting files are implemented; these should not be described as team adoption.
+The local workbench, REST API, CLI and MCP tools stay read-only: they prepare and dry-run transactions but never sign. On the public site, only the visitor's own wallet signs studio writes (a registry submit or review, or a `System.remark_with_event`), after a dry-run is shown. Explicit CLI helpers sign testnet writes only with an isolated test wallet, behind cost caps and journals. Receipts remain self-declared: an on-chain remark authenticates an account, not a person or an official authority. There is no hosted team workspace, automatic promotion, background watcher, security audit, or production guarantee. The V3 Live check is a read-only promotion assessment. Archive/restore and importing/exporting files are implemented; these should not be described as team adoption.
 
 ## Validate value before expanding
 
