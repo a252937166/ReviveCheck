@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-24T12:58:21.825Z",
+  "project": "ReviveCheck",
+  "purpose": "Offline diagnostic reproductions supporting the English project review; no fixes or real-chain actions.",
+  "runtime": {
+    "node": "v23.10.0",
+    "platform": "darwin",
+    "architecture": "x64",
+    "compiler": "0.8.24+commit.e11b9ed9.Emscripten.clang",
+    "evmVersion": "paris",
+    "inMemoryCreations": 4,
+    "inMemoryCalls": 17
+  },
+  "safety": {
+    "globalFetchDenied": true,
+    "blockedFetchAttempts": 0,
+    "actualNetworkRequests": 0,
+    "keyFilesRead": 0,
+    "walletConnections": 0,
+    "signedTransactions": 0,
+    "broadcastTransactions": 0,
+    "productionFilesWritten": 0,
+    "reviewedInputsUnchanged": true
+  },
+  "sourceSha256": {
+    "contracts/ReleaseRegistry.sol": "6ae08245bc8e5baa5c16643305c0db3704eff85dc0fb70ff337bf17600c466a7",
+    "contracts/ReviveCheckGuard.sol": "772080a43ca96888d955ae7a785ac00d77670158de36bdabc8bf765df6d17832",
+    "contracts/VerifiedTokenList.sol": "abcbb68f51d5aff8022c1b12e254190194d293c4efd0bb3b00800f0cefae2c31",
+    "scripts/compile-release-registry.js": "e9e82d95cebae8566be0b1bdd4cf74df59b5fcaf82e8cc02bd03878ccb0a38cc",
+    "scripts/compile-token-list.js": "07e56f8a4e83e9fe4101b11c433b9a2cdbd298265757d89fa706091e5ede7335",
+    "lib/replay.js": "202a77f0d6c865ea995b8ae27dda80270a38fb3bf60f8800bf012114566dcd6b",
+    "lib/chain.js": "d27b93272345944bcb2dcf01da855b8bc1098b55fbb28d3ddc5971df9106e314",
+    "lib/plan.js": "37416fff908175b918eeaf527b420e50fcb25cd3a699bf33359631c36905a7d8",
+    "lib/report.js": "b3f6df10be2b67aeda9337d58bcea55fddd05bfac4352b7d09d049e9b7ce3c76",
+    "lib/explorer.js": "9999a43702235bc9837480c6d7ef04ce73b280dddabfc05bd190689e04512cc5",
+    "package.json": "b99e0bf053cf71a0212f35d097700a4006ae2ef253bd20569fc917d763b5ecee",
+    "package-lock.json": "841d9d60dfb1e8d67a2472fec06fd525ce13e71b8a9a4eb3f5acb6043bf55126",
+    "public/reports/9dd04e0685d06a1a9a0525b2b8d6ac4b259d1618184789f345a7be5e55ae0645.json": "b3d0bd83e1954ed7d3617dc640b2f04043b7a950dc53538177790c882ed10d79",
+    "public/baselines/current-2026-10-23.json": "fe16fcc0683321832e41bf2828e35a97962cd6a61fa79313500f69af61c10475",
+    "artifacts/review-2026-10-24/reproduce-findings.mjs": "e8d612dfad6ee506741504aa6497c827a8cdbf037caef7014b82a2b58ea3440a"
+  },
+  "retainedEvidence": {
+    "reportHash": "9dd04e0685d06a1a9a0525b2b8d6ac4b259d1618184789f345a7be5e55ae0645",
+    "reportFileSha256": "b3d0bd83e1954ed7d3617dc640b2f04043b7a950dc53538177790c882ed10d79",
+    "baselineReportHash": "0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5",
+    "baselineFileSha256": "fe16fcc0683321832e41bf2828e35a97962cd6a61fa79313500f69af61c10475"
+  },
+  "diagnosticSourceSha256": {
+    "ReviewStubToken.sol": "b1aa0ea5a344c79dcbaa24b390596c8f00c03e0c69bb2c3eee1c23f9e37c123d",
+    "ReviewGuardHarness.sol": "06cad687f7a7eacd71d096a445676a71b2ca92bd6a163621a9adbd3a3dcaa1ac"
+  },
+  "findings": [
+    {
+      "id": "RC-01",
+      "title": "Duplicate reviewer addresses inflate the approval count",
+      "status": "reproduced",
+      "environment": "Compiled current source in an in-memory Paris EVM; no Portaldot node or wallet.",
+      "inputs": {
+        "reviewer": "0x0202020202020202020202020202020202020202",
+        "releaseId": "0xff5837af82a0cf80a9d8da5956dfacc4ebf35d2ccf53ebc5d7f21632abe7db09",
+        "reportHash": "0x1111111111111111111111111111111111111111111111111111111111111111",
+        "requestedReviewerLists": [
+          [
+            "0x0202020202020202020202020202020202020202"
+          ],
+          [
+            "0x0202020202020202020202020202020202020202",
+            "0x0202020202020202020202020202020202020202"
+          ]
+        ]
+      },
+      "observed": {
+        "uniqueApprovingAccounts": 1,
+        "singleAddressCount": 1,
+        "duplicateAddressCount": 2,
+        "naiveTwoApprovalThresholdWouldPass": true
+      },
+      "expected": {
+        "duplicateAddressCount": 1,
+        "twoDistinctApprovalThresholdWouldPass": false
+      },
+      "limitation": "This exercises the public library through a diagnostic harness; it does not show that the deployed token-list consumer uses multi-reviewer thresholds."
+    },
+    {
+      "id": "RC-02",
+      "title": "Open-curator listings can be overwritten by an unrelated self-approved release",
+      "status": "reproduced",
+      "inputs": {
+        "curator": "0x0000000000000000000000000000000000000000",
+        "originalReleaseOwner": "0x0101010101010101010101010101010101010101",
+        "originalReviewer": "0x0202020202020202020202020202020202020202",
+        "unrelatedReleaseOwnerAndReviewer": "0x0303030303030303030303030303030303030303",
+        "token": "0xdd5b1db31a6bcc5e0b22eb98bae503fc5c4f4377",
+        "realStubTokenDecimals": 6
+      },
+      "observed": {
+        "initialEntry": {
+          "releaseId": "0xff5837af82a0cf80a9d8da5956dfacc4ebf35d2ccf53ebc5d7f21632abe7db09",
+          "reportHash": "0x1111111111111111111111111111111111111111111111111111111111111111",
+          "reviewer": "0x0202020202020202020202020202020202020202"
+        },
+        "listedBefore": true,
+        "overwrittenEntry": {
+          "releaseId": "0x4fdb93fdf060e34a2ae449b862084601124b4c4acb720a81c05826b89e92c52b",
+          "reportHash": "0x2222222222222222222222222222222222222222222222222222222222222222",
+          "reviewer": "0x0303030303030303030303030303030303030303"
+        },
+        "listedAfterOverwrite": true,
+        "listedAfterUnrelatedOwnerSubmitsNewRevision": false,
+        "originalReleaseStillApproved": true
+      },
+      "expected": {
+        "sharedTokenEntryReplacement": "Requires an explicit trusted-curator, token-management or existing-entry update policy.",
+        "unrelatedReleaseRevision": "Must not invalidate a previously accepted entry belonging to another release."
+      },
+      "limitation": "Open reviewer choice is intentional in current source. The reproduced behavior is a trust and shared-entry integrity issue if presented as a curated or trusted directory; no live entry was changed."
+    },
+    {
+      "id": "RC-03",
+      "title": "A generic contract report is reported as reproduced after checkpoint-only reads",
+      "status": "reproduced",
+      "inputs": {
+        "path": "public/reports/9dd04e0685d06a1a9a0525b2b8d6ac4b259d1618184789f345a7be5e55ae0645.json",
+        "evidenceHash": "9dd04e0685d06a1a9a0525b2b8d6ac4b259d1618184789f345a7be5e55ae0645",
+        "originalFingerprintValid": true,
+        "profile": "contract",
+        "retainedCheckCount": 7,
+        "configuredAssertionCount": 5,
+        "retainedCheckIds": [
+          "network.chain-id",
+          "network.finalized",
+          "account.mapping",
+          "account.balance",
+          "contract.code",
+          "contract.assertions",
+          "transaction.finality"
+        ]
+      },
+      "observed": {
+        "status": "reproduced",
+        "replayedItemIds": [
+          "checkpoint.native",
+          "checkpoint.finalized",
+          "checkpoint.evm"
+        ],
+        "replayedItemCount": 3,
+        "calls": {
+          "getBlockHash": 1,
+          "getFinalizedHead": 1,
+          "getHeader": 1,
+          "at": 1,
+          "ethBlockHash": 1,
+          "nativeContractReads": 0,
+          "evmRpcCalls": 0,
+          "unexpectedReads": 0
+        },
+        "result": {
+          "reportHash": "9dd04e0685d06a1a9a0525b2b8d6ac4b259d1618184789f345a7be5e55ae0645",
+          "blockNumber": "160881",
+          "nativeHash": "0x6300ae4c9b66c1dc12250802d56db91a3056415523363fea44f3f5497b89cd45",
+          "evmHash": "0x75f4fff84288d1dad47869c5050c49c8ab810fae64c8502d870f02556b22a6f5",
+          "items": [
+            {
+              "id": "checkpoint.native",
+              "label": "Block 160881 is still canonical",
+              "recorded": "0x6300ae4c9b66c1dc12250802d56db91a3056415523363fea44f3f5497b89cd45",
+              "replayed": "0x6300ae4c9b66c1dc12250802d56db91a3056415523363fea44f3f5497b89cd45",
+              "match": true
+            },
+            {
+              "id": "checkpoint.finalized",
+              "label": "Block 160881 is finalized",
+              "recorded": true,
+              "replayed": true,
+              "match": true
+            },
+            {
+              "id": "checkpoint.evm",
+              "label": "EVM block hash via ReviveApi",
+              "recorded": "0x75f4fff84288d1dad47869c5050c49c8ab810fae64c8502d870f02556b22a6f5",
+              "replayed": "0x75f4fff84288d1dad47869c5050c49c8ab810fae64c8502d870f02556b22a6f5",
+              "match": true
+            }
+          ],
+          "status": "reproduced",
+          "checkedAt": "2026-10-24T12:58:21.817Z"
+        }
+      },
+      "expected": {
+        "fullReproduction": "Re-read supported generic contract observations at the pinned block, including code and ABI assertions.",
+        "partialCoverage": "Return an explicit partial or unsupported result; checkpoint agreement alone must not imply complete report reproduction."
+      },
+      "limitation": "The checkpoint responses are local mocks copied from the unchanged retained report. This demonstrates adapter coverage and status behavior, not current-chain truth or RPC correctness."
+    }
+  ],
+  "summary": {
+    "reproduced": 3,
+    "total": 3
+  }
+}
