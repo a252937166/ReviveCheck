@@ -124,7 +124,11 @@ test('the acceptance command fails on captured inputs that leave the verificatio
   assert.equal(unreachable.code, 1, 'an unavailable verification never passes');
   assert.match(unreachable.stdout, /acceptance FAILED/);
   assert.match(unreachable.stdout, /unknown \(observation-missing, registry-unavailable/);
-  const captured = await run(process.execPath, [cli, 'acceptance', '--config', 'examples/token-catalog/config/testnet.json', '--fixture', 'examples/token-catalog/fixtures/testnet-2026-10-24.inputs.json', '--out', 'artifacts/local/token-catalog/acceptance-captured'], options);
+  const captured = await run(process.execPath, [cli, 'acceptance', '--config', 'examples/token-catalog/config/testnet.json', '--fixture', 'examples/token-catalog/fixtures/testnet-policy-verified-2026-10-24.inputs.json', '--out', 'artifacts/local/token-catalog/acceptance-captured'], options);
   assert.match(captured.stdout, /acceptance PASSED/);
   assert.match(captured.stdout, /AVAILABLE  valid/);
+  const historical = await run(process.execPath, [cli, 'acceptance', '--config', 'examples/token-catalog/config/testnet.json', '--fixture', 'examples/token-catalog/fixtures/testnet-2026-10-24.inputs.json', '--out', 'artifacts/local/token-catalog/acceptance-historical'], options).then(() => ({ code: 0 }), (error) => ({ code: error.code, stdout: error.stdout }));
+  assert.equal(historical.code, 1, 'the preserved older capture lacks the newly required provenance and identity evidence');
+  assert.match(historical.stdout, /registry-domain-unverifiable/);
+  assert.match(historical.stdout, /consumer-identity-unavailable/);
 });

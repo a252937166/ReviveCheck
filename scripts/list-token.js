@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile, rename } from 'node:fs/promises';
 import { connectNative, evmRpc, assertTestnet, NETWORK, availableNativeBalance, formatNative, parseTokenAmount, str } from '../lib/chain.js';
 import { loadTestnetSigner, assertDryRun, sendFinalized, recordFinalizedNativeFee } from '../lib/execution.js';
 import { readRegistryWithClients, releaseIdOf, decodeRegistryError } from '../lib/registry.js';
-import { TOKEN_LIST, listCall, decodeTokenListError, readTokenListWithClients } from '../lib/tokenlist.js';
+import { TOKEN_LIST, assertTokenListWritable, listCall, decodeTokenListError, readTokenListWithClients } from '../lib/tokenlist.js';
 import { DEMO_PRECOMPILE } from '../lib/demo.js';
 
 // List a token in the VerifiedTokenList from the release owner's wallet: the
@@ -21,6 +21,7 @@ const journalPath = option('--journal', `artifacts/local/list-${token.slice(2, 1
 let api, journal;
 const save = async () => { await mkdir('artifacts/local', { recursive: true }); await writeFile(`${journalPath}.tmp`, `${JSON.stringify(journal, null, 2)}\n`); await rename(`${journalPath}.tmp`, journalPath); };
 try {
+  assertTokenListWritable();
   if (!TOKEN_LIST.address) throw new Error('Deploy the VerifiedTokenList first.');
   let prior;
   try { prior = JSON.parse(await readFile(journalPath, 'utf8')); } catch (error) { if (error.code !== 'ENOENT') throw error; }

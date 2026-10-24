@@ -26,7 +26,7 @@ jobs:
       - name: The local lifecycle reproduces the expected sequence (A submits, B approves, A lists, revision invalidates, recheck, reapproval, explicit rebinding)
         run: node examples/token-catalog/catalog.js demo --strict
       - name: Acceptance passes on complete captured inputs
-        run: node examples/token-catalog/catalog.js acceptance --config examples/token-catalog/config/testnet.json --fixture examples/token-catalog/fixtures/testnet-2026-10-24.inputs.json --out artifacts/local/token-catalog/ci-captured
+        run: node examples/token-catalog/catalog.js acceptance --config examples/token-catalog/config/testnet.json --fixture examples/token-catalog/fixtures/testnet-policy-verified-2026-10-24.inputs.json --out artifacts/local/token-catalog/ci-captured
       - name: Acceptance fails on an incomplete verification
         run: |
           if node examples/token-catalog/catalog.js acceptance --config examples/token-catalog/config/testnet.json --fixture examples/token-catalog/fixtures/unreachable.inputs.json --out artifacts/local/token-catalog/ci-unreachable; then

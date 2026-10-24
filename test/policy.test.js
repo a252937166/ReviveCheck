@@ -2,8 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { normalizePolicy, policyHash, createBinding, verifyBinding, evaluateBinding, summarizeEvaluation, REASONS, POLICY_STATUSES } from '../lib/policy.js';
-import { fingerprint } from '../lib/report.js';
+import { fingerprint, sealRun, verifyRun, validateImportedRun } from '../lib/report.js';
 import { NETWORKS } from '../lib/networks.js';
+import { LEGACY_TOKEN_LIST_IDENTITY } from '../lib/tokenlist.js';
 
 // Review F-05 (2026-10-24): the contracts answer whether an approval of an exact hash stands.
 // A business action also needs the right network, subject, plan, runtime, evidence age and a
@@ -34,10 +35,15 @@ const policyFor = (report, overrides = {}) => ({
 const seconds = (iso, delta) => new Date(Date.parse(iso) + delta * 1000);
 const after = (report, delta) => seconds(report.completedAt, delta);
 const bind = (policy, report, extra = {}) => createBinding({ policy, report, releaseId: RELEASE_ID, revision: '1', boundBy: 'catalog operator (project-controlled test account)', boundAt: report.completedAt, id: 'binding-1', ...extra });
-const registryRead = (report, { revision = '1', reportHash = `0x${report.evidenceHash}`, decisions = { [OWNER]: { reviewer: OWNER, reviewed: true, approved: true } }, interfacesAgree = true, exists = true, owner = OWNER } = {}) => ({ releaseId: RELEASE_ID, block: { number: '170000', nativeHash: `0x${'aa'.repeat(32)}`, evmHash: `0x${'bb'.repeat(32)}` }, release: { exists, owner, revision, reportHash }, decision: decisions[OWNER] ?? null, decisions, interfacesAgree });
+const registryRead = (report, { revision = '1', reportHash = `0x${report.evidenceHash}`, decisions = { [OWNER]: { reviewer: OWNER, reviewed: true, approved: true } }, interfacesAgree = true, exists = true, owner = OWNER, observedAt = after(report, 60).toISOString() } = {}) => ({ address: REGISTRY, releaseId: RELEASE_ID, observedAt, block: { number: '170000', nativeHash: `0x${'aa'.repeat(32)}`, evmHash: `0x${'bb'.repeat(32)}` }, release: { exists, owner, revision, reportHash }, decision: decisions[OWNER] ?? null, decisions, interfacesAgree });
 const observationAt = (now, { runtime = 'portaldot-v3/3002', chainId = TESTNET.chainId, genesisHash = TESTNET.genesisHash, age = 10 } = {}) => ({ network: 'testnet', chainId, genesisHash, runtime, finalized: { number: '170001', nativeHash: `0x${'cc'.repeat(32)}` }, observedAt: new Date(now.getTime() - age * 1000).toISOString() });
-const listingRead = (report, { listed = true, reviewer = OWNER, releaseId = RELEASE_ID, reportHash = `0x${report.evidenceHash}`, interfacesAgree = true } = {}) => ({ token: report.input.listing?.address, block: { number: '170000' }, listed, entry: listed ? { releaseId, reportHash, reviewer } : null, interfacesAgree });
-function evaluate(report, { policy = policyFor(report), binding = bind(policy, report), now = after(report, 60), registry = registryRead(report), observation = observationAt(now), listing = listingRead(report), evidence = null } = {}) {
+const listingRead = (report, { listed = true, reviewer = OWNER, releaseId = RELEASE_ID, reportHash = `0x${report.evidenceHash}`, interfacesAgree = true, observedAt = after(report, 60).toISOString() } = {}) => {
+  const block = { number: '170000', nativeHash: `0x${'aa'.repeat(32)}`, evmHash: `0x${'bb'.repeat(32)}` };
+  const side = { version: null, registry: REGISTRY, curator: LEGACY_TOKEN_LIST_IDENTITY.curator };
+  const identity = { address: LIST, block, evm: side, native: { ...side }, interfacesAgree: true, runtimeCodeHash: LEGACY_TOKEN_LIST_IDENTITY.runtimeCodeHash, version: 1, versionSource: 'known-deployment-runtime-code' };
+  return { token: report.input.listing?.address, list: LIST, block, observedAt, listed, entry: listed ? { releaseId, reportHash, reviewer } : null, interfacesAgree, identity };
+};
+function evaluate(report, { policy = policyFor(report), binding = bind(policy, report), now = after(report, 60), registry = registryRead(report, { observedAt: now.toISOString() }), observation = observationAt(now), listing = listingRead(report, { observedAt: now.toISOString() }), evidence = null } = {}) {
   return evaluateBinding({ policy, binding, report, registry, observation, listing, evidence, now });
 }
 const codes = (evaluation) => evaluation.reasons.map((reason) => reason.code);
@@ -80,7 +86,7 @@ test('every condition holding at fresh checkpoints is valid, and the evaluation 
   assert.equal(evaluation.enable, true);
   assert.deepEqual(evaluation.reasons, []);
   assert.ok(evaluation.checks.every((check) => check.status === 'passed'));
-  assert.deepEqual(evaluation.checks.map((check) => check.id), ['evidence.integrity', 'evidence.scope', 'target.network', 'target.subject', 'plan.fingerprint', 'report.status', 'runtime.report', 'observation.present', 'observation.fresh', 'observation.network', 'runtime.current', 'evidence.age', 'registry.read', 'registry.interfaces', 'registry.release', 'registry.owner', 'registry.revision', 'registry.approvals', 'consumer.read', 'consumer.interfaces', 'consumer.listed', 'consumer.entry']);
+  assert.deepEqual(evaluation.checks.map((check) => check.id), ['evidence.integrity', 'evidence.scope', 'target.network', 'target.subject', 'plan.fingerprint', 'report.status', 'runtime.report', 'observation.present', 'observation.fresh', 'observation.network', 'runtime.current', 'evidence.age', 'registry.read', 'registry.provenance', 'registry.domain', 'registry.fresh', 'registry.interfaces', 'registry.release', 'registry.owner', 'registry.revision', 'registry.approvals', 'consumer.read', 'consumer.provenance', 'consumer.domain', 'consumer.fresh', 'consumer.identity', 'consumer.registry', 'consumer.version-known', 'consumer.version', 'consumer.interfaces', 'consumer.listed', 'consumer.entry']);
   assert.equal(evaluation.simulation, false);
   assert.match(evaluation.reviewerTrust, /not independent review/);
   const { evaluationHash, ...rest } = evaluation;
@@ -227,7 +233,7 @@ test('a definite reason outranks an unavailable read, and every reason is kept',
   const expiredAndDark = evaluate(assetReport, { now, observation: observationAt(now), registry: { error: 'timeout' } });
   assert.equal(expiredAndDark.status, 'expired');
   assert.deepEqual(codes(expiredAndDark), ['evidence-expired', 'registry-unavailable']);
-  const supersededAndExpired = evaluate(assetReport, { now, observation: observationAt(now), registry: registryRead(assetReport, { revision: '2', reportHash: `0x${'22'.repeat(32)}`, decisions: {} }) });
+  const supersededAndExpired = evaluate(assetReport, { now, observation: observationAt(now), registry: registryRead(assetReport, { revision: '2', reportHash: `0x${'22'.repeat(32)}`, decisions: {}, observedAt: now.toISOString() }) });
   assert.equal(supersededAndExpired.status, 'recheck-required');
   assert.deepEqual(codes(supersededAndExpired), ['evidence-expired', 'revision-superseded', 'registry-unavailable']);
 });
@@ -241,4 +247,87 @@ test('a contract subject binds to the deployed code identity', () => {
   const otherCode = policyFor(contractReport, { consumer: null, registry: { address: REGISTRY }, subject: { kind: 'contract', address: contractReport.input.contractAddress, codeHash: `0x${'ee'.repeat(32)}` } });
   const redeployed = evaluateBinding({ policy: otherCode, binding: bind(otherCode, contractReport), report: contractReport, registry: registryRead(contractReport), observation: observationAt(after(contractReport, 60)), now: after(contractReport, 60) });
   assert.deepEqual(codes(redeployed), ['wrong-target']);
+});
+
+test('a satisfied quorum cannot hide unread or revoked trusted decisions', () => {
+  const policy = policyFor(assetReport, { reviewers: { trusted: [OWNER, OTHER], threshold: 1, basis: 'Two project-controlled fixture reviewers; no independent review.' } });
+  const binding = bind(policy, assetReport);
+  const unread = evaluate(assetReport, { policy, binding, registry: registryRead(assetReport) });
+  assert.equal(unread.status, 'unknown');
+  assert.equal(unread.enable, false);
+  assert.deepEqual(codes(unread), ['registry-unavailable']);
+  const revoked = evaluate(assetReport, { policy, binding, registry: registryRead(assetReport, { decisions: { [OWNER]: { reviewer: OWNER, reviewed: true, approved: true }, [OTHER]: { reviewer: OTHER, reviewed: true, approved: false } } }) });
+  assert.equal(revoked.enable, false);
+  assert.deepEqual(codes(revoked), ['approval-revoked']);
+});
+
+test('registry and consumer reads must identify the exact domains and token they claim', () => {
+  const otherRegistry = evaluate(assetReport, { registry: { ...registryRead(assetReport), address: OTHER } });
+  assert.deepEqual(codes(otherRegistry), ['registry-domain-mismatch']);
+  const otherRelease = evaluate(assetReport, { registry: { ...registryRead(assetReport), releaseId: `0x${'dd'.repeat(32)}` } });
+  assert.deepEqual(codes(otherRelease), ['registry-domain-mismatch']);
+  const unknownRegistry = evaluate(assetReport, { registry: { ...registryRead(assetReport), address: undefined } });
+  assert.equal(unknownRegistry.status, 'unknown');
+  assert.deepEqual(codes(unknownRegistry), ['registry-domain-unverifiable']);
+  for (const patch of [{ list: OTHER }, { token: OTHER }]) {
+    const result = evaluate(assetReport, { listing: { ...listingRead(assetReport), ...patch } });
+    assert.equal(result.enable, false);
+    assert.deepEqual(codes(result), ['consumer-domain-mismatch']);
+  }
+});
+
+test('a declared consumer version must be verified at the listing checkpoint', () => {
+  const versionPolicy = policyFor(assetReport, { consumer: { address: LIST, requireListed: true, version: 99 } });
+  const wrongVersion = evaluate(assetReport, { policy: versionPolicy, binding: bind(versionPolicy, assetReport) });
+  assert.equal(wrongVersion.enable, false);
+  // The known v1 identity is not sufficient to satisfy a policy requesting another version.
+  assert.deepEqual(codes(wrongVersion), ['consumer-identity-unavailable']);
+  const listing = listingRead(assetReport);
+  const missingIdentity = evaluate(assetReport, { listing: { ...listing, identity: null } });
+  assert.equal(missingIdentity.status, 'unknown');
+  assert.deepEqual(codes(missingIdentity), ['consumer-identity-unavailable']);
+  const anotherCheckpoint = evaluate(assetReport, { listing: { ...listing, identity: { ...listing.identity, block: { ...listing.block, nativeHash: `0x${'cc'.repeat(32)}` } } } });
+  assert.equal(anotherCheckpoint.status, 'unknown');
+  const fakeVersion = evaluate(assetReport, { listing: { ...listing, identity: { ...listing.identity, version: 1, versionSource: 'on-chain-version-getter' } } });
+  assert.equal(fakeVersion.status, 'unknown', 'a derived legacy version must not pretend to be an on-chain getter');
+});
+
+test('a fresh network header does not make stale registry or consumer state fresh', () => {
+  const now = after(assetReport, 3600);
+  const oldTime = after(assetReport, 60).toISOString();
+  const registry = evaluate(assetReport, { now, registry: registryRead(assetReport, { observedAt: oldTime }) });
+  const listing = evaluate(assetReport, { now, listing: listingRead(assetReport, { observedAt: oldTime }) });
+  for (const result of [registry, listing]) {
+    assert.equal(result.status, 'unknown');
+    assert.deepEqual(codes(result), ['observation-stale']);
+    assert.equal(result.enable, false);
+  }
+});
+
+test('future-dated evidence cannot bypass the evidence age limit', () => {
+  const report = sealRun({ ...assetReport, completedAt: after(assetReport, 86400).toISOString() });
+  const result = evaluate(report, { now: after(assetReport, 60) });
+  assert.equal(result.enable, false);
+  assert.deepEqual(codes(result), ['evidence-expired']);
+});
+
+test('resealing a report cannot hide a changed plan behind its earlier plan fingerprint', () => {
+  const policy = policyFor(assetReport);
+  const { evidenceHash, ...originalPayload } = assetReport;
+  const payload = { ...originalPayload, input: { ...originalPayload.input, nativeAsset: { ...originalPayload.input.nativeAsset, holder: '5GrwvaEF5zXb26Fz9rcQpDWS64VQi35ecyNBRBeZQPNPvAeyxZ' } } };
+  const report = { ...payload, evidenceHash: fingerprint(payload) };
+  assert.equal(verifyRun(report), true, 'the checksum alone is valid after resealing');
+  assert.throws(() => validateImportedRun(report), /binding does not match its inputs/);
+  assert.throws(() => bind(policy, report), /consistent plan and observation bindings/);
+  // Even a separately constructed, checksum-valid consumer binding cannot bypass
+  // report validation after a reviewer approved this inconsistent report's hash.
+  const { bindingHash, ...originalBinding } = bind(policy, assetReport);
+  const bindingPayload = { ...originalBinding, reportHash: report.evidenceHash };
+  const binding = { ...bindingPayload, bindingHash: fingerprint(bindingPayload) };
+  assert.equal(verifyBinding(binding, policy), true);
+  const result = evaluate(report, { policy, binding });
+  assert.equal(result.status, 'unknown');
+  assert.equal(result.enable, false);
+  assert.deepEqual(codes(result), ['evidence-unverifiable']);
+  assert.equal(result.checks.length, 1);
 });
