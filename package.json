@@ -1,19 +1,26 @@
 {
   "name": "revivecheck",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
-  "description": "Reproducible release acceptance for Portaldot V3 migrations",
+  "description": "Check Portaldot V3 releases against the chain, approve them on-chain, and assess promotion to V3 Live",
   "scripts": {
     "dev": "node server/index.js",
     "build": "vite build",
     "start": "NODE_ENV=production node server/index.js",
     "test": "node --test test/*.test.js",
     "wallet:create": "node scripts/create-wallet.js",
-    "check:live": "node scripts/check-live.js"
+    "check:live": "node scripts/check-live.js",
+    "mcp": "node mcp/server.js",
+    "rc": "node scripts/revivecheck.js"
   },
   "dependencies": {
+    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource-variable/geist-mono": "^5.3.0",
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "@noble/hashes": "^2.4.0",
     "@polkadot/api": "^16.4.8",
+    "@polkadot/extension-dapp": "^0.64.1",
     "@polkadot/keyring": "^14.0.3",
     "@polkadot/util-crypto": "^14.0.3",
     "ethers": "^6.17.0",
@@ -22,7 +29,8 @@
     "qrcode": "^1.5.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "solc": "^0.8.24"
+    "solc": "^0.8.24",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@ethereumjs/vm": "^10.1.3",
