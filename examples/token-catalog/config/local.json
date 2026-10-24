@@ -1,0 +1,31 @@
+{
+  "schema": "revivecheck.token-catalog-config.v1",
+  "name": "pUSD token catalog (simulated)",
+  "mode": "local",
+  "roles": {
+    "owner": { "address": "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1", "control": "fixture account A, controlled by this example; it owns the release" },
+    "reviewer": { "address": "0xb2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2", "control": "fixture account B, controlled by this example; it is the trusted reviewer" },
+    "stranger": { "address": "0xc3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3", "control": "fixture account C, controlled by this example; it tries to replace the entry" },
+    "operator": { "control": "this process; it binds reports and builds the catalog" }
+  },
+  "policy": {
+    "schema": "revivecheck.policy.v1",
+    "name": "pUSD catalog policy (simulated)",
+    "network": { "key": "local", "chainId": 420420777, "genesisHash": "0xd4f9acbcf7f52388d8b095abe3c198d19fc510e0343e643e87cfbccb155283bd" },
+    "runtime": { "specName": "portaldot-v3", "specVersions": ["3002"] },
+    "subject": { "kind": "native-asset", "assetId": "7777", "address": "0x00001e6100000000000000000000000000010000" },
+    "planHash": "ce76c98f90e2851aff534febe6c39a4802fbef32e478a665d3e4109352222191",
+    "evidence": { "scope": "local-rehearsal", "maxAgeSeconds": 604800, "maxObservationAgeSeconds": 900, "requireInterfacesAgree": true, "requireStoredOnChain": false },
+    "reviewers": {
+      "trusted": ["0xb2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2"],
+      "threshold": 1,
+      "basis": "Fixture account B. A, B and C are all controlled by this example, so the run demonstrates role separation in the contracts and the policy; it is not independent review."
+    },
+    "registry": { "address": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339", "owner": "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1", "label": "pusd-token-list" },
+    "consumer": { "address": "0x5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e", "requireListed": true, "version": 2 }
+  },
+  "tokens": [
+    { "address": "0x00001e6100000000000000000000000000010000", "symbol": "pUSD", "name": "Portaldot USD (test)", "decimals": 6, "assetId": "7777" }
+  ],
+  "data": "artifacts/local/token-catalog"
+}

@@ -1,0 +1,113 @@
+{
+  "schema": "revivecheck.token-catalog.v1",
+  "name": "pUSD token catalog (Portaldot V3 testnet)",
+  "mode": "testnet",
+  "simulation": false,
+  "generatedAt": "2026-10-24T15:55:29.691Z",
+  "policy": {
+    "name": "pUSD catalog policy (testnet)",
+    "hash": "bf084b036a4a692fe239c9fcc54adfe818cb16c0f00218ca2ea6a12ef791a2bc",
+    "network": {
+      "key": "testnet",
+      "chainId": 420420777,
+      "genesisHash": "0xd4f9acbcf7f52388d8b095abe3c198d19fc510e0343e643e87cfbccb155283bd"
+    },
+    "runtime": {
+      "specName": "portaldot-v3",
+      "specVersions": [
+        "3002"
+      ]
+    },
+    "evidence": {
+      "scope": "portaldot-testnet-readonly",
+      "maxAgeSeconds": 604800,
+      "maxObservationAgeSeconds": 900,
+      "requireInterfacesAgree": true,
+      "requireStoredOnChain": true
+    },
+    "reviewers": {
+      "trusted": [
+        "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b"
+      ],
+      "threshold": 1,
+      "basis": "The project's isolated test account, which is also the release owner. Its approval shows the mechanism end to end on the testnet; it is not independent review, and a production catalog would name reviewers it does not control."
+    },
+    "registry": {
+      "address": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339",
+      "owner": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+      "label": "pusd-token-list"
+    },
+    "consumer": {
+      "address": "0xd0bd833b4b8658b1230a0e9a99640935b3c65819",
+      "requireListed": true,
+      "version": 1
+    }
+  },
+  "roles": {
+    "owner": {
+      "address": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+      "control": "the project's isolated test account (5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt); it owns the pusd-token-list release"
+    },
+    "reviewer": {
+      "address": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+      "control": "the same project test account; owner and reviewer are one account in every recorded testnet transaction"
+    },
+    "operator": {
+      "control": "the project author, running this example; the binding below was made by hand"
+    }
+  },
+  "tokens": [
+    {
+      "address": "0x00001e6100000000000000000000000000010000",
+      "symbol": "pUSD",
+      "name": "Portaldot USD (test)",
+      "decimals": 6,
+      "assetId": "7777",
+      "available": true,
+      "status": "valid",
+      "reasons": [],
+      "binding": {
+        "id": "ea3b3f0e-91d3-4e3d-8fa6-28b87366ff91",
+        "reportHash": "cbd78faa85f8759860d88366794e0c70052b74f9ed775be5bb37ad20118ed427",
+        "release": "v1.0.1",
+        "releaseId": "0xe3f6ab7784cbaa8f60171e5201fea4e27fa5cec3d6682e06d8fcb7d89181f808",
+        "revision": "1",
+        "boundBy": "project author, by hand (owner, reviewer and operator are the project test account)",
+        "boundAt": "2026-10-24T15:53:19.564Z",
+        "storage": {
+          "extrinsicHash": "0x14b66988c9b160c1442485eae729ec92731fedd45820f8b63718f2c6405520ac",
+          "blockHash": "0xdeda40b38138e6b83de68871c8c66f147e37ec9968abe21ab4d63cf15f53eeea"
+        }
+      },
+      "evaluation": {
+        "evaluatedAt": "2026-10-24T15:55:29.691Z",
+        "checkpoint": {
+          "registry": {
+            "number": "176662",
+            "nativeHash": "0x95e540522da3464628d3f68138bff233f4447fd9533e378b7eb380ff1656a434",
+            "evmHash": "0x0cb0ea104d9202024443b3a1c04a1a15fe7fe15555f9818251c3160a3c6159a5"
+          },
+          "observation": {
+            "number": "176662",
+            "nativeHash": "0x95e540522da3464628d3f68138bff233f4447fd9533e378b7eb380ff1656a434",
+            "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0x95e540522da3464628d3f68138bff233f4447fd9533e378b7eb380ff1656a434"
+          },
+          "listing": {
+            "number": "176662",
+            "nativeHash": "0x95e540522da3464628d3f68138bff233f4447fd9533e378b7eb380ff1656a434",
+            "evmHash": "0x0cb0ea104d9202024443b3a1c04a1a15fe7fe15555f9818251c3160a3c6159a5"
+          }
+        },
+        "evaluationHash": "517bd188b9fe7de495daa603ffd8b9502b38b155c5a3b1261ca54160d5cf213a",
+        "nextAction": "Enable the subject under this policy. Validity is a point-in-time result: evaluate again before each use.",
+        "checks": 24,
+        "failed": []
+      }
+    }
+  ],
+  "summary": {
+    "available": 1,
+    "total": 1
+  },
+  "caveat": "An available entry means the policy held at the recorded checkpoints and time. The roles above say who controls each account; this catalog does not establish independent review or adoption."
+}
