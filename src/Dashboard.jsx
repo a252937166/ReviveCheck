@@ -56,7 +56,7 @@ export function AppShell({ page, bare = false, wide = false, children }) {
           <a className="side-link" href="#/review" aria-current={page === 'review' ? 'page' : undefined}><ScanSearch size={17} aria-hidden="true"/><span>Report reviewer</span></a>
           {isLoopback() && <a className="side-link" href="#/app/workbench" aria-current={page === 'workbench' ? 'page' : undefined}><Wrench size={17} aria-hidden="true"/><span>Local workbench</span></a>}
         </nav>
-        <div className="side-group"><span className="side-label">Contracts on the V3 testnet</span><ContractChip label="Registry" record={data.registry}/><ContractChip label="Token list" record={data.tokenList}/></div>
+        <div className="side-group"><span className="side-label">Contracts on the V3 testnet</span><ContractChip label="Registry" record={data.registry}/><ContractChip label={data.tokenListV2 ? 'Token list v1' : 'Token list'} record={data.tokenList}/>{data.tokenListV2 && <ContractChip label="Token list v2" record={{ contract: data.tokenListV2.address, deploy: data.tokenListV2.deploy }}/>}</div>
       </aside>}
       <Main className="app-main" id={bare ? undefined : 'main'}>{children}</Main>
     </div>

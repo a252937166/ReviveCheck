@@ -16,7 +16,7 @@ export const symbolOf = (token) => String(token || '').toLowerCase() === PUSD.to
 export const fmt = (value) => value === null || value === undefined || value === '' ? '—' : Number(value).toLocaleString('en-US');
 export const when = (value) => { const date = new Date(value); return Number.isNaN(date.getTime()) ? '' : new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'UTC', hour12: false }).format(date) + ' UTC'; };
 
-const FILES = ['lifecycle/reference.json', 'lifecycle/release-gate.json', 'lifecycle/registry.json', 'lifecycle/studio-run.json', 'lifecycle/token-list.json', 'lifecycle/evidence.json', 'api/registry.json', 'reports/index.json'];
+const FILES = ['lifecycle/reference.json', 'lifecycle/release-gate.json', 'lifecycle/registry.json', 'lifecycle/studio-run.json', 'lifecycle/token-list.json', 'lifecycle/evidence.json', 'api/registry.json', 'reports/index.json', 'lifecycle/token-list-v2.json', 'lifecycle/registry-writes.json'];
 let cache = null;
 /** Every public record, loaded once per page and shared. */
 export function useRecords() {
@@ -24,8 +24,9 @@ export function useRecords() {
   useEffect(() => {
     if (cache) return undefined;
     let alive = true;
-    Promise.all(FILES.map(fetchJson)).then(async ([rec, gate, registry, studio, tokenList, evidence, feed, reports]) => {
-      const next = { rec, gate, registry, studio, tokenList, evidence, feed, reports: reports?.reports || [], loaded: true };
+    Promise.all(FILES.map(fetchJson)).then(async ([rec, gate, registry, studio, tokenList, evidence, feed, reports, tokenListV2, registryWrites]) => {
+      // tokenListV2 and registryWrites are null until the v2 deployment and the terminal-driven writes are recorded.
+      const next = { rec, gate, registry, studio, tokenList, evidence, feed, reports: reports?.reports || [], tokenListV2, registryWrites, loaded: true };
       if (rec) {
         const [checkRun, promotionRun] = await Promise.all([fetchJson(`reports/${rec.check.reportHash}.json`), fetchJson(`reports/${rec.promotion.reportHash}.json`)]);
         next.promotion = { check: checkRun, promotion: promotionRun };
@@ -59,7 +60,7 @@ export function recordedState(data, liveSpec) {
 }
 
 /** Every on-chain record behind the site, in block order on each network. */
-export function evidenceRows({ rec, gate, registry, studio, tokenList, evidence }) {
+export function evidenceRows({ rec, gate, registry, studio, tokenList, evidence, tokenListV2, registryWrites }) {
   if (!rec || !gate) return [];
   const rows = [
     ['Check v1.0.0', 'Failed', TESTNET, rec.check.block.nativeHash, rec.check.block.number, 'block', rec.check.reportHash, rec.check.completedAt],
@@ -78,7 +79,10 @@ export function evidenceRows({ rec, gate, registry, studio, tokenList, evidence 
     ] : []),
     ...(tokenList?.deploy ? [['VerifiedTokenList deployed', 'Finalized', TESTNET, tokenList.deploy.extrinsicHash, tokenList.deploy.blockNumber, 'extrinsic', null, tokenList.deploy.finalizedAt]] : []),
     ...(evidence?.items || []).map((item) => [`Report ${short(item.reportHash, 10)} stored on-chain`, 'Finalized', TESTNET, item.extrinsicHash, item.blockNumber, 'extrinsic', item.reportHash, item.finalizedAt]),
-    ...(tokenList?.listings || []).map((item) => ['pUSD listed in the VerifiedTokenList', 'Finalized', TESTNET, item.extrinsicHash, item.blockNumber, 'extrinsic', null, item.finalizedAt]),
+    ...(tokenList?.listings || []).map((item) => ['pUSD listed in the VerifiedTokenList v1', 'Finalized', TESTNET, item.extrinsicHash, item.blockNumber, 'extrinsic', null, item.finalizedAt]),
+    ...(tokenListV2?.deploy ? [['VerifiedTokenList v2 deployed', 'Finalized', TESTNET, tokenListV2.deploy.extrinsicHash, tokenListV2.deploy.blockNumber, 'extrinsic', null, tokenListV2.deploy.finalizedAt]] : []),
+    ...(tokenListV2?.listings || []).map((item) => [`${symbolOf(item.token)} listed in the VerifiedTokenList v2`, 'Finalized', TESTNET, item.extrinsicHash, item.blockNumber, 'extrinsic', null, item.finalizedAt]),
+    ...(registryWrites?.items || []).map((item) => [item.action === 'submit' ? `${item.label} · revision ${item.revision} submitted` : `${short(item.releaseId, 12)} · revision ${item.revision} ${item.approved ? 'approved' : 'changes requested'}`, 'Finalized', TESTNET, item.extrinsicHash, item.blockNumber, 'extrinsic', item.reportHash?.replace(/^0x/, '') ?? null, item.finalizedAt]),
   ];
   return rows.sort((a, b) => (a[2] === b[2] ? Number(a[4]) - Number(b[4]) : a[2] === LIVE ? 1 : -1));
 }
