@@ -1,0 +1,411 @@
+{
+  "schema": "revivecheck.token-list-deployment.v1",
+  "contract": "VerifiedTokenList",
+  "version": 2,
+  "network": "testnet",
+  "chainId": 420420777,
+  "genesisHash": "0xd4f9acbcf7f52388d8b095abe3c198d19fc510e0343e643e87cfbccb155283bd",
+  "address": "0xedaf8a25bb583ad164a94191b762414277198df9",
+  "registry": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339",
+  "curator": "0x0000000000000000000000000000000000000000",
+  "deployer": {
+    "ss58": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+    "evm": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b"
+  },
+  "sources": [
+    "contracts/ReviveCheckGuard.sol",
+    "contracts/VerifiedTokenList.sol"
+  ],
+  "sourceSha256": "e710ec145dcc8fae642218657725348c2c00d3c7686c88178344020a11768d1f",
+  "compiler": "0.8.24+commit.e11b9ed9.Emscripten.clang",
+  "optimizerRuns": 1,
+  "evmVersion": "paris",
+  "runtimeBytes": 2726,
+  "runtime": {
+    "specName": "portaldot-v3",
+    "specVersion": "3002"
+  },
+  "manifestHash": "29c3032c1b3ef90ec72d3cf1f85e2d33cedf2c6dfab85098d78cf78164d8ea0c",
+  "deploy": {
+    "extrinsicHash": "0xb0264f2bd82e55a791a21c265f1188c112c5b0b7bda60d5fe558666cbee5abab",
+    "blockHash": "0xbfc6980b434b56c358d67033f9b632944f1588292859b3bdefb583f48a3756d1",
+    "blockNumber": "177354",
+    "finalizedAt": "2026-10-24T17:05:12.151Z"
+  },
+  "estimate": {
+    "version": 2,
+    "runtimeBytes": 2726,
+    "initcodeBytes": 3035,
+    "registry": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339",
+    "curator": "0x0000000000000000000000000000000000000000",
+    "origin": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+    "originEvm": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+    "runtime": "portaldot-v3/3002",
+    "maxStorageDepositTpot": "225.738",
+    "estimatedFeeTpot": "0.31621060206248",
+    "feeReserveTpot": "0.63242120412496",
+    "estimatedCostTpot": "226.37042120412496",
+    "budgetCapTpot": "250",
+    "availableTpot": "578.79266917837345",
+    "shortfallTpot": "0",
+    "withinBudget": true,
+    "funded": true,
+    "pendingTransactions": 0,
+    "projected": false,
+    "basis": "dry-run from the deployer",
+    "estimatedAt": "2026-10-24T17:04:58.141Z"
+  },
+  "actualNativeFeesRaw": "31621060206248",
+  "verification": {
+    "checkedAt": "2026-10-24T17:05:19.640Z",
+    "block": {
+      "number": "177354",
+      "nativeHash": "0xbfc6980b434b56c358d67033f9b632944f1588292859b3bdefb583f48a3756d1",
+      "evmHash": "0x1ddbee4d903028fa9fb8b22cdb4f50a73fb6c51e14fde7d63cddb771c1aaf0d2"
+    },
+    "checks": [
+      {
+        "id": "code.runtime",
+        "status": "passed",
+        "observed": "2726 bytes match (10 immutable words masked)",
+        "expected": "2726 bytes of the compiled runtime"
+      },
+      {
+        "id": "version.evm",
+        "status": "passed",
+        "observed": "2",
+        "expected": "2"
+      },
+      {
+        "id": "version.native",
+        "status": "passed",
+        "observed": "2",
+        "expected": "2"
+      },
+      {
+        "id": "registry.evm",
+        "status": "passed",
+        "observed": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339",
+        "expected": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339"
+      },
+      {
+        "id": "registry.native",
+        "status": "passed",
+        "observed": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339",
+        "expected": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339"
+      },
+      {
+        "id": "curator.evm",
+        "status": "passed",
+        "observed": "0x0000000000000000000000000000000000000000",
+        "expected": "0x0000000000000000000000000000000000000000"
+      },
+      {
+        "id": "curator.native",
+        "status": "passed",
+        "observed": "0x0000000000000000000000000000000000000000",
+        "expected": "0x0000000000000000000000000000000000000000"
+      },
+      {
+        "id": "interfaces.agree",
+        "status": "passed",
+        "observed": "EVM RPC and ReviveApi agree",
+        "expected": "agreement at one finalized block"
+      },
+      {
+        "id": "checkpoint.finalized",
+        "status": "passed",
+        "observed": "#177354 0xbfc6980b434b56c358d67033f9b632944f1588292859b3bdefb583f48a3756d1",
+        "expected": "a finalized native block with its EVM hash"
+      }
+    ]
+  },
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "contract IReleaseRegistry",
+          "name": "registry_",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "curator_",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint8",
+          "name": "chainDecimals",
+          "type": "uint8"
+        }
+      ],
+      "name": "DecimalsMismatch",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "EntryOwnedByAnother",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NoEntry",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotReleaseOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "id",
+          "type": "bytes32"
+        }
+      ],
+      "name": "ReleaseNotApproved",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "id",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "expected",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "current",
+          "type": "bytes32"
+        }
+      ],
+      "name": "ReportMismatch",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "reviewer",
+          "type": "address"
+        }
+      ],
+      "name": "ReviewerNotAllowed",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "releaseId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "by",
+          "type": "address"
+        }
+      ],
+      "name": "Delisted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "releaseId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "reviewer",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "reportHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "decimals",
+          "type": "uint8"
+        }
+      ],
+      "name": "Listed",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "curator",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "delist",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "entryOf",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "releaseId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "reportHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "reviewer",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "isListed",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "releaseId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "reportHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "reviewer",
+          "type": "address"
+        },
+        {
+          "internalType": "uint8",
+          "name": "decimals",
+          "type": "uint8"
+        }
+      ],
+      "name": "list",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "registry",
+      "outputs": [
+        {
+          "internalType": "contract IReleaseRegistry",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "version",
+      "outputs": [
+        {
+          "internalType": "uint8",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    }
+  ]
+}

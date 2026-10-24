@@ -89,7 +89,7 @@ contract MyLaunchpad {
     rows: [['Stored reports', `${STUDIO_REPORT.slice(0, 12)}… in #164,266 (${STORE_TX.slice(0, 14)}…) and ${PASSED.slice(0, 12)}… in #164,335`], ['Feed', 'public/api/registry.json, rebuilt with node scripts/index-registry.js'], ['Module', 'pallet-remark (remark.store), events remark.Stored']],
     code: [
       { title: 'Store and retrieve', code: `node scripts/store-evidence.js --report ${PASSED}            # estimate only\nnode scripts/store-evidence.js --report ${PASSED} --broadcast --max-fee-tpot 2\nnpm run rc -- retrieve_evidence --extrinsicHash ${STORE_TX}` },
-      { title: 'Read the feed', code: `curl -s https://a252937166.github.io/ReviveCheck/api/registry.json | jq '.releases[0], .evidence[0]'` },
+      { title: 'Read the feed', code: `curl -s https://revivecheck.axiqo.xyz/api/registry.json | jq '.releases[0], .evidence[0]'` },
     ],
   },
   {
@@ -260,7 +260,7 @@ export const FEATURES = [
       REST: rest('list_releases', {}),
       JavaScript: "import { verifyReport } from './lib/share.js';\n\nawait verifyReport(reportJson, expectedHash);   // throws on mismatch",
       CLI: `npm run rc -- get_report --reportHash ${PASSED}\nnpm run rc -- list_releases`,
-      Browser: `https://a252937166.github.io/ReviveCheck/?report=${PASSED}#/review`,
+      Browser: `https://revivecheck.axiqo.xyz/?report=${PASSED}#/review`,
     },
     output: JSON.stringify({ schema: 'revivecheck.feed.v1', indexedTo: 164338, releases: [{ releaseId: RELEASE, owner: OWNER, label: 'pusd-token-list', revision: '1', reportHash: `0x${STUDIO_REPORT}`, decisions: { [OWNER]: { revision: '1', approved: true, blockNumber: '163489' } } }], listings: [{ token: PUSD.toLowerCase(), blockNumber: '164313' }], evidence: [{ reportHash: STUDIO_REPORT, bytes: 7404, blockNumber: '164266' }] }, null, 2),
   },

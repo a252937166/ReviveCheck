@@ -118,16 +118,25 @@ test('a deployment is verified by code, version, registry and curator through bo
 });
 
 test('the generated deployments module is in sync with the records, deterministic, and switches only to a recorded version', async () => {
-  const fromRecords = deploymentsFromRecords({ v1: v1Record });
+  let recordedV2 = null;
+  try { recordedV2 = await read(manifestInput.records.record); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+  const fromRecords = deploymentsFromRecords({ v1: v1Record, v2: recordedV2 ? { ...recordedV2, recordPath: manifestInput.records.record } : null, active: TOKEN_LIST_DEPLOYMENTS.active });
   const rendered = renderDeploymentsModule(fromRecords);
   assert.equal(rendered, await readFile(new URL('lib/tokenlist.deployments.js', root), 'utf8'), 'lib/tokenlist.deployments.js is regenerated from the records, not edited');
   assert.equal(renderDeploymentsModule(fromRecords), rendered);
-  assert.equal(TOKEN_LIST_DEPLOYMENTS.active, 'v1');
-  assert.equal(TOKEN_LIST.address, v1Record.contract);
-  assert.equal(TOKEN_LIST.version, 1);
-  assert.equal(TOKEN_LIST.record, 'public/lifecycle/token-list.json');
+  const active = fromRecords[fromRecords.active];
+  assert.equal(TOKEN_LIST.address, active.address);
+  assert.equal(TOKEN_LIST.version, active.version);
+  assert.equal(TOKEN_LIST.record, active.record);
   assert.equal(TOKEN_LIST.registry, v1Record.registry);
-  assert.equal(TOKEN_LIST_VERSIONS.v2, null);
+  assert.equal(TOKEN_LIST_VERSIONS.v1.address, v1Record.contract, 'the historical v1 deployment remains readable');
+  if (recordedV2) {
+    assert.equal(TOKEN_LIST_VERSIONS.v2.address, recordedV2.address);
+    assert.equal(TOKEN_LIST_VERSIONS.v2.record, manifestInput.records.record);
+  } else {
+    assert.equal(TOKEN_LIST_VERSIONS.v2, null);
+    assert.equal(TOKEN_LIST_DEPLOYMENTS.active, 'v1', 'v2 cannot be active before its record exists');
+  }
   assert.throws(() => deploymentsFromRecords({ v1: v1Record, active: 'v2' }), /no verified deployment record/);
   const manifest = normalizeManifest(manifestInput);
   const v2 = { address: `0x${'cd'.repeat(20)}`, curator: ZERO, registry: v1Record.registry, sourceSha256: manifest.sourceSha256, deploy: { blockNumber: '2' }, recordPath: manifest.records.record };

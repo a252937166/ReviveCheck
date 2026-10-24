@@ -54,7 +54,7 @@ async function clientsFor(artifact, { address = legacy.address, corruptCode = fa
 test('legacy v1 is identified by its exact recorded address and constructor-specific runtime code', async () => {
   const clients = await clientsFor(v1Artifact);
   assert.equal(keccak256(clients.code), legacy.runtimeCodeHash, 'the identity pin derives from the preserved artifact and recorded constructor arguments');
-  const listing = await readTokenListWithClients(clients, { token: TOKEN });
+  const listing = await readTokenListWithClients(clients, { token: TOKEN, address: legacy.address });
   assert.equal(listing.list, legacy.address);
   assert.equal(listing.token, TOKEN);
   assert.equal(listing.identity.version, 1);
@@ -87,8 +87,17 @@ test('v2 uses its actual getter, and disagreeing identity interfaces leave the v
   assert.equal(disagreeing.identity.version, null);
 });
 
-test('the service refuses new listings on active known-vulnerable v1 before any network work', { skip: !(TOKEN_LIST.version === 1 && TOKEN_LIST.knownIssue) }, async () => {
-  await assert.rejects(prepareTransaction({ action: 'list', from: OWNER }), /New listings are disabled on the historical v1 token list/);
+test('the service blocks known-vulnerable active v1 and prepares unsigned calls only to the active corrected consumer', async () => {
+  if (TOKEN_LIST.version === 1 && TOKEN_LIST.knownIssue) {
+    await assert.rejects(prepareTransaction({ action: 'list', from: OWNER }), /New listings are disabled on the historical v1 token list/);
+    return;
+  }
+  assert.ok(TOKEN_LIST.version >= 2);
+  const prepared = await prepareTransaction({ action: 'list', token: TOKEN, releaseId: `0x${'ab'.repeat(32)}`, reportHash: `0x${'cd'.repeat(32)}`, reviewer: OWNER, decimals: 6 });
+  assert.equal(prepared.to, TOKEN_LIST.address);
+  assert.equal(prepared.action, 'list');
+  assert.equal(prepared.dryRun, undefined, 'an unsigned preparation without a sender does not contact the network');
+  assert.equal(tokenListInterface.decodeFunctionData('list', prepared.data)[0].toLowerCase(), TOKEN);
 });
 
 test('the shared write guard preserves v1 refusal after another version becomes active', () => {

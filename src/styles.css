@@ -687,7 +687,7 @@ a.network-pill:hover { border-color: var(--line-strong); color: var(--ink); }
 }
 .release-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 2rem; align-items: start; }
 .release-video { margin: 0; overflow: hidden; }
-.release-video video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #111827; }
+.release-video iframe { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; background: #111827; }
 .release-video figcaption { padding: 1rem 1.25rem; color: var(--ink-3); font-size: .8125rem; line-height: 1.6; }
 .release-summary { display: grid; gap: 1.25rem; }
 .release-summary h3 { margin: 0 0 .4rem; font-size: 1.125rem; }

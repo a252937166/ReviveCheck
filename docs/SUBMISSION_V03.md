@@ -18,20 +18,21 @@ Portaldot is part of the mechanism: Revive runs the contracts; ReviveApi maps na
 
 - ReleaseRegistry: `0xe949b200edf070b9d425b206ed24dc8fe5b7d339`, testnet block 162962.
 - VerifiedTokenList v1: `0xd0bd833b4b8658b1230a0e9a99640935b3c65819`, block 164220; pUSD listing at 164313.
+- VerifiedTokenList v2: `0xedaf8a25bb583ad164a94191b762414277198df9`, finalized deployment at 177354; verified code and dual-interface identity, locally selected after re-verification at 177362. No completed v2 listing is claimed.
 - Sealed reports stored through `remark.store` at blocks 164266 and 164335, with retrieval and fingerprint verification.
 - A standalone Token Catalog with a reproducible local lifecycle, policy refusal cases and downstream acceptance CI.
 - A current-version demonstration distinguishing historical transactions, live reads and simulated lifecycle operations.
 
 ### Current boundaries
 
-VerifiedTokenList v2 has tested entry-ownership and delisting fixes, plus versioned deployment and activation tooling. It is not deployed: the available 78.79 tPOT is below the current conservative deployment estimate of 226.37 tPOT. New v1 listing writes are disabled in the application; historical reads remain available.
+VerifiedTokenList v2 is deployed at `0xedaf8a25bb583ad164a94191b762414277198df9`, finalized at block 177354 in transaction `0xb0264f2bd82e55a791a21c265f1188c112c5b0b7bda60d5fe558666cbee5abab`. Code, version, registry and curator verification passed through the native and EVM interfaces; local activation independently reverified at block 177362. Its first v2 listing and live v2 Catalog acceptance are still pending. Historical v1 receipts remain preserved. The complete 17-step Token Catalog lifecycle is demonstrated locally and labelled SIMULATED.
 
 Policy freshness is evaluated by the application when invoked, not discovered continuously by a Solidity contract. Historical testnet owner and reviewer roles use one project account; the two-role local demonstration uses project-controlled simulated accounts. The value experiment compares scripted operations and command packaging, not measured human time savings or external adoption. Unsupported historical replay observations are reported as partial.
 
 ### Try and verify
 
-- Application: https://a252937166.github.io/ReviveCheck/
-- Current video: https://a252937166.github.io/ReviveCheck/demo-v0.3.mp4
+- Application: https://revivecheck.axiqo.xyz/
+- Current video: https://www.youtube.com/watch?v=CvpzlQfya4U
 - Source and setup: https://github.com/a252937166/ReviveCheck
 - Token Catalog: https://github.com/a252937166/ReviveCheck/tree/main/examples/token-catalog
 - Explorer: https://scanner-testnet-v3.portaldot.dev/

@@ -14,7 +14,7 @@ test('browser and server agree on report integrity and compressed link round-tri
   const share = await makeShareLink(run);
   const decoded = await reportFromHash(new URL(share.url).hash);
   assert.deepEqual(decoded.run, run);
-  assert.equal(new URL(share.url).origin, 'https://a252937166.github.io');
+  assert.equal(new URL(share.url).origin, 'https://revivecheck.axiqo.xyz');
 });
 
 test('modified report and modified review receipt cannot pass verification', async () => {
