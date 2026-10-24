@@ -11,11 +11,14 @@ import { verifyRun } from '../lib/report.js';
 import { NETWORKS, blockUrl, networkForScope } from '../lib/networks.js';
 import { PUBLIC_REVIEW_URL } from '../lib/share.js';
 
+// Looking a missing report or feed up on the public site is opt-in, so tests and CI stay offline.
+const PUBLIC_FALLBACK = process.env.REVIVECHECK_PUBLIC_FALLBACK === '1';
+
 /** The public data feed built by scripts/index-registry.js: this checkout's copy, then the public site's. */
 export async function loadFeed() {
   try { return JSON.parse(await readFile(path.join(root, 'public', 'api', 'registry.json'), 'utf8')); }
   catch {
-    const response = await fetch(new URL('api/registry.json', PUBLIC_REVIEW_URL), { signal: AbortSignal.timeout(10_000), redirect: 'error' }).catch(() => null);
+    const response = PUBLIC_FALLBACK ? await fetch(new URL('api/registry.json', PUBLIC_REVIEW_URL), { signal: AbortSignal.timeout(10_000), redirect: 'error' }).catch(() => null) : null;
     if (!response?.ok) throw new Error('No feed is available. Run `node scripts/index-registry.js` to build one.');
     return response.json();
   }
@@ -26,7 +29,7 @@ const HASH64 = /^(0x)?[a-fA-F0-9]{64}$/;
 const sessionReports = new Map();
 const bare = (hash) => String(hash).replace(/^0x/, '').toLowerCase();
 
-/** A report by fingerprint: this session, then this checkout's published reports, then the public site. */
+/** A report by fingerprint: this session, then this checkout's published reports, then (with REVIVECHECK_PUBLIC_FALLBACK=1) the public site. */
 export async function loadReport({ reportHash, report } = {}) {
   if (report) {
     if (!verifyRun(report)) throw new Error('The supplied report failed its SHA-256 integrity check. Pass the original JSON.');
@@ -38,8 +41,8 @@ export async function loadReport({ reportHash, report } = {}) {
   let found;
   try { found = JSON.parse(await readFile(path.join(root, 'public', 'reports', `${hash}.json`), 'utf8')); }
   catch {
-    const response = await fetch(new URL(`reports/${hash}.json`, PUBLIC_REVIEW_URL), { signal: AbortSignal.timeout(10_000), redirect: 'error' }).catch(() => null);
-    if (!response?.ok) throw new Error(`No report ${hash.slice(0, 12)}… in this session, this checkout or the public site. Pass the report JSON instead.`);
+    const response = PUBLIC_FALLBACK ? await fetch(new URL(`reports/${hash}.json`, PUBLIC_REVIEW_URL), { signal: AbortSignal.timeout(10_000), redirect: 'error' }).catch(() => null) : null;
+    if (!response?.ok) throw new Error(`No report ${hash.slice(0, 12)}… in this session or this checkout. Pass the report JSON instead${PUBLIC_FALLBACK ? '' : ', or set REVIVECHECK_PUBLIC_FALLBACK=1 to look it up on the public site'}.`);
     found = await response.json();
   }
   if (!verifyRun(found) || found.evidenceHash !== hash) throw new Error('The stored report failed its SHA-256 integrity check.');
@@ -98,7 +101,7 @@ export const TOOLS = [
   },
   {
     name: 'replay_report', title: 'Replay a report',
-    description: 'Re-read every observation of a testnet report at its own pinned finalized block, through both interfaces, and compare value by value. Shows the chain still returns what the report recorded.',
+    description: 'Re-read every observation of a testnet report at its own pinned finalized block, through both interfaces, and compare value by value. Observations this replay cannot re-read yet (contract code, ABI assertions, account mapping, transaction evidence) make the status "partial" and are listed under coverage.unsupported; only full coverage with every value matching is "reproduced". Shows the chain still returns what the report recorded.',
     inputSchema: reportInput,
     annotations: { ...read, idempotentHint: true },
     run: async (args) => service.replay(await loadReport(args)),

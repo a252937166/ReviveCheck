@@ -151,7 +151,7 @@ export function ChainLink({ hash, kind = 'block', network = NETWORKS.testnet, ch
   return url ? <a className="chain-link" href={url} target="_blank" rel="noreferrer" title={`${kind === 'block' ? 'Block' : 'Extrinsic'} ${hash} on ${network.name}`}>{label}<ArrowUpRight size={12} aria-hidden="true"/></a> : <span className="chain-link pending">{label}</span>;
 }
 
-const BADGE = { passed: 'pass', approved: 'pass', reproduced: 'pass', accepted: 'pass', finalized: 'pass', listed: 'pass', failed: 'fail', refused: 'fail', differs: 'fail', 'changes-requested': 'fail', blocked: 'hold', unknown: 'hold', pending: 'hold', running: 'run', idle: 'quiet', locked: 'quiet' };
+const BADGE = { passed: 'pass', approved: 'pass', reproduced: 'pass', accepted: 'pass', finalized: 'pass', listed: 'pass', failed: 'fail', refused: 'fail', differs: 'fail', 'changes-requested': 'fail', blocked: 'hold', unknown: 'hold', pending: 'hold', partial: 'hold', running: 'run', idle: 'quiet', locked: 'quiet' };
 export function Badge({ status, children }) {
   return <span className={`badge ${BADGE[status] || status || 'quiet'}`}><span className="badge-dot" aria-hidden="true"/>{children}</span>;
 }

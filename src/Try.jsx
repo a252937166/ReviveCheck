@@ -218,7 +218,8 @@ function ReplayCard({ report, session, patch }) {
     <div className="step-actions"><button type="button" className="btn btn-secondary" onClick={start} disabled={!!task.busy}>{task.busy && <LoaderCircle className="spin" size={15}/>}{result ? 'Replay again' : 'Replay at its block'}</button></div>
     <Working task={task}/>
     {result && !task.busy && <div className="result-card">
-      <div className="result-head"><Badge status={result.status}>{result.items.filter((item) => item.match).length}/{result.items.length} reproduced</Badge><strong>At block #{fmt(result.blockNumber)}</strong><ChainLink hash={result.nativeHash}/></div>
+      <div className="result-head"><Badge status={result.status}>{result.items.filter((item) => item.match).length}/{result.items.length} {result.status === 'partial' ? 'checkpoint reads match' : 'reproduced'}</Badge><strong>At block #{fmt(result.blockNumber)}</strong><ChainLink hash={result.nativeHash}/></div>
+      {result.status === 'partial' && <p className="muted">Not re-read: {result.coverage.unsupported.join(', ')}. Replay covers the checkpoint, asset-parity and token-listing evidence; other observations stay unverified here.</p>}
       <table className="data-table"><thead><tr><th scope="col">Observation</th><th scope="col">Recorded</th><th scope="col">Replayed</th><th scope="col"><span className="visually-hidden">Result</span></th></tr></thead><tbody>{result.items.map((item) => <tr key={item.id} className={item.match ? '' : 'differs'}><th scope="row">{item.label}</th><td className="mono">{short(String(item.recorded), 20)}</td><td className="mono">{short(String(item.replayed), 20)}</td><td>{item.match ? <Check size={15} aria-label="match"/> : 'differs'}</td></tr>)}</tbody></table>
     </div>}
   </div>;
@@ -514,19 +515,21 @@ function ConsumeStep({ session, patch }) {
   const releaseId = session.submit?.releaseId || '';
   const [token, setToken] = useState(session.consume?.token || DEMO_PRECOMPILE);
   const [decimals, setDecimals] = useState(session.consume?.decimals ?? 6);
+  const [reviewer, setReviewer] = useState(session.consume?.reviewer || session.approve?.reviewer || '');
   const [state, setState] = useState(null);
   const [prepared, setPrepared] = useState(null);
   const [fee, setFee] = useState(null);
   const [tx, setTx] = useState({ stage: 'idle' });
   const [task, run] = useTask();
   const done = session.consume?.tx && session.consume.releaseId === releaseId ? session.consume : null;
+  // The reviewer defaults to the connected account's own EVM address; any address that approved the release can be named.
+  useEffect(() => { if (reviewer || !account) return; engine().then((api) => api.accountOverview(account.address)).then((overview) => setReviewer((current) => current || overview.evm)).catch(() => {}); }, [account?.address]);
   useEffect(() => {
     setPrepared(null); setFee(null); setState(null);
-    if (!releaseId || !account || !/^0x[0-9a-fA-F]{40}$/.test(token)) return undefined;
+    if (!releaseId || !account || !/^0x[0-9a-fA-F]{40}$/.test(token) || !/^0x[0-9a-fA-F]{40}$/.test(reviewer)) return undefined;
     let alive = true;
     run('Reading the registry and dry-running the listing…', async () => {
       const api = await engine();
-      const reviewer = (await api.accountOverview(account.address)).evm;
       const current = await api.readRegistry({ releaseId, reviewer });
       if (!alive) return;
       setState(current);
@@ -537,13 +540,13 @@ function ConsumeStep({ session, patch }) {
       if (account.kind === 'polkadot' && next.dryRun?.ok) walletModule().then((module) => module.nativeFee(account, next)).then((value) => alive && setFee(value)).catch(() => {});
     });
     return () => { alive = false; };
-  }, [releaseId, account?.address, token, decimals]);
+  }, [releaseId, account?.address, token, decimals, reviewer]);
   async function sign() {
     setTx({ stage: 'signing' });
     try {
       const result = await (await walletModule()).sendContractCall(account, prepared, (status) => setTx((value) => ({ ...value, ...status })));
       if (!result.success) throw new Error(`Included in block #${result.blockNumber}, but the call failed${result.failure ? ` (${result.failure})` : ''}.`);
-      patch('consume', { token, decimals: Number(decimals), releaseId, reportHash: state.release.reportHash, reviewer: prepared.dryRun.sender, from: account.address, tx: result });
+      patch('consume', { token, decimals: Number(decimals), releaseId, reportHash: state.release.reportHash, reviewer, from: account.address, tx: result });
       setTx({ stage: 'readback', result });
       const readback = await (await engine()).readTokenList({ token });
       patch('consume', (value) => ({ ...value, readback }));
@@ -553,14 +556,16 @@ function ConsumeStep({ session, patch }) {
   }
   if (!releaseId) return <StepFrame id="consume" purpose="Let a contract act on the approval."><Locked action={<a className="btn btn-secondary btn-sm" href="#/app/run/submit">Go to Submit</a>}>Consume needs your release in the registry. Submit and approve it first.</Locked></StepFrame>;
   const busyTx = ['signing', 'submitted', 'in-block', 'finalized', 'readback'].includes(tx.stage);
-  return <StepFrame id="consume" purpose="The VerifiedTokenList is a contract that consumes the registry as middleware. It lists a token only from the release owner, only while the named reviewer’s approval of the exact report stands, and only if the token itself reports the claimed decimals. Here your wallet is the reviewer it relies on."
+  return <StepFrame id="consume" purpose="The VerifiedTokenList is a contract that consumes the registry as middleware. It lists a token only from the release owner, only while the named reviewer’s approval of the exact report stands, and only if the token itself reports the claimed decimals. Name the reviewer whose approval the listing relies on: your own address by default, or the account that approved your release."
     next={done && <a className="btn btn-primary" href="#/app/run/promote">Assess promotion<ArrowRight size={15}/></a>}>
     {blocker || <>
+      <label className="field">Reviewer<span className="hint">the approval this listing relies on · your own address by default</span><input value={reviewer} onChange={(event) => setReviewer(event.target.value.trim())} placeholder="0x… (20 bytes)" spellCheck="false" disabled={busyTx}/></label>
       <div className="field-row two"><label className="field">Token<input value={token} onChange={(event) => setToken(event.target.value.trim())} spellCheck="false" disabled={busyTx}/></label><label className="field">Claimed decimals<input type="number" min="0" max="255" value={decimals} onChange={(event) => setDecimals(event.target.value)} disabled={busyTx}/></label></div>
       <p className="muted">The default is the pUSD precompile, which reports 6 decimals. Claim 18 to watch the contract refuse the listing.</p>
       <Working task={task}/>
       {state && !state.release.exists && <p className="form-error"><CircleAlert size={14}/>Your release is not in the registry yet.</p>}
-      {state?.release.exists && !state.decision?.approved && <p className="form-error"><CircleAlert size={14}/>Approve the current revision first; the list call checks the registry.</p>}
+      {state?.release.exists && !state.decision?.approved && <p className="form-error"><CircleAlert size={14}/>Reviewer <span className="mono">{short(reviewer, 12)}</span> has not approved the current revision; the list call checks the registry. Name the account that approved it, or approve it first.</p>}
+      {state?.release.exists && state.decision?.approved && <p className="muted">Reviewer <span className="mono">{short(reviewer, 12)}</span> approved revision {state.release.revision}; the contract re-checks that approval on every <code>isListed</code> read.</p>}
       <DryRun prepared={prepared} fee={fee} info={info} account={account}/>
       <div className="step-actions"><button type="button" className="btn btn-primary" disabled={!prepared?.dryRun?.ok || !!task.busy || busyTx} onClick={sign}><PenLine size={15}/>{done ? 'List again' : 'Sign and list'}</button><SignerLine id="consume"/></div>
       <TxProgress tx={tx}/>

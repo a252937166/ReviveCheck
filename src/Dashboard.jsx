@@ -9,7 +9,7 @@ import Workspace, { isLoopback } from './Workspace.jsx';
 import { Mark, short } from './components.jsx';
 import { Badge, ChainLink, CopyButton, NetworkPill, WalletButton, useNetworkHead, useSubRoute, useTestnetHead } from './site.jsx';
 import { Odometer } from './motion.jsx';
-import { useRecords, recordedState, evidenceRows, counts, activity, listingFor, reviewerLink, fmt, when, useTask, TESTNET, LIVE, PUSD } from './records.js';
+import { useRecords, recordedState, evidenceRows, counts, activity, listingFor, reviewerLink, symbolOf, fmt, when, useTask, TESTNET, LIVE, PUSD } from './records.js';
 import { NETWORKS } from '../lib/networks.js';
 
 const engine = () => import('./engine.js');
@@ -84,7 +84,7 @@ function Overview({ data, head, liveHead }) {
   const rules = [
     ['Approval names one exact hash', studio ? `revision ${studio.release.revision} · ${short(strip(studio.reports.recheck.reportHash), 10)}` : '…'],
     ['New revision clears approvals', 'enforced in submit()'],
-    ['Only the owner lists, while approved', listing ? `pUSD listed · #${fmt(listing.blockNumber)}` : 'no listing yet'],
+    ['Only the release owner lists, while approved', listing ? `${symbolOf(listing.token)} listed · #${fmt(listing.blockNumber)}` : 'no listing yet'],
     ['Both interfaces agree', studio ? `at #${fmt(studio.readback.block.number)}` : '…'],
   ];
   return <>
@@ -109,7 +109,7 @@ function Overview({ data, head, liveHead }) {
         <dl className="tiles">
           <Tile label="Releases" value={c.releases} note="In the registry, each with one current revision" loaded={!!data.loaded}/>
           <Tile label="Approvals standing" value={c.approvals} note="Current revisions a reviewer approved" loaded={!!data.loaded}/>
-          <Tile label="Tokens listed" value={c.listings} note="On the VerifiedTokenList, on those approvals" loaded={!!data.loaded}/>
+          <Tile label="Tokens listed" value={c.listings} note="Unique tokens with a listing event in the feed; validity is read live on the Token list page" loaded={!!data.loaded}/>
         </dl>
         <section className="card" aria-labelledby="recent-title">
           <div className="card-head"><h2 id="recent-title">Latest activity</h2><a className="link-arrow" href="#/app/activity">See all<ArrowRight size={14} aria-hidden="true"/></a></div>
@@ -209,7 +209,7 @@ function Tokens({ data }) {
     <section className="card" aria-label="Listings">
       <div className="table-wrap flat"><table className="data-table">
         <thead><tr><th scope="col">Token</th><th scope="col">Decimals</th><th scope="col">Release</th><th scope="col">Reviewer</th><th scope="col">Report</th><th scope="col">Listed</th></tr></thead>
-        <tbody>{listings.length ? listings.map((item) => <tr key={item.extrinsicHash}><th scope="row">pUSD<small className="block mono">{short(item.token, 16)}</small></th><td>{item.decimals}</td><td className="mono">{short(item.releaseId, 12)}</td><td className="mono">{short(item.reviewer, 12)}</td><td><a className="hash-link" href={reviewerLink(strip(item.reportHash))}>{short(strip(item.reportHash), 12)}</a></td><td><ChainLink hash={item.extrinsicHash} kind="extrinsic">#{fmt(item.blockNumber)}</ChainLink></td></tr>) : <tr><td colSpan={6} className="muted">{data.loaded ? 'No listings in the feed yet.' : 'Loading the feed…'}</td></tr>}</tbody>
+        <tbody>{listings.length ? listings.map((item) => <tr key={item.extrinsicHash}><th scope="row">{symbolOf(item.token)}<small className="block mono">{short(item.token, 16)}</small></th><td>{item.decimals}</td><td className="mono">{short(item.releaseId, 12)}</td><td className="mono">{short(item.reviewer, 12)}</td><td><a className="hash-link" href={reviewerLink(strip(item.reportHash))}>{short(strip(item.reportHash), 12)}</a></td><td><ChainLink hash={item.extrinsicHash} kind="extrinsic">#{fmt(item.blockNumber)}</ChainLink></td></tr>) : <tr><td colSpan={6} className="muted">{data.loaded ? 'No listings in the feed yet.' : 'Loading the feed…'}</td></tr>}</tbody>
       </table></div>
     </section>
     <section className="card" aria-labelledby="token-lookup-title">

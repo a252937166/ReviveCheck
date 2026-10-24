@@ -71,7 +71,7 @@ function Stats({ data }) {
     ['Records on-chain', c.records, 'Linked from this site, each one an explorer click away'],
     ['Approvals standing', c.approvals, 'Current revisions with a reviewer’s approval in the registry'],
     ['Reports stored', c.stored, 'Sealed reports kept in Portaldot blocks through remark.store'],
-    ['Tokens listed', c.listings, 'On the VerifiedTokenList, each on a standing approval in the registry'],
+    ['Tokens listed', c.listings, 'Unique tokens with a listing event in the feed; validity is read live in the app'],
   ];
   return <section className="stats" ref={ref} aria-label="ReviveCheck in numbers">
     <div className="stats-inner">
@@ -89,14 +89,15 @@ function Rules({ data }) {
   const rules = [
     { title: 'An approval names one exact report hash', text: 'A reviewer approves the hash they read, nothing broader. A decision on a superseded report reverts with StaleReport.', chips: [['ok', studio ? `Revision ${studio.release.revision} · approved` : 'Approved'], ['', studio ? `report ${short(studio.reports.recheck.reportHash, 12)}` : 'report hash']] },
     { title: 'A new revision clears every approval', text: 'Each submission opens a new revision with no decision on it, so an approval never silently carries over to a newer report.', chips: [['ok', 'Cleared on submit, by the contract'], ['', 'ReportSubmitted → revision + 1']] },
-    { title: 'Only the owner lists, and only while approved', text: 'The VerifiedTokenList accepts a listing from the release owner for the named reviewer’s current approval, and un-lists it the moment that approval lapses.', chips: [['ok', listing ? `pUSD listed · #${fmt(listing.blockNumber)}` : 'pUSD listed'], ['', 'ReviveCheckGuard.requireApproved']] },
-    { title: 'Both interfaces must agree, at one block', text: 'Every readback runs through the EVM RPC and ReviveApi at the same finalized block. A disagreement is reported, never averaged away.', chips: [['ok', studio ? `Agree at #${fmt(studio.readback.block.number)}` : 'Interfaces agree'], ['', '0 keys held by this site']] },
+    { title: 'Only the release owner lists, and only while approved', text: 'The VerifiedTokenList accepts a listing from the owner of the release it names, for the named reviewer’s current approval, and un-lists it the moment that approval lapses.', chips: [['ok', listing ? `pUSD listed · #${fmt(listing.blockNumber)}` : 'pUSD listed'], ['', 'ReviveCheckGuard.requireApproved']] },
+    { title: 'Both interfaces must agree before a value is reported', text: 'Every readback ReviveCheck makes runs through the EVM RPC and ReviveApi at the same finalized block, and a disagreement is reported, never averaged away. This one is the verification service’s rule, not a contract’s.', chips: [['ok', studio ? `Agree at #${fmt(studio.readback.block.number)}` : 'Interfaces agree'], ['', 'read_registry · token_list_status']] },
   ];
   return <section className="rules" id="rules" aria-labelledby="rules-title">
     <Reveal className="rules-band on-band">
       <h2 id="rules-title">Permissions the registry enforces, not a policy someone remembers.</h2>
-      <p className="lede">An approval in ReviveCheck is a permission a contract checks on-chain. Four rules are written into the ReleaseRegistry and the ReviveCheckGuard library; nothing off-chain can loosen them.</p>
+      <p className="lede">An approval in ReviveCheck is a permission a contract checks on-chain. Three of these rules are written into the ReleaseRegistry and the ReviveCheckGuard library, where nothing off-chain can loosen them; the fourth is how ReviveCheck reads them.</p>
       <div className="rules-grid">{rules.map((rule) => <article className="rule" key={rule.title}><h3>{rule.title}</h3><p>{rule.text}</p><div className="rule-chips">{rule.chips.map(([tone, text]) => <span className={`chip-dark ${tone}`} key={text}>{text}</span>)}</div></article>)}</div>
+      <p className="rules-note">The token list on the testnet is v1: any release owner can replace a token’s entry with their own approved release. The v2 source in the repository adds entry ownership, a delist call and a curator override, with regression tests; it awaits its own deployment.</p>
       <div className="rules-actions"><a className="btn btn-primary btn-lg" href="#/app">See the registry live<ArrowRight size={16} aria-hidden="true"/></a><a className="btn btn-ghost btn-lg" href="#/docs/middleware">Integrate the guard<ArrowRight size={16} aria-hidden="true"/></a></div>
     </Reveal>
   </section>;

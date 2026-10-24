@@ -395,7 +395,8 @@ a.network-pill:hover { border-color: var(--line-strong); color: var(--ink); }
 .chip-dark { display: inline-flex; align-items: center; gap: .4rem; height: 28px; padding: 0 .7rem; border-radius: 999px; background: rgba(255, 255, 255, .08); color: var(--on-band); font-size: .8125rem; font-weight: 500; white-space: nowrap; }
 .chip-dark.ok::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #4ade80; }
 .chip-dark .mono { font-size: .75rem; }
-.rules-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; }
+.rules-note { margin-top: 1.25rem; font-size: .875rem; color: var(--on-band-3); max-width: 72ch; }
+.rules-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.5rem; }
 
 /* Sections */
 .section { max-width: calc(var(--page) + 2 * var(--gutter)); margin: 0 auto; padding: clamp(64px, 8vw, 104px) var(--gutter) 0; }
