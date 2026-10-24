@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { stringToU8a, u8aToString, hexToU8a } from '@polkadot/util';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { REGISTRY, registryInterface, labelText } from '../lib/registry.js';
-import { TOKEN_LIST, tokenListInterface } from '../lib/tokenlist.js';
+import { TOKEN_LIST, TOKEN_LIST_VERSIONS, tokenListInterface } from '../lib/tokenlist.js';
 import { verifyRun } from '../lib/report.js';
 import { NETWORKS } from '../lib/networks.js';
 
@@ -32,10 +32,12 @@ async function* events(section, method) {
 const arg = (item, name) => item.args?.find((entry) => entry.name === name)?.value;
 const lower = (value) => String(value ?? '').toLowerCase();
 
-const releases = new Map(), listings = [], evidence = [], history = [];
+// Every verified token-list deployment is indexed, not only the active one, so v1 listings stay in the feed after v2 activates.
+const LISTS = new Map(Object.entries(TOKEN_LIST_VERSIONS).filter(([key, value]) => key !== 'active' && value?.address).map(([, value]) => [value.address, value.version]));
+const releases = new Map(), listings = [], delistings = [], evidence = [], history = [];
 for await (const item of events('revive', 'ContractEmitted')) {
   const contract = lower(arg(item, 'contract'));
-  const isRegistry = contract === REGISTRY.address, isList = TOKEN_LIST.address && contract === TOKEN_LIST.address;
+  const isRegistry = contract === REGISTRY.address, isList = LISTS.has(contract);
   if (!isRegistry && !isList) continue;
   let log;
   try { log = (isRegistry ? registryInterface : tokenListInterface).parseLog({ topics: arg(item, 'topics'), data: arg(item, 'data') }); } catch { continue; }
@@ -45,7 +47,8 @@ for await (const item of events('revive', 'ContractEmitted')) {
   const a = log.args;
   if (log.name === 'ReportSubmitted') history.push({ type: 'submitted', releaseId: lower(a.releaseId), owner: lower(a.owner), label: labelText(a.name), revision: a.revision.toString(), reportHash: lower(a.reportHash), ...at });
   else if (log.name === 'ReportReviewed') history.push({ type: 'reviewed', releaseId: lower(a.releaseId), reviewer: lower(a.reviewer), revision: a.revision.toString(), reportHash: lower(a.reportHash), approved: a.approved, ...at });
-  else if (log.name === 'Listed') listings.push({ token: lower(a.token), releaseId: lower(a.releaseId), reviewer: lower(a.reviewer), reportHash: lower(a.reportHash), decimals: Number(a.decimals), ...at });
+  else if (log.name === 'Listed') listings.push({ token: lower(a.token), releaseId: lower(a.releaseId), reviewer: lower(a.reviewer), reportHash: lower(a.reportHash), decimals: Number(a.decimals), list: contract, version: LISTS.get(contract), ...at });
+  else if (log.name === 'Delisted') delistings.push({ token: lower(a.token), releaseId: lower(a.releaseId), by: lower(a.by), list: contract, version: LISTS.get(contract), ...at });
 }
 // Oldest first, so revisions and decisions fold in order.
 history.sort((x, y) => Number(x.blockNumber) - Number(y.blockNumber) || 0);
@@ -73,11 +76,14 @@ const overview = await get('/overview');
 const feed = {
   schema: 'revivecheck.feed.v1', network: network.key, chainId: network.chainId, generatedAt: new Date().toISOString(), indexedTo: overview.finalizedHeight,
   source: { explorerApi: network.explorerApi, from: FROM, note: 'Every row names its block and extrinsic. Re-read the chain to verify; the feed is a convenience.' },
-  registry: { address: REGISTRY.address, deploy: REGISTRY.deploy }, tokenList: TOKEN_LIST.address ? { address: TOKEN_LIST.address, curator: TOKEN_LIST.curator ?? null, deploy: TOKEN_LIST.deploy } : null,
+  registry: { address: REGISTRY.address, deploy: REGISTRY.deploy },
+  tokenList: TOKEN_LIST.address ? { address: TOKEN_LIST.address, version: TOKEN_LIST.version, curator: TOKEN_LIST.curator ?? null, deploy: TOKEN_LIST.deploy } : null,
+  tokenLists: Object.entries(TOKEN_LIST_VERSIONS).filter(([key, value]) => key !== 'active' && value?.address).map(([key, value]) => ({ key, version: value.version, address: value.address, curator: value.curator, deploy: value.deploy, active: key === TOKEN_LIST_VERSIONS.active, knownIssue: value.knownIssue ?? null })),
   releases: [...releases.values()].sort((x, y) => Number(y.history.at(-1).blockNumber) - Number(x.history.at(-1).blockNumber)),
   listings: listings.sort((x, y) => Number(y.blockNumber) - Number(x.blockNumber)),
+  delistings: delistings.sort((x, y) => Number(y.blockNumber) - Number(x.blockNumber)),
   evidence: evidence.sort((x, y) => Number(y.blockNumber) - Number(x.blockNumber)),
 };
 await mkdir('public/api', { recursive: true });
 await writeFile(out, `${JSON.stringify(feed, null, 2)}\n`);
-console.log(JSON.stringify({ status: 'indexed', releases: feed.releases.length, decisions: history.filter((event) => event.type === 'reviewed').length, listings: listings.length, evidence: evidence.length, indexedTo: feed.indexedTo, out }, null, 2));
+console.log(JSON.stringify({ status: 'indexed', releases: feed.releases.length, decisions: history.filter((event) => event.type === 'reviewed').length, listings: listings.length, delistings: delistings.length, tokenLists: feed.tokenLists.map((list) => `v${list.version}@${list.address}`), evidence: evidence.length, indexedTo: feed.indexedTo, out }, null, 2));
