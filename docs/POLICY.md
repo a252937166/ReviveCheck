@@ -17,7 +17,7 @@ Implementation: `lib/policy.js` (pure functions, offline-testable), `evaluatePol
 | `evidence.scope`, `maxAgeSeconds`, `maxObservationAgeSeconds`, `requireInterfacesAgree`, `requireStoredOnChain` | the evidence class, its age, how fresh the observation must be, dual-interface agreement, on-chain storage | the report, the clock, every read |
 | `reviewers.trusted`, `threshold`, `basis` | who counts, how many, and why (the basis text is required) | the registry decisions of exactly those addresses |
 | `registry.address`, optional `owner`, `label` | the ReleaseRegistry and the release owner | the registry read |
-| `consumer.address`, `requireListed`, `version` | the consuming contract whose listing must agree | `isListed` and `entryOf` |
+| `consumer.address`, `requireListed`, `version` | the consuming contract whose listing must agree | listing plus dual-interface identity at the same finalized checkpoint; an explicit, code-verified v1 selection for the legacy deployment |
 
 **Binding** (`revivecheck.binding.v1`). An explicit act by the operator: this subject, this exact report hash, this release ID and revision, who bound it and when, optionally where the report is stored on-chain. It carries the policy hash, so a binding made under one policy does not verify under another. A new report or a new revision needs a new binding; the old one stays in history.
 
@@ -36,6 +36,7 @@ A definite reason outranks an unavailable read: a report that is both expired an
 
 ## Rules the evaluator enforces
 
+- **Report semantics and read provenance.** A valid checksum alone is insufficient: report inputs and observations must reproduce its plan/environment bindings. Registry reads identify the expected contract, release and observation time; consumer reads identify the expected contract, token and observation time. Consumer identity is checked at the listing checkpoint. Legacy v1 is recognized only by its recorded address, exact runtime code and agreeing registry/curator reads, with the absent version getter preserved as `null` in the raw evidence.
 - **Explicit reviewer trust.** Only addresses in `reviewers.trusted` count, each once, and `threshold` of them must have approved the current revision. An approval by any other account adds nothing. A trusted decision that was not read makes the result `unknown`, not a count of zero. `basis` must say why those reviewers are trusted and what that does not establish; the text is copied into every evaluation.
 - **New approval and explicit rebinding for new reports.** The registry must hold exactly the bound report hash on exactly the bound revision. A new submission opens a new revision and clears approvals, so the entry is `recheck-required` until a trusted reviewer approves the new hash and the operator binds it. The approval alone does not move the binding.
 - **Historical evidence is preserved.** Bindings are append-only; earlier reports, bindings and evaluations are never rewritten. A superseded binding is history, not an error.
@@ -61,4 +62,4 @@ The Token Catalog (`examples/token-catalog/`) is the worked consumer: a token is
 
 ## What this does not do
 
-A `valid` result means the policy's conditions held at the recorded checkpoints and time. It is not a guarantee of future state, a security audit, or independent review: the trusted reviewer set is the policy author's choice, and in every record this project has produced so far the owner, the reviewer and the operator are the project's own test account. The evaluator trusts the public RPC operators it reads from, as every other read in ReviveCheck does.
+A `valid` result means the policy's conditions held at the recorded checkpoints and time. It is not a guarantee of future state, a security audit, or independent review: the trusted reviewer set is the policy author's choice, and in every record this project has produced so far the owner, the reviewer and the operator are the project's own test account. The evaluator trusts the public RPC operators it reads from, as every other read in ReviveCheck does. Fresh network, registry and listing reads do not continuously re-read every subject metadata field or arbitrary target code: subject/plan validation refers to the dated report, bounded by the policy age limit. Run a new acceptance check and reapproval/rebinding when fresh subject evidence is required.

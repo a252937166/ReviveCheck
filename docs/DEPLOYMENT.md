@@ -14,7 +14,7 @@ The v2 estimate on 2026-10-24 (`deployments/token-list-v2.estimate-2026-10-24.js
 
 | | tPOT |
 | --- | --- |
-| Storage deposit (held, returned if the code is removed) | 225.738 |
+| Maximum storage deposit (held; recovery conditions below) | 225.738 |
 | Fee (spent), with a two-times reserve | 0.316 (reserve 0.632) |
 | Total committed | 226.370 |
 | Available in the project wallet | 78.793 |
@@ -83,4 +83,6 @@ Activation re-reads the chain rather than trusting the record, then regenerates 
 | Report stored with `remark.store`, 7,404 bytes | #164266, #164335 | none | 0.752 each |
 | VerifiedTokenList v2 deployment (estimate) | pending | 225.738 | 0.316 |
 
-Deposits are held against the account and returned when the storage is freed; fees are spent. Estimates can change before inclusion. Every recorded figure comes from the finalized `TransactionFeePaid` and hold events in the local journals and the explorer.
+Deposits are held for code and contract storage; fees are spent. A held deposit is not automatically available again. Recovering a code deposit requires the uploader to remove the code after its instance reference count reaches zero. The deployed contracts have live instances and no ordinary teardown interface, so their full code and instance deposits have no demonstrated recovery path. Deleting a supported storage entry may release its own deposit, subject to the runtime's accounting, but that does not remove the contract or recover its code deposit. This release does not attempt recovery, and its deployment budget assumes existing deposits remain held.
+
+Estimates can change before inclusion. Recorded deployment and listing figures come from finalized `TransactionFeePaid` and hold events in the local journals and the explorer; pending estimates are labelled separately.

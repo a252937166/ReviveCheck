@@ -26,7 +26,7 @@ node examples/token-catalog/catalog.js build --config examples/token-catalog/con
 
 # Acceptance: exit 0 only when every token is available. Live, or from captured inputs.
 node examples/token-catalog/catalog.js acceptance --config examples/token-catalog/config/testnet.json
-node examples/token-catalog/catalog.js acceptance --config examples/token-catalog/config/testnet.json --fixture examples/token-catalog/fixtures/testnet-2026-10-24.inputs.json
+node examples/token-catalog/catalog.js acceptance --config examples/token-catalog/config/testnet.json --fixture examples/token-catalog/fixtures/testnet-policy-verified-2026-10-24.inputs.json
 
 # Bind a new report explicitly (after a new revision was approved).
 node examples/token-catalog/catalog.js bind --config examples/token-catalog/config/testnet.json \
@@ -60,7 +60,9 @@ The demo writes its transcript, bindings, simulated reports and catalog under `a
 
 ## What is pending
 
-The testnet catalog consumes the v1 `VerifiedTokenList`, whose entry-ownership defect (F-02) is fixed in v2. The local lifecycle already runs on v2. Real v2 transactions on the testnet (deploy, list, a revision, a rebind) wait for about 148 tPOT of testnet funding; see `docs/DEPLOYMENT.md`. The recorded testnet evaluation (`data/testnet/catalog.json`, `fixtures/testnet-2026-10-24.inputs.json`) is from 2026-10-24 and will read `expired` seven days after the report it binds unless the release is rechecked, approved again and rebound, which is the policy working as written.
+The testnet catalog consumes the v1 `VerifiedTokenList`, whose entry-ownership defect (F-02) is fixed in v2. New v1 listing writes are refused by the application and shared script helper. The local lifecycle already runs on v2. Real v2 transactions on the testnet (deploy, list, a revision, a rebind) wait for about 148 tPOT of testnet funding; see `docs/DEPLOYMENT.md`. The stricter captured testnet inputs (`fixtures/testnet-policy-verified-2026-10-24.inputs.json`) verify the consumer identity at finalized block #177177. Legacy v1 has no `version()` getter; its version is derived only from its recorded address, exact runtime code and agreeing registry/curator reads. Missing getter results remain `null` in the raw evidence.
+
+The original `data/testnet/catalog.json` and `fixtures/testnet-2026-10-24.inputs.json` remain historical evidence. The older fixture lacks the provenance now required and evaluates `unknown`; it must not be presented as a current acceptance pass. A policy also reads `expired` seven days after its bound report unless the release is rechecked, approved again and rebound. Captured acceptance evaluates at the capture's recorded time; use the live command for a current decision.
 
 ## Downstream CI
 

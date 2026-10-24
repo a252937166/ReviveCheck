@@ -12,6 +12,7 @@ import { useWallet } from './WalletContext.jsx';
 import { NETWORKS, RUNTIME_HISTORY } from '../lib/networks.js';
 import { DEMO_RELEASES, DEMO_PRECOMPILE, demoPlan, tokenListDocument } from '../lib/demo.js';
 import { downloadJson, makeShareLink } from '../lib/share.js';
+import { TOKEN_LIST } from '../lib/tokenlist.js';
 
 const TESTNET = NETWORKS.testnet, LIVE = NETWORKS.live;
 const engine = () => import('./engine.js');
@@ -526,7 +527,7 @@ function ConsumeStep({ session, patch }) {
   useEffect(() => { if (reviewer || !account) return; engine().then((api) => api.accountOverview(account.address)).then((overview) => setReviewer((current) => current || overview.evm)).catch(() => {}); }, [account?.address]);
   useEffect(() => {
     setPrepared(null); setFee(null); setState(null);
-    if (!releaseId || !account || !/^0x[0-9a-fA-F]{40}$/.test(token) || !/^0x[0-9a-fA-F]{40}$/.test(reviewer)) return undefined;
+    if (TOKEN_LIST.knownIssue || !releaseId || !account || !/^0x[0-9a-fA-F]{40}$/.test(token) || !/^0x[0-9a-fA-F]{40}$/.test(reviewer)) return undefined;
     let alive = true;
     run('Reading the registry and dry-running the listing…', async () => {
       const api = await engine();
@@ -554,6 +555,7 @@ function ConsumeStep({ session, patch }) {
       refresh();
     } catch (error) { setTx((value) => ({ ...value, stage: 'error', failedAt: value.stage, error: error.message })); }
   }
+  if (TOKEN_LIST.knownIssue) return <StepFrame id="consume" purpose="Inspect the recorded consumer while its corrected replacement awaits deployment."><Locked action={<a className="btn btn-secondary btn-sm" href="#/app/tokens">Read the recorded listing</a>}>New token-list writes are disabled for v1 because existing entries can be replaced by another release owner. The corrected v2 must be deployed, verified and activated before listing resumes. Historical transactions and live reads remain available.</Locked></StepFrame>;
   if (!releaseId) return <StepFrame id="consume" purpose="Let a contract act on the approval."><Locked action={<a className="btn btn-secondary btn-sm" href="#/app/run/submit">Go to Submit</a>}>Consume needs your release in the registry. Submit and approve it first.</Locked></StepFrame>;
   const busyTx = ['signing', 'submitted', 'in-block', 'finalized', 'readback'].includes(tx.stage);
   return <StepFrame id="consume" purpose="The VerifiedTokenList is a contract that consumes the registry as middleware. It lists a token only from the release owner, only while the named reviewer’s approval of the exact report stands, and only if the token itself reports the claimed decimals. Name the reviewer whose approval the listing relies on: your own address by default, or the account that approved your release."

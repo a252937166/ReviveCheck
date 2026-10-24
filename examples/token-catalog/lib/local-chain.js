@@ -8,7 +8,7 @@
 import { Common, Hardfork, Mainnet } from '@ethereumjs/common';
 import { Account, bytesToHex, createAddressFromString, hexToBytes } from '@ethereumjs/util';
 import { createVM } from '@ethereumjs/vm';
-import { AbiCoder, Interface, id as keccakText } from 'ethers';
+import { AbiCoder, Interface, id as keccakText, keccak256 } from 'ethers';
 import { compileReleaseRegistry } from '../../../scripts/compile-release-registry.js';
 import { compileTokenList } from '../../../scripts/compile-token-list.js';
 import { inspectWithClients, NETWORK } from '../../../lib/chain.js';
@@ -116,14 +116,19 @@ export async function createLocalChain({ clock = () => new Date() } = {}) {
       const [owner, revision, reportHash] = await read(FIXTURE.registry, registryInterface, 'releaseOf', [releaseId]);
       const decisions = {};
       for (const reviewer of reviewers) { const [reviewed, approved] = await read(FIXTURE.registry, registryInterface, 'decisionOf', [releaseId, reviewer]); decisions[lower(reviewer)] = { reviewer: lower(reviewer), reviewed, approved }; }
-      return { releaseId: lower(releaseId), block: block(), release: { exists: revision !== 0n, owner: lower(owner), revision: revision.toString(), reportHash: lower(reportHash) }, decision: null, decisions, interfacesAgree: true, simulation: true };
+      return { address: FIXTURE.registry, releaseId: lower(releaseId), block: block(), observedAt: clock().toISOString(), release: { exists: revision !== 0n, owner: lower(owner), revision: revision.toString(), reportHash: lower(reportHash) }, decision: null, decisions, interfacesAgree: true, simulation: true };
     },
     /** Shaped like lib/service.js readTokenList. */
     async readTokenList({ token }) {
       reach();
       const [listed] = await read(FIXTURE.tokenList, tokenListInterface, 'isListed', [token]);
       const [releaseId, reportHash, reviewer] = await read(FIXTURE.tokenList, tokenListInterface, 'entryOf', [token]);
-      return { token: lower(token), list: FIXTURE.tokenList, block: block(), listed, entry: releaseId === ZERO32 ? null : { releaseId: lower(releaseId), reportHash: lower(reportHash), reviewer: lower(reviewer) }, interfacesAgree: true, simulation: true };
+      const [version] = await read(FIXTURE.tokenList, tokenListInterface, 'version', []);
+      const [registry] = await read(FIXTURE.tokenList, tokenListInterface, 'registry', []);
+      const [curator] = await read(FIXTURE.tokenList, tokenListInterface, 'curator', []);
+      const side = { version: version.toString(), registry: lower(registry), curator: lower(curator) };
+      const identity = { address: FIXTURE.tokenList, block: block(), evm: side, native: { ...side }, version: Number(version), versionSource: 'on-chain-version-getter', runtimeCodeHash: keccak256(bytesToHex(await vm.stateManager.getCode(address(FIXTURE.tokenList)))), interfacesAgree: true, simulation: true };
+      return { token: lower(token), list: FIXTURE.tokenList, block: block(), observedAt: clock().toISOString(), listed, entry: releaseId === ZERO32 ? null : { releaseId: lower(releaseId), reportHash: lower(reportHash), reviewer: lower(reviewer) }, interfacesAgree: true, identity, simulation: true };
     },
     /** Shaped like lib/service.js networkStatus. */
     observe() {

@@ -20,8 +20,11 @@ test('evidence bytes are the sealed report, addressed by its SHA-256 and the byt
 
 test('the token-list client encodes list calls the contract decodes, and names its errors', () => {
   assert.match(TOKEN_LIST.address, /^0x[0-9a-f]{40}$/);
-  const call = listCall({ token: '0x00001E6100000000000000000000000000010000', releaseId: `0x${'ab'.repeat(32)}`, reportHash: `0x${'cd'.repeat(32)}`, reviewer: `0x${'01'.repeat(20)}`, decimals: 6 });
-  const decoded = tokenListInterface.decodeFunctionData('list', call.data);
+  const input = { token: '0x00001E6100000000000000000000000000010000', releaseId: `0x${'ab'.repeat(32)}`, reportHash: `0x${'cd'.repeat(32)}`, reviewer: `0x${'01'.repeat(20)}`, decimals: 6 };
+  const data = tokenListInterface.encodeFunctionData('list', [input.token, input.releaseId, input.reportHash, input.reviewer, input.decimals]);
+  if (TOKEN_LIST.version === 1 && TOKEN_LIST.knownIssue) assert.throws(() => listCall(input), /New listings are disabled/);
+  else assert.equal(listCall(input).data, data);
+  const decoded = tokenListInterface.decodeFunctionData('list', data);
   assert.equal(decoded[0].toLowerCase(), '0x00001e6100000000000000000000000000010000');
   assert.equal(decoded[4], 6n);
   assert.throws(() => listCall({ token: 'nope', releaseId: `0x${'ab'.repeat(32)}`, reportHash: `0x${'cd'.repeat(32)}`, reviewer: `0x${'01'.repeat(20)}`, decimals: 6 }), /H160/);

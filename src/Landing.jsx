@@ -8,7 +8,7 @@ import { Badge, ChainLink, CodeBlock, CopyButton, REPO, useNetworkHead, useTestn
 import { Odometer, Reveal, reduceMotion, useAutoAdvance, useInView, useSequence } from './motion.jsx';
 import { useRecords, recordedState, counts, activity, evidenceFor, listingFor, reviewerLink, fmt, when, TESTNET, LIVE } from './records.js';
 
-const SECTIONS = ['products', 'product-middleware', 'product-storage', 'product-api', 'rules', 'lifecycle', 'activity', 'audience'];
+const SECTIONS = ['release', 'products', 'product-middleware', 'product-storage', 'product-api', 'rules', 'lifecycle', 'activity', 'audience'];
 const MCP_COMMAND = 'claude mcp add revivecheck -- node mcp/server.js';
 const strip = (hash) => String(hash || '').replace(/^0x/, '');
 const KIND = { submitted: 'submitted', approved: 'approved', changes: 'changes requested', listed: 'listed', stored: 'stored' };
@@ -34,7 +34,7 @@ function Hero({ data, head }) {
         <p className="hero-chip"><span className={`dot ${live ? head.status : 'idle'}`} aria-hidden="true"/>Live on the Portaldot V3 testnet{live && <> · <ChainLink hash={head.hash}>#{fmt(head.number)}</ChainLink></>}</p>
         <h1 id="hero-title">Release approvals your contracts enforce.</h1>
         <p className="hero-sub">A registry on Portaldot V3 that records who approved which exact report, contracts that act only while that approval stands, and evidence anyone can read back from the chain.</p>
-        <div className="hero-actions"><a className="btn btn-primary btn-lg" href="#/app">Open the app<ArrowRight size={17} aria-hidden="true"/></a><a className="btn btn-secondary btn-lg" href="#/rules">How it is enforced</a></div>
+        <div className="hero-actions"><a className="btn btn-primary btn-lg" href="#/app">Open the app<ArrowRight size={17} aria-hidden="true"/></a><a className="btn btn-secondary btn-lg" href="#/release">Watch the current demo<Play size={16} aria-hidden="true"/></a></div>
         <p className="hero-source">Open source · <a href={REPO} target="_blank" rel="noreferrer">github.com/a252937166/ReviveCheck</a></p>
       </div>
       <div className="hero-stack">
@@ -61,6 +61,28 @@ function Hero({ data, head }) {
       </div>
     </div>
     <p className="hero-note">Recorded on the V3 testnet by one isolated test account acting as both owner and reviewer: the mechanism, not independent review. Every block number links to the official explorer.</p>
+  </section>;
+}
+
+function ReleaseUpdate() {
+  return <section className="section" id="release" aria-labelledby="release-title">
+    <div className="section-head row"><div><p className="hero-source">Current release · v0.3</p><h2 id="release-title">An approval needs a lifecycle.</h2><p>Check the evidence, enable a catalog entry, and require a fresh decision when its context changes.</p></div><a className="link-arrow" href={`${REPO}/blob/main/docs/RELEASE_STATUS.md`} target="_blank" rel="noreferrer">Release status<ArrowUpRight size={15}/></a></div>
+    <div className="release-grid">
+      <figure className="release-video visual-card">
+        <video controls playsInline preload="none" poster="./demo-v0.3-poster.png" aria-label="ReviveCheck v0.3 demonstration">
+          <source src="./demo-v0.3.mp4" type="video/mp4"/>
+          <track kind="captions" src="./demo-v0.3.vtt" srcLang="en" label="English"/>
+          <a href="./demo-v0.3.mp4">Download the demonstration</a>
+        </video>
+        <figcaption>Current product footage. The local lifecycle is labelled simulated; historical testnet transactions and live reads are identified separately.</figcaption>
+      </figure>
+      <div className="release-summary">
+        <article><h3>Evidence that can expire</h3><p>The application policy checks the target, plan, runtime, evidence age and trusted reviewer. Expired or unavailable verification blocks use. A policy decision is separate from an on-chain approval.</p><a className="link-arrow" href="#/docs/policy">Inspect the policy<ArrowRight size={14}/></a></article>
+        <article><h3>A consumer you can reproduce</h3><p>The standalone Token Catalog exercises approval, revision invalidation, revocation and explicit rebinding on a local chain. Its testnet mode reads the recorded v1 release.</p><a className="link-arrow" href={`${REPO}/tree/main/examples/token-catalog`} target="_blank" rel="noreferrer">Run the Token Catalog<ArrowUpRight size={14}/></a></article>
+        <p className="release-boundary"><strong>v1 deployed · v2 deployment pending</strong>Historical v1 reads remain available. New token-list writes are disabled until the corrected v2 deployment is verified and activated.</p>
+      </div>
+    </div>
+    <p className="stats-note">The value experiment compares a scripted baseline with two packaged commands. It records repeatability and decision evidence; it does not establish human time savings or external adoption. <a className="text-link" href={`${REPO}/blob/main/docs/VALUE_EXPERIMENT.md`} target="_blank" rel="noreferrer">Read the experiment</a>.</p>
   </section>;
 }
 
@@ -332,6 +354,7 @@ export default function Landing() {
   }, []);
   return <main className="landing" id="main">
     <Hero data={data} head={head}/>
+    <ReleaseUpdate/>
     <Stats data={data}/>
     <Rules data={data}/>
     <Products data={data}/>
