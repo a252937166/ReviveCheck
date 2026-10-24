@@ -1,0 +1,27 @@
+{
+  "schema": "revivecheck.deployment-manifest.v1",
+  "contract": "VerifiedTokenList",
+  "version": 2,
+  "network": "testnet",
+  "chainId": 420420777,
+  "genesisHash": "0xd4f9acbcf7f52388d8b095abe3c198d19fc510e0343e643e87cfbccb155283bd",
+  "runtime": { "specName": "portaldot-v3", "specVersion": "3002" },
+  "sources": ["contracts/ReviveCheckGuard.sol", "contracts/VerifiedTokenList.sol"],
+  "sourceSha256": "e710ec145dcc8fae642218657725348c2c00d3c7686c88178344020a11768d1f",
+  "compiler": { "version": "0.8.24", "evmVersion": "paris", "optimizerRuns": 1 },
+  "constructor": {
+    "registry": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339",
+    "curator": "0x0000000000000000000000000000000000000000"
+  },
+  "deployer": {
+    "ss58": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+    "evm": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b"
+  },
+  "budget": { "maxCostTpot": "250" },
+  "records": {
+    "journal": "artifacts/local/token-list-v2-deploy.json",
+    "record": "public/lifecycle/token-list-v2.json"
+  },
+  "activation": { "module": "lib/tokenlist.deployments.js" },
+  "note": "Version 2 of the VerifiedTokenList: entry ownership, delist and a curator override (review F-02, 2026-10-24). It reuses the ReleaseRegistry deployed at block 162962. The curator stays open, as in v1, so each lister names the reviewer their listing relies on; set a reviewer address here for a curated deployment. The deployer fields are public addresses only; the signer is read from .private/wallet.json only with --broadcast."
+}
