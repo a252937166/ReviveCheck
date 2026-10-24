@@ -20,7 +20,7 @@ const json = (result) => JSON.parse(result.content[0].text);
 test('the MCP server lists read-only tools with object input schemas', async () => {
   const client = await connect();
   const { tools } = await client.listTools();
-  assert.deepEqual(tools.map((tool) => tool.name).sort(), ['assess_promotion', 'check_release', 'compare_reports', 'get_report', 'list_releases', 'network_status', 'prepare_transaction', 'read_registry', 'replay_report', 'retrieve_evidence', 'token_list_status', 'verify_attestation']);
+  assert.deepEqual(tools.map((tool) => tool.name).sort(), ['assess_promotion', 'check_release', 'compare_reports', 'evaluate_policy', 'get_report', 'list_releases', 'network_status', 'prepare_transaction', 'read_registry', 'replay_report', 'retrieve_evidence', 'token_list_status', 'verify_attestation']);
   for (const tool of tools) {
     assert.equal(tool.inputSchema.type, 'object', tool.name);
     assert.equal(tool.annotations?.readOnlyHint, true, tool.name);
