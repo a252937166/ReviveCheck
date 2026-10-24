@@ -1,0 +1,111 @@
+{
+  "schema": "revivecheck.studio-run.v1",
+  "network": "testnet",
+  "registry": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339",
+  "scope": "Driven through the public studio (#/try) in headless Chromium. A test-only injected Polkadot extension forwarded each signing payload to a local signer holding the isolated project test wallet, so owner and reviewer are the same test account.",
+  "release": {
+    "label": "pusd-token-list",
+    "releaseId": "0xe3f6ab7784cbaa8f60171e5201fea4e27fa5cec3d6682e06d8fcb7d89181f808",
+    "owner": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+    "revision": "1"
+  },
+  "reports": {
+    "check": {
+      "reportHash": "7f01ed85594c47523d44ecf4f87c3e42da920bff9925a33f4cd6fc0686b1dc14",
+      "release": "v1.0.0",
+      "status": "failed",
+      "network": "testnet",
+      "block": {
+        "number": "163478",
+        "nativeHash": "0x9a5487537965c07f29f59c2ef5d8f9ea46bdefa8ef62d676d3802ca4c5616715",
+        "evmHash": "0xb77e28a208023bf7fb767e1c26bb49c651e01ec458e2d6a58fd500cdf7748ac4"
+      },
+      "runtime": "portaldot-v3/3002"
+    },
+    "recheck": {
+      "reportHash": "cbd78faa85f8759860d88366794e0c70052b74f9ed775be5bb37ad20118ed427",
+      "release": "v1.0.1",
+      "status": "passed",
+      "network": "testnet",
+      "block": {
+        "number": "163480",
+        "nativeHash": "0x9f47ccffb5faeee4887a0a8c9c0a15026867e6e267ba6b16b2eb52ac6faba09a",
+        "evmHash": "0x44bb5e117d2dce5f5a662c47ccd5fbe901d06130ea72b4ef903c5393be59510b"
+      },
+      "runtime": "portaldot-v3/3002"
+    },
+    "promote": {
+      "reportHash": "189aa2e966070829412d586f4811b520c2e88a867c2d003f5ef260fd8a734612",
+      "release": "v1.0.1",
+      "status": "failed",
+      "network": "live",
+      "block": {
+        "number": "763020",
+        "nativeHash": "0x13738cd06145e7a3b13c2367b7ab38cad4520b50010b66fa083ce9debe6ed702",
+        "evmHash": null
+      },
+      "runtime": "portaldot-v3/3001"
+    },
+    "watch": {
+      "reportHash": "17baad394b7c6df801a6c5d4e72d29202535d0e9f4b861623208f05fd2903377",
+      "release": "v1.0.1",
+      "status": "passed",
+      "network": "testnet",
+      "block": {
+        "number": "163525",
+        "nativeHash": "0x730160b878ff65b12fbd9d53919e97df17c4eac22e825ef53e46343c7780b4b2",
+        "evmHash": "0x54419973b6d1f4e5a4c1f7ae43f0833057e294c5cc1b920d92184cf4119bc868"
+      },
+      "runtime": "portaldot-v3/3002"
+    }
+  },
+  "comparison": {
+    "kind": "same-target",
+    "summary": {
+      "improved": 1,
+      "regressed": 0,
+      "unchanged": 3,
+      "changed": 0
+    }
+  },
+  "replay": {
+    "reportHash": "cbd78faa85f8759860d88366794e0c70052b74f9ed775be5bb37ad20118ed427",
+    "status": "reproduced",
+    "reproduced": 13,
+    "total": 13
+  },
+  "submit": {
+    "extrinsicHash": "0x8b2d357ed411278e9fc79edbb87574924aa76cd10f3a96261c2b8d7979e8bec9",
+    "blockHash": "0x5818f2cd19c2307868c45dba3be777d7744c8e2f58bbd8331cdd1b169b897487",
+    "blockNumber": "163485",
+    "finalizedAt": "2026-10-23T17:49:19.335Z"
+  },
+  "approve": {
+    "extrinsicHash": "0xee40fcecedfd4b958756e6be14ec26439b8021b47cc0a6832014c324313a05aa",
+    "blockHash": "0x9735187f65cb7cc841c1617abb6ce15ae060a45903c759010596b47a8b383256",
+    "blockNumber": "163489",
+    "finalizedAt": "2026-10-23T17:49:43.377Z",
+    "approved": true,
+    "reviewer": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b"
+  },
+  "remark": {
+    "extrinsicHash": "0xf9f0b295e89528b906947969172032c207ac58d687004ff2dd29dd0651fdd686",
+    "blockHash": "0x2b562f76539b4428b78354077e8cd98e75560b264e51ecc5d94211e00d82d881",
+    "blockNumber": "163493",
+    "finalizedAt": "2026-10-23T17:50:07.394Z",
+    "remark": "revivecheck:1:review:accepted:cbd78faa85f8759860d88366794e0c70052b74f9ed775be5bb37ad20118ed427",
+    "verified": true
+  },
+  "readback": {
+    "checkedAt": "2026-10-23T17:57:22.136Z",
+    "block": {
+      "number": "163561",
+      "nativeHash": "0x8dd25a78595ee0eaf5a84a761921d4769187935edaf7bda6968f3cf8ce773679",
+      "evmHash": "0x95386bcd0609fa9c077df64fe17b0319fea06a7fbdf0a94bef590262aac6aa9d"
+    },
+    "revision": "1",
+    "reportHash": "0xcbd78faa85f8759860d88366794e0c70052b74f9ed775be5bb37ad20118ed427",
+    "approved": true,
+    "interfacesAgree": true
+  }
+}

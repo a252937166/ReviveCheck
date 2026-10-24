@@ -1,0 +1,34 @@
+{
+  "schema": "revivecheck.evidence.v1",
+  "network": "testnet",
+  "items": [
+    {
+      "reportHash": "cbd78faa85f8759860d88366794e0c70052b74f9ed775be5bb37ad20118ed427",
+      "release": "v1.0.1",
+      "projectName": "pUSD token list",
+      "bytes": 7404,
+      "contentHash": "0x99c9307f94420db10ebab5bcc9f1a511906add6b0a7383c6d6c011c89e5a4e3e",
+      "publisher": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+      "extrinsicHash": "0x14b66988c9b160c1442485eae729ec92731fedd45820f8b63718f2c6405520ac",
+      "blockHash": "0xdeda40b38138e6b83de68871c8c66f147e37ec9968abe21ab4d63cf15f53eeea",
+      "blockNumber": "164266",
+      "finalizedAt": "2026-10-23T19:07:49.126Z",
+      "feeTpot": "0.75150452898347",
+      "retrievedAt": "2026-10-23T19:07:50.125Z"
+    },
+    {
+      "reportHash": "9707ec92029bc1708cab17989922aef4ccbabffb6333a80ef0d2bc300667c661",
+      "release": "v1.0.1",
+      "projectName": "pUSD token list",
+      "bytes": 7404,
+      "contentHash": "0x18f027671fe773e93871e2ca8d6531ee291330ac3b569de738808a50efefe237",
+      "publisher": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+      "extrinsicHash": "0xfac6d3d2761091c9ed678a5fc590d6a3f7fcb6403fc79bfbf9ba9493711cbe04",
+      "blockHash": "0x7235019005ecab52644e3736ed972470b51b1855eb8f51c2ef02995414c1b4e0",
+      "blockNumber": "164335",
+      "finalizedAt": "2026-10-23T19:14:42.955Z",
+      "feeTpot": "0.75150452838897",
+      "retrievedAt": "2026-10-23T19:14:43.980Z"
+    }
+  ]
+}

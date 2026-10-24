@@ -1,0 +1,121 @@
+{
+  "schema": "revivecheck.lifecycle.v1",
+  "subject": "pUSD token list",
+  "scope": "Reference run by the ReviveCheck author: real read-only observations of a token-list release written for this walkthrough. No signing.",
+  "observedAt": "2026-10-23T14:52:47.649Z",
+  "check": {
+    "reportHash": "49ea0e93c6163cb37ed5e4a1dc1f2119c8fb4ec8cb5afc3a174df3a3098de71f",
+    "release": "v1.0.0",
+    "status": "failed",
+    "network": "testnet",
+    "block": {
+      "number": "161715",
+      "nativeHash": "0xd6e1b9b391f8c9d51c2547c4080901b2ac43bc126ecd94b28274181fdd733e19",
+      "evmHash": "0x6dfb7e4c217d14ba355bca9a094edf49859b748cacfdc41d8c407a2f783f1803"
+    },
+    "runtime": "portaldot-v3/3002",
+    "completedAt": "2026-10-23T14:51:56.325Z"
+  },
+  "recheck": {
+    "reportHash": "9707ec92029bc1708cab17989922aef4ccbabffb6333a80ef0d2bc300667c661",
+    "release": "v1.0.1",
+    "status": "passed",
+    "network": "testnet",
+    "block": {
+      "number": "161718",
+      "nativeHash": "0xcb31158afcc86f9e5c1a03b15788198d41eb582ea159e36ddbc43d507cf00a4d",
+      "evmHash": "0xf4afdb52d83c70847f8a6d6682c3cda85693da28af21b5eb800f3035503753d0"
+    },
+    "runtime": "portaldot-v3/3002",
+    "completedAt": "2026-10-23T14:52:12.535Z",
+    "comparison": {
+      "kind": "same-target",
+      "summary": {
+        "improved": 1,
+        "regressed": 0,
+        "unchanged": 3,
+        "changed": 0
+      },
+      "caveat": "A changed check result records an observation difference, not proof of the cause or an application code fix."
+    }
+  },
+  "replay": {
+    "reportHash": "9707ec92029bc1708cab17989922aef4ccbabffb6333a80ef0d2bc300667c661",
+    "status": "reproduced",
+    "reproduced": 13,
+    "total": 13,
+    "checkedAt": "2026-10-23T14:56:05.053Z",
+    "error": null
+  },
+  "attestation": {
+    "status": "recorded",
+    "mechanism": "release-gate",
+    "contract": "0xf062d47c63613da90e3573e0ee2bba126347f3d3",
+    "revision": 2,
+    "reportHash": "9707ec92029bc1708cab17989922aef4ccbabffb6333a80ef0d2bc300667c661",
+    "submit": {
+      "extrinsicHash": "0x9a28a9293b687ae299b01ffbb5658005ac6064742ae847d0805d0b00ca1fc407",
+      "blockHash": "0xa68b26e5a207a6d2846bd8b87639f9e3bdf40b327256d03e45a4c25156643cf2",
+      "blockNumber": "161790",
+      "finalizedAt": "2026-10-23T14:59:13.665Z"
+    },
+    "resetObserved": {
+      "blockNumber": "161790",
+      "approved": false,
+      "revision": "2"
+    },
+    "review": {
+      "extrinsicHash": "0x8366c5aaf29078ad7bd2b5c1a054e47579842d8bfbf34e38c0e4a53df57d2f57",
+      "blockHash": "0x79a6660e2d826df7218083be86459500d8cb16deca45e3a494bc379fea5ffddd",
+      "blockNumber": "161839",
+      "finalizedAt": "2026-10-23T15:04:07.253Z"
+    },
+    "readbackReportHash": "bab546b408c92922b42c2a75e8e1d9facdc286622e702526f58a8303c9839fcc",
+    "scope": "Owner and reviewer are the same isolated test account. Each revision is a facilitated demonstration of the gate, not independent review.",
+    "visitorRemark": "revivecheck:1:review:accepted:9707ec92029bc1708cab17989922aef4ccbabffb6333a80ef0d2bc300667c661"
+  },
+  "promotion": {
+    "reportHash": "5dfe148e10b9084f5c7051a5098ed0d5902f10a2fbb2447dca48667500905966",
+    "release": "v1.0.1",
+    "status": "failed",
+    "network": "live",
+    "block": {
+      "number": "761215",
+      "nativeHash": "0x8d30c9fb2d581d9ec796bd93e1f5fd171e3ca7442a15ee59a2b3953dda92ad2d",
+      "evmHash": null
+    },
+    "runtime": "portaldot-v3/3001",
+    "completedAt": "2026-10-23T14:52:47.649Z"
+  },
+  "runtimes": {
+    "testnet": [
+      {
+        "spec": 3000,
+        "from": 0,
+        "hash": "0xd4f9acbcf7f52388d8b095abe3c198d19fc510e0343e643e87cfbccb155283bd"
+      },
+      {
+        "spec": 3001,
+        "from": 50000,
+        "hash": "0xcad07ddff0ca7d0f647b1438243082f4ac266cbfec6a03a7daae51af643be494"
+      },
+      {
+        "spec": 3002,
+        "from": 57052,
+        "hash": "0x2f72b0eb30b9046271b12d05f188a6a50e11a8e60f7d86010d1c0b11b50980c5"
+      }
+    ],
+    "live": [
+      {
+        "spec": 3000,
+        "from": 0,
+        "hash": "0x6e7f1f24628d2fa3a1ac81a8b45157c63b1037fee4123a7664aae2c55cdbbc36"
+      },
+      {
+        "spec": 3001,
+        "from": 660453,
+        "hash": "0xd1f3a302074a2eef290af27995783d9a3ff2abe36e91a15e45df6263e4f5aa2d"
+      }
+    ]
+  }
+}

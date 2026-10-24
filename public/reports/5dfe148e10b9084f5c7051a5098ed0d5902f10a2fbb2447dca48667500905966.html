@@ -1,0 +1,49 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ReviveCheck · pUSD token list</title><style>body{font:16px/1.6 system-ui,sans-serif;color:#17254a;background:#f6f8ff;max-width:1000px;margin:auto;padding:40px}h1{font-size:36px;line-height:1.2}table{border-collapse:collapse;width:100%;background:white}td,th{padding:14px;text-align:left;border-bottom:1px solid #dbe3fa;vertical-align:top}code,pre,a{overflow-wrap:anywhere}code,pre{white-space:pre-wrap}small{color:#50617e}.scope{border-left:4px solid #2445a7;padding:16px;background:#e9efff}details{margin:12px 0}.explorer-target{background:#fff;border:1px solid #dbe3fa;border-radius:8px;padding:20px;margin:16px 0}figure{margin:16px 0}figure img{display:block;max-width:100%;height:auto}figcaption{font-size:14px;max-width:620px}@media(max-width:600px){body{padding:20px}td,th{padding:8px}}</style><h1>ReviveCheck</h1><p>pUSD token list / v1.0.1</p><p class="scope">Portaldot V3 Live — live read-only observations<br>Result: <strong>failed</strong><br>Observed 2026-10-23T14:52:47.649Z. This report is a point-in-time observation, not a security audit or a guarantee of future execution.</p><table><thead><tr><th>Check</th><th>Result</th><th>Observation / next action</th></tr></thead><tbody><tr><td>V3 Live network identity</td><td>passed</td><td>Native runtime identifies 780780777; pinned V3 Live genesis matches<br><small></small><details><summary>Raw evidence</summary><pre>{
+  &quot;nativeGenesisHash&quot;: &quot;0x6e7f1f24628d2fa3a1ac81a8b45157c63b1037fee4123a7664aae2c55cdbbc36&quot;,
+  &quot;nativeRuntimeChainId&quot;: &quot;780780777&quot;,
+  &quot;evmChainIdHex&quot;: null
+}</pre></details></td></tr><tr><td>Finalized V3 Live checkpoint</td><td>passed</td><td>Finalized native block 761215<br><small></small><details><summary>Raw evidence</summary><pre>{
+  &quot;nativeBlockHash&quot;: &quot;0x8d30c9fb2d581d9ec796bd93e1f5fd171e3ca7442a15ee59a2b3953dda92ad2d&quot;,
+  &quot;nativeBlockNumber&quot;: &quot;761215&quot;
+}</pre></details></td></tr><tr><td>Release names this network</td><td>failed</td><td>The release names chain 420420777; V3 Live reports 780780777<br><small>Publish a separate V3 Live release that names chain 780780777.</small><details><summary>Raw evidence</summary><pre>{
+  &quot;claimedChainId&quot;: 420420777,
+  &quot;targetChainId&quot;: 780780777
+}</pre></details></td></tr><tr><td>Runtime matches the accepted report</td><td>blocked</td><td>V3 Live runs portaldot-v3/3001; the report was accepted on portaldot-v3/3002<br><small>Recheck on portaldot-v3/3001. The ERC-20 precompile address scheme is verified only for portaldot-v3/3002.</small><details><summary>Raw evidence</summary><pre>{
+  &quot;acceptedReportHash&quot;: &quot;9707ec92029bc1708cab17989922aef4ccbabffb6333a80ef0d2bc300667c661&quot;,
+  &quot;acceptedRuntime&quot;: &quot;portaldot-v3/3002&quot;,
+  &quot;targetRuntime&quot;: &quot;portaldot-v3/3001&quot;
+}</pre></details></td></tr><tr><td>Referenced asset exists on V3 Live</td><td>failed</td><td>Asset 7777 does not exist on V3 Live at block 761215<br><small>The listing cannot point at asset 7777&#39;s precompile until that asset exists on V3 Live.</small><details><summary>Raw evidence</summary><pre>{
+  &quot;assetId&quot;: &quot;7777&quot;,
+  &quot;nativeExists&quot;: false,
+  &quot;nativeBlockHash&quot;: &quot;0x8d30c9fb2d581d9ec796bd93e1f5fd171e3ca7442a15ee59a2b3953dda92ad2d&quot;
+}</pre></details></td></tr><tr><td>EVM interface for dual reads</td><td>blocked</td><td>No official V3 Live EVM RPC is listed in the official explorer configuration; ERC-20 reads were not performed<br><small>Obtain the official V3 Live EVM endpoint, then recheck through both interfaces.</small><details><summary>Raw evidence</summary><pre>{
+  &quot;configuredNodes&quot;: [
+    &quot;wss://live-v3-node.portaldot.dev&quot;
+  ],
+  &quot;evmRpcUrl&quot;: null
+}</pre></details></td></tr></tbody></table><section aria-label="Official explorer evidence"><h2>Official explorer and QR targets</h2><p><strong>Portaldot V3 Live</strong><br>Pinned V3 Live identity verified in this assessment. Links locate saved observations; they do not establish ownership or current state.</p><article class="explorer-target"><h3>Official V3 Live explorer</h3><code>780780777</code><p><a href="https://scanner-live-v3.portaldot.dev/#/" target="_blank" rel="noopener noreferrer">https://scanner-live-v3.portaldot.dev/#/</a></p><p><small>Official Portaldot V3 Live explorer home.</small></p></article><article class="explorer-target"><h3>Finalized V3 Live block 761215</h3><code>0x8d30c9fb2d581d9ec796bd93e1f5fd171e3ca7442a15ee59a2b3953dda92ad2d</code><p><a href="https://scanner-live-v3.portaldot.dev/#/blocks/0x8d30c9fb2d581d9ec796bd93e1f5fd171e3ca7442a15ee59a2b3953dda92ad2d" target="_blank" rel="noopener noreferrer">https://scanner-live-v3.portaldot.dev/#/blocks/0x8d30c9fb2d581d9ec796bd93e1f5fd171e3ca7442a15ee59a2b3953dda92ad2d</a></p><p><small>Native block hash of the V3 Live checkpoint. No EVM checkpoint exists for this network in the official configuration.</small></p></article><h3>Unavailable or pending targets</h3><ul><li><strong>Transaction target:</strong> A promotion assessment is read-only; it contains no deployment or write transaction.</li></ul><p><small>A QR encodes exactly the displayed link or plain identifier. It does not sign a transaction, prove ownership, or prove current chain state. Native extrinsic and EVM transaction hashes are separate evidence types.</small></p></section><h2>Scope and limitations</h2><ul><li>A promotion assessment reads V3 Live without signing. It decides whether an accepted testnet report can stand for this network; it does not deploy, list, or migrate anything.</li></ul><details><summary>Saved input</summary><pre>{
+  &quot;name&quot;: &quot;pUSD token list&quot;,
+  &quot;profile&quot;: &quot;native-asset&quot;,
+  &quot;logicalContractId&quot;: &quot;token-list:portaldot-v3:pusd&quot;,
+  &quot;expectedChainId&quot;: 420420777,
+  &quot;nativeAsset&quot;: {
+    &quot;assetId&quot;: &quot;7777&quot;,
+    &quot;holder&quot;: &quot;&quot;
+  },
+  &quot;release&quot;: &quot;v1.0.1&quot;,
+  &quot;sourceRevision&quot;: &quot;pusd-token-list@1.0.1&quot;,
+  &quot;listing&quot;: {
+    &quot;chainId&quot;: 420420777,
+    &quot;address&quot;: &quot;0x00001E6100000000000000000000000000010000&quot;,
+    &quot;symbol&quot;: &quot;pUSD&quot;,
+    &quot;name&quot;: &quot;Portaldot USD (test)&quot;,
+    &quot;decimals&quot;: 6
+  },
+  &quot;promotionOf&quot;: {
+    &quot;reportHash&quot;: &quot;9707ec92029bc1708cab17989922aef4ccbabffb6333a80ef0d2bc300667c661&quot;,
+    &quot;release&quot;: &quot;v1.0.1&quot;,
+    &quot;network&quot;: &quot;testnet&quot;,
+    &quot;specVersion&quot;: &quot;3002&quot;,
+    &quot;finalizedBlockNumber&quot;: &quot;161718&quot;
+  }
+}</pre></details><p>Run 3fc97fe1-6066-4d7d-a978-15939a43c49f<br>Evidence SHA-256 <code>5dfe148e10b9084f5c7051a5098ed0d5902f10a2fbb2447dca48667500905966</code></p><p>The fingerprint corresponds to the companion JSON report. Download JSON and verify that file with the ReviveCheck CLI; this HTML rendering is not integrity-verified. It is not an on-chain attestation or proof that RPC responses are truthful.</p></html>
