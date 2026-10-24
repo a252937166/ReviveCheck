@@ -13,6 +13,8 @@ const port = Number(process.env.PORT || 4173);
 const store = new Store(process.env.REVIVECHECK_DATA_DIR || path.join(root, '.revivecheck'));
 const network = { name: 'Portaldot V3 Testnet', chainId: 420420777, evmRpcUrl: 'https://test-evm-rpc-v3.portaldot.dev', substrateRpcUrl: 'wss://test-node-v3.portaldot.dev' };
 app.disable('x-powered-by');
+// The public data feed is a static file under /api, served before the loopback-only API.
+app.use('/api', express.static(path.join(root, 'public', 'api'), { index: false, fallthrough: true }));
 app.use('/api', (req, res, next) => {
   if (!['localhost', '127.0.0.1', '::1'].includes(req.hostname)) return res.status(403).json({ error: 'This prototype accepts localhost requests only.' });
   if (req.headers.origin && ![`http://127.0.0.1:${port}`, `http://localhost:${port}`].includes(req.headers.origin)) return res.status(403).json({ error: 'Use this workspace from its local origin.' });
@@ -40,7 +42,7 @@ const runProject = async (req, res, recheck = false) => {
   try {
     const startedAt = new Date().toISOString();
     const input = structuredClone(project);
-    const result = mode === 'rehearsal' ? rehearse(input, scenario) : await (await import('../lib/chain.js')).inspectChain(input, { signal: AbortSignal.timeout(25000) });
+    const result = mode === 'rehearsal' ? rehearse(input, scenario) : await (await import('../lib/chain.js')).inspectChain(input, { signal: AbortSignal.timeout(60000) });
     const previous = state.runs.filter(r => r.projectId === project.id && r.mode === mode).at(-1);
     const run = sealRun({ id: randomUUID(), projectId: project.id, projectName: project.name, release: project.release, mode, scenario: mode === 'rehearsal' ? scenario : null, trigger: recheck ? 'recheck' : 'manual', startedAt, completedAt: new Date().toISOString(), scope: mode === 'rehearsal' ? 'local-rehearsal' : 'portaldot-testnet-readonly', status: overall(result.checks), checks: result.checks, network: result.network, input, previousRunId: previous?.id || null, limitations: result.limitations });
     await store.addRun(run);
@@ -97,6 +99,17 @@ app.get('/api/compare', async (req, res) => {
   const state = await store.read(), baseline = state.runs.find(r => r.id === req.query.baseline), candidate = state.runs.find(r => r.id === req.query.candidate);
   if (!baseline || !candidate) return res.status(404).json({ error: 'Choose two saved runs.' });
   res.json(compareRuns(baseline, candidate));
+});
+// The MCP tools, served as JSON over HTTP on loopback: the same handlers and input schemas.
+const tools = () => import('../mcp/tools.js').then((module) => module.TOOLS);
+app.get('/api/tools', async (req, res) => res.json({ tools: (await tools()).map(({ name, title, description, annotations }) => ({ name, title, description, readOnly: !!annotations?.readOnlyHint })) }));
+app.post('/api/tools/:name', async (req, res) => {
+  const tool = (await tools()).find((item) => item.name === req.params.name);
+  if (!tool) return res.status(404).json({ error: 'Unknown tool. GET /api/tools lists them.' });
+  const { z } = await import('zod');
+  const parsed = z.object(tool.inputSchema).strict().safeParse(req.body ?? {});
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.issues.map((issue) => `${issue.path.join('.') || 'input'}: ${issue.message}`).join('; ') });
+  res.json(await tool.run(parsed.data));
 });
 app.use('/api', (req, res) => res.status(404).json({ error: 'Unknown API route.' }));
 app.use((error, req, res, next) => {
