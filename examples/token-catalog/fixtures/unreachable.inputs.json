@@ -1,0 +1,17 @@
+{
+  "schema": "revivecheck.token-catalog-inputs.v1",
+  "capturedAt": "2026-10-24T16:00:00.000Z",
+  "now": "2026-10-24T16:00:00.000Z",
+  "config": "pUSD token catalog (Portaldot V3 testnet)",
+  "policyHash": "bf084b036a4a692fe239c9fcc54adfe818cb16c0f00218ca2ea6a12ef791a2bc",
+  "note": "Hand-written fixture: every read failed, as when both public nodes time out. The acceptance command must fail on it; an unavailable verification is never a pass.",
+  "tokens": {
+    "0x00001e6100000000000000000000000000010000": {
+      "observation": { "error": "Portaldot V3 Testnet did not answer in time (The read-only request timed out or was cancelled.). Nothing was signed; retry in a moment." },
+      "registry": { "error": "Portaldot V3 Testnet did not answer in time (The read-only request timed out or was cancelled.). Nothing was signed; retry in a moment." },
+      "listing": { "error": "Portaldot V3 Testnet did not answer in time (The read-only request timed out or was cancelled.). Nothing was signed; retry in a moment." },
+      "evidence": { "error": "The read-only request timed out or was cancelled." },
+      "collectedAt": "2026-10-24T16:00:00.000Z"
+    }
+  }
+}

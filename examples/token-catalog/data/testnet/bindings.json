@@ -1,0 +1,26 @@
+{
+  "schema": "revivecheck.token-catalog-bindings.v1",
+  "policyHash": "bf084b036a4a692fe239c9fcc54adfe818cb16c0f00218ca2ea6a12ef791a2bc",
+  "bindings": [
+    {
+      "schema": "revivecheck.binding.v1",
+      "id": "ea3b3f0e-91d3-4e3d-8fa6-28b87366ff91",
+      "policyHash": "bf084b036a4a692fe239c9fcc54adfe818cb16c0f00218ca2ea6a12ef791a2bc",
+      "policyName": "pUSD catalog policy (testnet)",
+      "subject": "0x00001e6100000000000000000000000000010000",
+      "subjectKind": "native-asset",
+      "reportHash": "cbd78faa85f8759860d88366794e0c70052b74f9ed775be5bb37ad20118ed427",
+      "release": "v1.0.1",
+      "releaseId": "0xe3f6ab7784cbaa8f60171e5201fea4e27fa5cec3d6682e06d8fcb7d89181f808",
+      "revision": "1",
+      "boundBy": "project author, by hand (owner, reviewer and operator are the project test account)",
+      "boundAt": "2026-10-24T15:53:19.564Z",
+      "note": "pUSD listed at #164313 on the studio-run approval at #163489; report stored at #164266",
+      "storage": {
+        "extrinsicHash": "0x14b66988c9b160c1442485eae729ec92731fedd45820f8b63718f2c6405520ac",
+        "blockHash": "0xdeda40b38138e6b83de68871c8c66f147e37ec9968abe21ab4d63cf15f53eeea"
+      },
+      "bindingHash": "ee58d65eb5632564fdaba5a518026588371278c5f497cf693b354288af7a2838"
+    }
+  ]
+}

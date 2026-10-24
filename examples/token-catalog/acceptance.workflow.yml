@@ -1,0 +1,32 @@
+# Template for a token-list maintainer's own repository. Copy it to .github/workflows/ and
+# point --config at a catalog configuration whose policy names the reviewers you trust.
+# It reads the live V3 testnet, so it needs network access and fails when the public nodes
+# do not answer: an unavailable verification is reported as `unknown` and never passes.
+name: Token catalog acceptance (live)
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # re-evaluate every six hours; evidence age and runtime drift are policy conditions
+  workflow_dispatch:
+  push:
+    paths:
+      - 'examples/token-catalog/**'
+
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Evaluate every bound token against the live registry, consumer, stored report and runtime
+        run: node examples/token-catalog/catalog.js acceptance --config examples/token-catalog/config/testnet.json --out artifacts/local/token-catalog/live
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: token-catalog-live
+          path: artifacts/local/token-catalog/live/**

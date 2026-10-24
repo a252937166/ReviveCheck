@@ -1,0 +1,44 @@
+name: Token Catalog acceptance
+
+# The downstream acceptance workflow, run on the reference consumer itself. It is offline:
+# the lifecycle runs on the in-memory stand-in chain, and the acceptance command evaluates
+# captured inputs. A job is green only when every catalog entry evaluates to `valid`; an
+# incomplete verification (unknown, recheck-required, expired, unbound) fails it, and the
+# second acceptance step proves that by requiring a failure. A maintainer's own CI would run
+# the live variant instead: see examples/token-catalog/acceptance.workflow.yml.
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  catalog:
+    name: Lifecycle, acceptance and release status
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: The local lifecycle reproduces the expected sequence (A submits, B approves, A lists, revision invalidates, recheck, reapproval, explicit rebinding)
+        run: node examples/token-catalog/catalog.js demo --strict
+      - name: Acceptance passes on complete captured inputs
+        run: node examples/token-catalog/catalog.js acceptance --config examples/token-catalog/config/testnet.json --fixture examples/token-catalog/fixtures/testnet-2026-10-24.inputs.json --out artifacts/local/token-catalog/ci-captured
+      - name: Acceptance fails on an incomplete verification
+        run: |
+          if node examples/token-catalog/catalog.js acceptance --config examples/token-catalog/config/testnet.json --fixture examples/token-catalog/fixtures/unreachable.inputs.json --out artifacts/local/token-catalog/ci-unreachable; then
+            echo "The acceptance command passed on unreachable inputs; it must fail." >&2
+            exit 1
+          fi
+      - name: Every published record is intact and consistent; deployment-dependent work is listed as pending
+        run: node scripts/release-status.js --out artifacts/local/release-status.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: token-catalog
+          path: |
+            artifacts/local/token-catalog/**
+            artifacts/local/release-status.json

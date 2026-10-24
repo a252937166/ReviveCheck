@@ -1,0 +1,31 @@
+{
+  "schema": "revivecheck.token-catalog-config.v1",
+  "name": "pUSD token catalog (Portaldot V3 testnet)",
+  "mode": "testnet",
+  "roles": {
+    "owner": { "address": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b", "control": "the project's isolated test account (5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt); it owns the pusd-token-list release" },
+    "reviewer": { "address": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b", "control": "the same project test account; owner and reviewer are one account in every recorded testnet transaction" },
+    "operator": { "control": "the project author, running this example; the binding below was made by hand" }
+  },
+  "policy": {
+    "schema": "revivecheck.policy.v1",
+    "name": "pUSD catalog policy (testnet)",
+    "network": { "key": "testnet", "chainId": 420420777, "genesisHash": "0xd4f9acbcf7f52388d8b095abe3c198d19fc510e0343e643e87cfbccb155283bd" },
+    "runtime": { "specName": "portaldot-v3", "specVersions": ["3002"] },
+    "subject": { "kind": "native-asset", "assetId": "7777", "address": "0x00001e6100000000000000000000000000010000" },
+    "planHash": "ce76c98f90e2851aff534febe6c39a4802fbef32e478a665d3e4109352222191",
+    "evidence": { "scope": "portaldot-testnet-readonly", "maxAgeSeconds": 604800, "maxObservationAgeSeconds": 900, "requireInterfacesAgree": true, "requireStoredOnChain": true },
+    "reviewers": {
+      "trusted": ["0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b"],
+      "threshold": 1,
+      "basis": "The project's isolated test account, which is also the release owner. Its approval shows the mechanism end to end on the testnet; it is not independent review, and a production catalog would name reviewers it does not control."
+    },
+    "registry": { "address": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339", "owner": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b", "label": "pusd-token-list" },
+    "consumer": { "address": "0xd0bd833b4b8658b1230a0e9a99640935b3c65819", "requireListed": true, "version": 1 }
+  },
+  "tokens": [
+    { "address": "0x00001e6100000000000000000000000000010000", "symbol": "pUSD", "name": "Portaldot USD (test)", "decimals": 6, "assetId": "7777" }
+  ],
+  "data": "examples/token-catalog/data/testnet",
+  "reports": "public/reports"
+}
