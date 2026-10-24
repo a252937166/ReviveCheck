@@ -8,23 +8,28 @@ import solc from 'solc';
 const SOURCES = ['ReviveCheckGuard.sol', 'VerifiedTokenList.sol'];
 // Optimized for size: code is paid for in storage deposit on revive.
 const RUNS = 1;
-export async function compileTokenList({ extraSources = {} } = {}) {
+// The version of the sources in contracts/. The v1 sources, as deployed on 2026-10-23, are
+// kept under contracts/deployed/v1 and their artifact at artifacts/VerifiedTokenList.json;
+// the CLI below writes a versioned artifact beside it and never overwrites v1.
+export const TOKEN_LIST_SOURCE_VERSION = 2;
+export async function compileTokenList({ extraSources = {}, sourceDirectory = '../contracts/' } = {}) {
   if (!solc.version().startsWith('0.8.24+')) throw new Error('Use pinned solc 0.8.24');
   const sources = {};
-  for (const file of SOURCES) sources[file] = { content: await readFile(new URL(`../contracts/${file}`, import.meta.url), 'utf8') };
+  for (const file of SOURCES) sources[file] = { content: await readFile(new URL(`${sourceDirectory}${file}`, import.meta.url), 'utf8') };
   Object.assign(sources, Object.fromEntries(Object.entries(extraSources).map(([file, content]) => [file, { content }])));
-  const input = { language: 'Solidity', sources, settings: { optimizer: { enabled: true, runs: RUNS }, evmVersion: 'paris', outputSelection: { '*': { '*': ['abi', 'evm.bytecode.object', 'evm.deployedBytecode.object'] } } } };
+  const input = { language: 'Solidity', sources, settings: { optimizer: { enabled: true, runs: RUNS }, evmVersion: 'paris', outputSelection: { '*': { '*': ['abi', 'evm.bytecode.object', 'evm.deployedBytecode.object', 'evm.deployedBytecode.immutableReferences'] } } } };
   const output = JSON.parse(solc.compile(JSON.stringify(input)));
   const errors = (output.errors || []).filter((error) => error.severity === 'error');
   if (errors.length) throw new Error(errors.map((error) => error.formattedMessage).join('\n'));
-  const pick = (file, name) => { const contract = output.contracts[file][name]; return { abi: contract.abi, bytecode: `0x${contract.evm.bytecode.object}`, deployedBytecode: `0x${contract.evm.deployedBytecode.object}` }; };
+  const pick = (file, name) => { const contract = output.contracts[file][name]; return { abi: contract.abi, bytecode: `0x${contract.evm.bytecode.object}`, deployedBytecode: `0x${contract.evm.deployedBytecode.object}`, immutableReferences: contract.evm.deployedBytecode.immutableReferences || {} }; };
   const sourceSha256 = createHash('sha256').update(SOURCES.map((file) => sources[file].content).join('\n')).digest('hex');
   return { contractName: 'VerifiedTokenList', compiler: solc.version(), target: 'evm-paris', optimizerRuns: RUNS, sources: SOURCES, sourceSha256, ...pick('VerifiedTokenList.sol', 'VerifiedTokenList'), extra: Object.fromEntries(Object.keys(extraSources).map((file) => [file, output.contracts[file]])) };
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const { extra, ...artifact } = await compileTokenList();
+  const file = `artifacts/VerifiedTokenList.v${TOKEN_LIST_SOURCE_VERSION}.json`;
   await mkdir(new URL('../artifacts/', import.meta.url), { recursive: true });
-  await writeFile(new URL('../artifacts/VerifiedTokenList.json', import.meta.url), `${JSON.stringify(artifact, null, 2)}\n`);
-  console.log(JSON.stringify({ contract: artifact.contractName, compiler: artifact.compiler, initcodeBytes: (artifact.bytecode.length - 2) / 2, runtimeBytes: (artifact.deployedBytecode.length - 2) / 2, sourceSha256: artifact.sourceSha256 }, null, 2));
+  await writeFile(new URL(`../${file}`, import.meta.url), `${JSON.stringify(artifact, null, 2)}\n`);
+  console.log(JSON.stringify({ contract: artifact.contractName, version: TOKEN_LIST_SOURCE_VERSION, compiler: artifact.compiler, initcodeBytes: (artifact.bytecode.length - 2) / 2, runtimeBytes: (artifact.deployedBytecode.length - 2) / 2, sourceSha256: artifact.sourceSha256, artifact: file, note: 'Local compilation is not testnet deployment. The v1 artifact at artifacts/VerifiedTokenList.json is untouched.' }, null, 2));
 }
