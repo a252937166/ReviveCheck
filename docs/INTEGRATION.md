@@ -31,13 +31,13 @@ contract MyLaunchpad {
     function enable(bytes32 releaseId, bytes32 reportHash, address reviewer) external {
         registry.requireApproved(releaseId, reviewer, reportHash); // ReleaseNotApproved / ReportMismatch
     }
-    function quorum(bytes32 releaseId, address[] memory reviewers) external view returns (bool) {
-        return registry.approvals(releaseId, reviewers) >= 2;
+    function quorum(bytes32 releaseId, bytes32 reportHash, address[] memory reviewers) external view returns (bool) {
+        return registry.approvals(releaseId, reportHash, reviewers) >= 2; // distinct reviewers of this exact report; [A, A] counts once
     }
 }
 ```
 
-`VerifiedTokenList` at `0xd0bd833b4b8658b1230a0e9a99640935b3c65819` is the reference consumer: `list(token, releaseId, reportHash, reviewer, decimals)` and `isListed(token)`. Its curator is open, so each lister names the reviewer the listing relies on; a curated deployment passes a reviewer to the constructor.
+`VerifiedTokenList` at `0xd0bd833b4b8658b1230a0e9a99640935b3c65819` is the reference consumer: `list(token, releaseId, reportHash, reviewer, decimals)` and `isListed(token)`. Its curator is open, so each lister names the reviewer the listing relies on; a curated deployment passes a reviewer to the constructor. The testnet deployment is v1: it never checked who owned an existing entry, so any release owner could replace any token's entry with their own approved release (2026-10-24 review, finding F-02). The v2 source in `contracts/` lets only the owner of the release an entry names, or the curator, replace or `delist` it, with regression tests in `test/verified-token-list.test.js`; the v1 sources stay under `contracts/deployed/v1` and still hash to the deployment record. v2 awaits its own deployment and code deposit.
 
 ### Storage: evidence on Portaldot
 
@@ -217,7 +217,8 @@ There is no background watcher. A recheck runs when you or your CI start it.
 ```solidity
 library ReviveCheckGuard {
   function isApproved(IReleaseRegistry, bytes32 id, address reviewer, bytes32 reportHash) internal view returns (bool);
-  function approvals(IReleaseRegistry, bytes32 id, address[] memory reviewers) internal view returns (uint256);
+  function approvals(IReleaseRegistry, bytes32 id, address[] memory reviewers) internal view returns (uint256);                     // distinct reviewers who approved the current revision
+  function approvals(IReleaseRegistry, bytes32 id, bytes32 reportHash, address[] memory reviewers) internal view returns (uint256); // the same, zero unless the current report is reportHash
   function requireApproved(IReleaseRegistry, bytes32 id, address reviewer, bytes32 reportHash) internal view;
 }
 contract VerifiedTokenList {

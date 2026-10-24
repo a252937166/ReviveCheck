@@ -18,8 +18,9 @@ jobs:
           cache: npm
       - run: npm ci
       # Unit tests run offline: the compiled contracts execute in an in-memory EVM,
-      # the sealed-report and evidence checks use recorded fixtures, and the MCP
-      # server is driven over stdio. No network, no wallet, no testnet calls.
+      # the sealed-report, replay and evidence checks use recorded fixtures with mocked
+      # clients, and the MCP server is driven over an in-memory transport. The public-site
+      # lookup is opt-in (REVIVECHECK_PUBLIC_FALLBACK), so no network, wallet or testnet call runs.
       - run: npm test
       - run: npx vite build
       - name: Feed and lifecycle records parse

@@ -11,6 +11,8 @@ export const fetchJson = (path) => fetch(new URL(path, new URL('./', location.hr
 export const reviewerLink = (hash) => `./?report=${hash}#/review`;
 export const evidenceFor = (data, hash) => data.evidence?.items?.find((item) => item.reportHash === hash) || null;
 export const listingFor = (data, token = PUSD) => data.tokenList?.listings?.find((item) => item.token === token.toLowerCase()) || null;
+/** The feed knows token addresses; only the demo precompile has a symbol here. */
+export const symbolOf = (token) => String(token || '').toLowerCase() === PUSD.toLowerCase() ? 'pUSD' : short(token, 10);
 export const fmt = (value) => value === null || value === undefined || value === '' ? '—' : Number(value).toLocaleString('en-US');
 export const when = (value) => { const date = new Date(value); return Number.isNaN(date.getTime()) ? '' : new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'UTC', hour12: false }).format(date) + ' UTC'; };
 
@@ -89,7 +91,7 @@ export function counts(data) {
     records: evidenceRows(data).length,
     releases: releases.length,
     approvals: releases.reduce((sum, release) => sum + Object.values(release.decisions || {}).filter((decision) => decision.approved && decision.revision === release.revision).length, 0),
-    listings: feed?.listings?.length || 0,
+    listings: new Set((feed?.listings || []).map((item) => item.token)).size,
     stored: feed?.evidence?.length || data.evidence?.items?.length || 0,
     indexedTo: feed?.indexedTo,
   };
@@ -101,7 +103,7 @@ export function activity(data) {
   if (!feed) return [];
   const items = [];
   for (const release of feed.releases) for (const event of release.history) items.push({ kind: event.type === 'submitted' ? 'submitted' : event.approved ? 'approved' : 'changes', title: event.type === 'submitted' ? `${release.label} · revision ${event.revision} submitted` : `${release.label} · revision ${event.revision} ${event.approved ? 'approved' : 'changes requested'}`, who: event.type === 'submitted' ? event.owner : event.reviewer, report: event.reportHash, time: event.time, block: event.blockNumber, hash: event.extrinsicHash, kindOfHash: 'extrinsic', network: TESTNET });
-  for (const listing of feed.listings) items.push({ kind: 'listed', title: `pUSD listed in the VerifiedTokenList`, who: listing.reviewer, report: listing.reportHash, time: listing.time, block: listing.blockNumber, hash: listing.extrinsicHash, kindOfHash: 'extrinsic', network: TESTNET });
+  for (const listing of feed.listings) items.push({ kind: 'listed', title: `${symbolOf(listing.token)} listed in the VerifiedTokenList`, who: listing.reviewer, report: listing.reportHash, time: listing.time, block: listing.blockNumber, hash: listing.extrinsicHash, kindOfHash: 'extrinsic', network: TESTNET });
   for (const item of feed.evidence) items.push({ kind: 'stored', title: `Report ${short(item.reportHash, 10)} stored (${fmt(item.bytes)} bytes)`, who: item.publisher, report: item.reportHash, time: item.time, block: item.blockNumber, hash: item.extrinsicHash, kindOfHash: 'extrinsic', network: TESTNET });
   return items.sort((a, b) => Number(b.block) - Number(a.block));
 }

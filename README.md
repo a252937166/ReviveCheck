@@ -179,6 +179,7 @@ node scripts/record-studio-run.js <session.json>                               #
 
 Deployed on 2026-10-23: ReleaseRegistry at block 162962, VerifiedTokenList at 164220 (code deposit 178.158 tPOT), reports stored at 164266 and 164335, pUSD listed at 164313. Every record is in [docs/LIFECYCLE.md](docs/LIFECYCLE.md) with its extrinsic.
 
+**Versions and known issues.** The `VerifiedTokenList` on the testnet is v1. A review on 2026-10-24 ([docs/2026-10-24_revivecheck-improvement-review.md](docs/2026-10-24_revivecheck-improvement-review.md)) reproduced two defects in it offline: the guard library counted a reviewer passed twice as two approvals, and `list` never checked who owned an existing entry, so any release owner could replace any token's entry and un-list it with a new revision. The v2 sources in `contracts/` fix both (distinct reviewers, an exact-hash quorum overload, entry ownership, `delist`, a curator override) with regression tests; the v1 sources stay under `contracts/deployed/v1` and still hash to the deployment record. v2 needs its own deployment and code deposit; until then the site and the feed describe v1. The same review found that `replay_report` returned "reproduced" for contract reports it only checkpoint-checked; it now returns "partial" with the uncovered check ids.
 
 ## Architecture and materials
 
