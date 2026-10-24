@@ -13,7 +13,7 @@ import { promisify } from 'node:util';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { verifyRun } from '../lib/report.js';
+import { verifyRun, validateImportedRun, fingerprint } from '../lib/report.js';
 import { verifyBaseline } from '../lib/baseline.js';
 import { REGISTRY } from '../lib/registry.js';
 import { TOKEN_LIST, TOKEN_LIST_VERSIONS } from '../lib/tokenlist.js';
@@ -58,6 +58,7 @@ await check('token-list.v1.sources', async () => {
 });
 const manifest = normalizeManifest(await json('deployments/token-list-v2.manifest.json'));
 let v2Record = null;
+let v2Catalog = { ready: false, why: 'No verified v2 catalog binding and recorded live evaluation have been checked.' };
 await check('token-list.v2.manifest', async () => {
   const { extra, ...artifact } = await compileTokenList();
   checkArtifact(manifest, artifact);
@@ -96,6 +97,40 @@ await check('catalog.bindings', async () => {
   }
   return `${bindings.length} testnet binding${bindings.length === 1 ? '' : 's'} verify under policy ${config.policyHash.slice(0, 12)}…`;
 });
+await check('catalog.v2.binding-and-evaluation', async () => {
+  const pending = (why) => { v2Catalog = { ready: false, why }; return `${why} Pending; the original v1 catalog remains preserved.`; };
+  if (!v2Record || TOKEN_LIST_VERSIONS.active !== 'v2') return pending('The verified v2 consumer is not active.');
+  let config;
+  try { config = normalizeConfig(await json('examples/token-catalog/config/testnet-v2.json')); }
+  catch (error) { if (error.code === 'ENOENT') return pending('The separate v2 catalog configuration has not been created.'); throw error; }
+  if (config.mode !== 'testnet' || config.policy.consumer?.address !== v2Record.address || config.policy.consumer.version !== 2 || config.policy.registry.address !== REGISTRY.address) throw new Error('The v2 catalog policy does not name the verified v2 consumer and reused registry.');
+  let history;
+  try { history = await json(path.join(config.data, 'bindings.json')); }
+  catch (error) { if (error.code === 'ENOENT') return pending('The separate v2 catalog has no explicit binding.'); throw error; }
+  if (!Array.isArray(history.bindings) || !history.bindings.length) return pending('The separate v2 catalog binding history is empty.');
+  for (const binding of history.bindings) {
+    if (!verifyBinding(binding, config.policy)) throw new Error(`v2 binding ${binding.id} fails policy/hash verification`);
+    validateImportedRun(await json(`public/reports/${binding.reportHash}.json`));
+  }
+  const binding = [...history.bindings].reverse().find((item) => item.subject === config.policy.subject.address);
+  if (!binding) return pending('No v2 binding names the configured token.');
+  const listing = v2Record.listings?.find((item) => item.token === config.policy.subject.address && item.releaseId === binding.releaseId && item.reportHash === `0x${binding.reportHash}` && item.readback?.listed === true && item.readback?.interfacesAgree === true && /^0x[a-f0-9]{64}$/.test(item.extrinsicHash || ''));
+  if (!listing) return pending('The v2 deployment record has no matching finalized listing and agreeing readback.');
+  let catalog, evaluation;
+  try {
+    catalog = await json(path.join(config.data, 'catalog.json'));
+    evaluation = await json(path.join(config.data, 'evaluations', `${config.policy.subject.address}.json`));
+  } catch (error) { if (error.code === 'ENOENT') return pending('The v2 catalog has not recorded its live policy evaluation.'); throw error; }
+  const { evaluationHash, ...payload } = evaluation;
+  if (fingerprint(payload) !== evaluationHash || evaluation.policyHash !== config.policyHash || evaluation.reportHash !== binding.reportHash || evaluation.bindingId !== binding.id || evaluation.releaseId !== binding.releaseId || evaluation.revision !== binding.revision || evaluation.simulation !== false) throw new Error('The v2 evaluation does not verify or does not bind the exact v2 policy and report.');
+  const entry = catalog.tokens?.find((item) => item.address === config.policy.subject.address);
+  if (catalog.simulation !== false || catalog.policy?.hash !== config.policyHash || catalog.policy?.consumer?.address !== v2Record.address || entry?.evaluation?.evaluationHash !== evaluationHash) throw new Error('The v2 catalog and its evaluation disagree.');
+  if (evaluation.status !== 'valid' || evaluation.enable !== true || entry.available !== true || !Array.isArray(evaluation.checks) || !evaluation.checks.length || evaluation.checks.some((item) => item.status !== 'passed')) return pending(`The recorded v2 policy evaluation is ${evaluation.status || 'unknown'}, not valid.`);
+  const checkpoint = evaluation.checkpoint?.listing;
+  if (!/^0x[a-f0-9]{64}$/.test(checkpoint?.nativeHash || '') || !/^0x[a-f0-9]{64}$/.test(checkpoint?.evmHash || '') || BigInt(checkpoint.number) < BigInt(listing.blockNumber) || !Number.isFinite(Date.parse(evaluation.evaluatedAt))) throw new Error('The v2 evaluation lacks a dated finalized listing checkpoint after the listing.');
+  v2Catalog = { ready: true, evidenceScope: 'recorded live listing and policy evaluation; the complete role-separated lifecycle remains a local simulation', policyHash: config.policyHash, bindingId: binding.id, reportHash: binding.reportHash, version: 2, address: v2Record.address, listing: listing.extrinsicHash, evaluatedAt: evaluation.evaluatedAt, checkpoint };
+  return `v2 listing ${listing.extrinsicHash} and policy evaluation ${evaluationHash} verify at #${checkpoint.number}; this is recorded live evidence, not continuous monitoring`;
+});
 await check('language.english', async () => {
   // Built from code points so this file carries no non-English character itself: Hiragana and Katakana, CJK ideographs (extension A and unified), Hangul syllables.
   const range = (from, to) => `${String.fromCharCode(from)}-${String.fromCharCode(to)}`;
@@ -122,9 +157,10 @@ try { const files = (await readdir(path.join(root, 'deployments'))).filter((file
 const status = {
   schema: 'revivecheck.release-status.v1', checkedAt: new Date().toISOString(), commit, status: checks.every((item) => item.status === 'passed') ? 'ok' : 'failed', checks,
   deployed: { registry: { address: REGISTRY.address, block: REGISTRY.deploy.blockNumber }, tokenList: { active: TOKEN_LIST_VERSIONS.active, version: TOKEN_LIST.version, address: TOKEN_LIST.address, block: TOKEN_LIST.deploy.blockNumber, knownIssue: TOKEN_LIST.knownIssue } },
+  catalogV2: v2Catalog,
   pending: [
     ...(v2Record ? [] : [{ item: 'VerifiedTokenList v2 deployment', why: 'needs testnet tPOT for the code deposit', estimate: estimate ? { estimatedAt: estimate.estimatedAt, maxStorageDepositTpot: estimate.maxStorageDepositTpot, estimatedFeeTpot: estimate.estimatedFeeTpot, estimatedCostTpot: estimate.estimatedCostTpot, availableTpot: estimate.availableTpot, shortfallTpot: estimate.shortfallTpot } : null, command: 'node scripts/deploy-token-list.js (estimate) · --broadcast --max-cost-tpot <n> (sign) · node scripts/activate-token-list.js --write (activate)' }]),
-    ...(TOKEN_LIST_VERSIONS.active === 'v1' ? [{ item: 'Token Catalog on v2', why: 'the testnet catalog consumes the v1 list until v2 is deployed and activated; the local lifecycle already runs on v2' }] : []),
+    ...(!v2Catalog.ready ? [{ item: 'Token Catalog on v2', why: v2Catalog.why }] : []),
   ],
 };
 if (outIndex >= 0) await writeFile(path.resolve(root, args[outIndex + 1]), `${JSON.stringify(status, null, 2)}\n`);

@@ -23,11 +23,17 @@ async function extrinsicAt(height, index) {
 // The explorer lists events newest first; stop once we are older than the registry.
 async function* events(section, method) {
   for (let page = 0; page < 500; page += 1) {
-    const items = (await get(`/events?section=${section}&method=${method}&page=${page}&pageSize=100`)).items || [];
+    const response = await get(`/events?section=${section}&method=${method}&page=${page}&pageSize=100`);
+    if (!Array.isArray(response.items)) throw new Error(`Invalid event page for ${section}.${method} at page ${page}`);
+    const items = response.items;
     if (!items.length) return;
     for (const item of items) { if (item.indexer.blockHeight < FROM) return; yield item; }
-    if (items.length < 100) return;
+    // The explorer may cap the requested page size. Only its returned page size
+    // can establish that a nonempty page is the last one.
+    const actualPageSize = Number(response.pageSize);
+    if (Number.isSafeInteger(actualPageSize) && actualPageSize > 0 && items.length < actualPageSize) return;
   }
+  throw new Error(`Event pagination exceeded 500 pages for ${section}.${method}; refusing an incomplete feed`);
 }
 const arg = (item, name) => item.args?.find((entry) => entry.name === name)?.value;
 const lower = (value) => String(value ?? '').toLowerCase();

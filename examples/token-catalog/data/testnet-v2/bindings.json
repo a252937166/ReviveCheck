@@ -1,0 +1,33 @@
+{
+  "schema": "revivecheck.token-catalog-bindings.v1",
+  "policyHash": "2314f14b1a9b1a6763c0968db846a5c07021ed15804f276a2e1a5e911e704142",
+  "migrationFrom": {
+    "config": "examples/token-catalog/config/testnet.json",
+    "bindings": "examples/token-catalog/data/testnet/bindings.json",
+    "policyHash": "bf084b036a4a692fe239c9fcc54adfe818cb16c0f00218ca2ea6a12ef791a2bc",
+    "bindingId": "ea3b3f0e-91d3-4e3d-8fa6-28b87366ff91",
+    "bindingHash": "ee58d65eb5632564fdaba5a518026588371278c5f497cf693b354288af7a2838"
+  },
+  "bindings": [
+    {
+      "schema": "revivecheck.binding.v1",
+      "id": "5029767f-1b1f-43d6-ab90-3e2c7f70d70c",
+      "policyHash": "2314f14b1a9b1a6763c0968db846a5c07021ed15804f276a2e1a5e911e704142",
+      "policyName": "pUSD catalog policy (testnet, consumer v2)",
+      "subject": "0x00001e6100000000000000000000000000010000",
+      "subjectKind": "native-asset",
+      "reportHash": "cbd78faa85f8759860d88366794e0c70052b74f9ed775be5bb37ad20118ed427",
+      "release": "v1.0.1",
+      "releaseId": "0xe3f6ab7784cbaa8f60171e5201fea4e27fa5cec3d6682e06d8fcb7d89181f808",
+      "revision": "1",
+      "boundBy": "Project-controlled catalog operator; the release owner and reviewer are the same isolated test account.",
+      "boundAt": "2026-10-24T17:07:52.088Z",
+      "note": "Explicit migration to the verified v2 consumer. The report, Registry revision and existing exact-report approval are unchanged; the v1 policy and binding remain preserved.",
+      "storage": {
+        "extrinsicHash": "0x14b66988c9b160c1442485eae729ec92731fedd45820f8b63718f2c6405520ac",
+        "blockHash": "0xdeda40b38138e6b83de68871c8c66f147e37ec9968abe21ab4d63cf15f53eeea"
+      },
+      "bindingHash": "a320bb83fd6ed4795e79402a2820af811e4d39239eb8b2bc24b21c7aa962f482"
+    }
+  ]
+}

@@ -7,11 +7,13 @@ import { short } from './components.jsx';
 import { Badge, ChainLink, CodeBlock, CopyButton, REPO, useNetworkHead, useTestnetHead } from './site.jsx';
 import { Odometer, Reveal, reduceMotion, useAutoAdvance, useInView, useSequence } from './motion.jsx';
 import { useRecords, recordedState, counts, activity, evidenceFor, listingFor, reviewerLink, fmt, when, TESTNET, LIVE } from './records.js';
+import { TOKEN_LIST } from '../lib/tokenlist.js';
 
 const SECTIONS = ['release', 'products', 'product-middleware', 'product-storage', 'product-api', 'rules', 'lifecycle', 'activity', 'audience'];
 const MCP_COMMAND = 'claude mcp add revivecheck -- node mcp/server.js';
 const strip = (hash) => String(hash || '').replace(/^0x/, '');
 const KIND = { submitted: 'submitted', approved: 'approved', changes: 'changes requested', listed: 'listed', stored: 'stored' };
+const V2_ACTIVE = TOKEN_LIST.version === 2 && !TOKEN_LIST.knownIssue;
 
 /* The hero: the recorded release in the registry, its on-chain status stepping through on load. */
 function Hero({ data, head }) {
@@ -66,20 +68,16 @@ function Hero({ data, head }) {
 
 function ReleaseUpdate() {
   return <section className="section" id="release" aria-labelledby="release-title">
-    <div className="section-head row"><div><p className="hero-source">Current release · v0.3</p><h2 id="release-title">An approval needs a lifecycle.</h2><p>Check the evidence, enable a catalog entry, and require a fresh decision when its context changes.</p></div><a className="link-arrow" href={`${REPO}/blob/main/docs/RELEASE_STATUS.md`} target="_blank" rel="noreferrer">Release status<ArrowUpRight size={15}/></a></div>
+    <div className="section-head row"><div><p className="hero-source">Current release · v0.3</p><h2 id="release-title">An approval needs a lifecycle.</h2><p>Check the evidence, enable a catalog entry, and require a fresh decision when its context changes.</p></div><a className="link-arrow" href="./release-status.json" target="_blank" rel="noreferrer">Release status<ArrowUpRight size={15}/></a></div>
     <div className="release-grid">
       <figure className="release-video visual-card">
-        <video controls playsInline preload="none" poster="./demo-v0.3-poster.png" aria-label="ReviveCheck v0.3 demonstration">
-          <source src="./demo-v0.3.mp4" type="video/mp4"/>
-          <track kind="captions" src="./demo-v0.3.vtt" srcLang="en" label="English"/>
-          <a href="./demo-v0.3.mp4">Download the demonstration</a>
-        </video>
-        <figcaption>Current product footage. The local lifecycle is labelled simulated; historical testnet transactions and live reads are identified separately.</figcaption>
+        <iframe src="https://www.youtube-nocookie.com/embed/CvpzlQfya4U" title="ReviveCheck v0.3 demonstration" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen/>
+        <figcaption>Current product footage. The local lifecycle is labelled SIMULATED; historical testnet transactions and live reads are identified separately. <a className="text-link" href="https://www.youtube.com/watch?v=CvpzlQfya4U" target="_blank" rel="noreferrer">Watch on YouTube</a>.</figcaption>
       </figure>
       <div className="release-summary">
         <article><h3>Evidence that can expire</h3><p>The application policy checks the target, plan, runtime, evidence age and trusted reviewer. Expired or unavailable verification blocks use. A policy decision is separate from an on-chain approval.</p><a className="link-arrow" href="#/docs/policy">Inspect the policy<ArrowRight size={14}/></a></article>
-        <article><h3>A consumer you can reproduce</h3><p>The standalone Token Catalog exercises approval, revision invalidation, revocation and explicit rebinding on a local chain. Its testnet mode reads the recorded v1 release.</p><a className="link-arrow" href={`${REPO}/tree/main/examples/token-catalog`} target="_blank" rel="noreferrer">Run the Token Catalog<ArrowUpRight size={14}/></a></article>
-        <p className="release-boundary"><strong>v1 deployed · v2 deployment pending</strong>Historical v1 reads remain available. New token-list writes are disabled until the corrected v2 deployment is verified and activated.</p>
+        <article><h3>A consumer you can reproduce</h3><p>The standalone Token Catalog exercises approval, revision invalidation, revocation and explicit rebinding on a local chain. {V2_ACTIVE ? 'Its separate v2 testnet configuration and explicit binding are prepared; its first v2 listing and live Catalog acceptance remain pending.' : 'Its testnet mode reads the recorded v1 release.'}</p><a className="link-arrow" href={`${REPO}/tree/main/examples/token-catalog`} target="_blank" rel="noreferrer">Run the Token Catalog<ArrowUpRight size={14}/></a></article>
+        <p className="release-boundary"><strong>{V2_ACTIVE ? 'v2 deployed and verified' : 'v1 deployed · v2 deployment pending'}</strong>{V2_ACTIVE ? 'Entry ownership and delisting fixes are deployed and verified on the V3 testnet. The first v2 listing and live v2 Catalog acceptance remain pending. Historical v1 receipts stay preserved. The full 17-step lifecycle is a local SIMULATED demonstration.' : 'Historical v1 reads remain available. New token-list writes are disabled until the corrected v2 deployment is verified and activated.'}</p>
       </div>
     </div>
     <p className="stats-note">The value experiment compares a scripted baseline with two packaged commands. It records repeatability and decision evidence; it does not establish human time savings or external adoption. <a className="text-link" href={`${REPO}/blob/main/docs/VALUE_EXPERIMENT.md`} target="_blank" rel="noreferrer">Read the experiment</a>.</p>
@@ -119,7 +117,7 @@ function Rules({ data }) {
       <h2 id="rules-title">Permissions the registry enforces, not a policy someone remembers.</h2>
       <p className="lede">An approval in ReviveCheck is a permission a contract checks on-chain. Three of these rules are written into the ReleaseRegistry and the ReviveCheckGuard library, where nothing off-chain can loosen them; the fourth is how ReviveCheck reads them.</p>
       <div className="rules-grid">{rules.map((rule) => <article className="rule" key={rule.title}><h3>{rule.title}</h3><p>{rule.text}</p><div className="rule-chips">{rule.chips.map(([tone, text]) => <span className={`chip-dark ${tone}`} key={text}>{text}</span>)}</div></article>)}</div>
-      <p className="rules-note">The token list on the testnet is v1: any release owner can replace a token’s entry with their own approved release. The v2 source in the repository adds entry ownership, a delist call and a curator override, with regression tests; it awaits its own deployment.</p>
+      <p className="rules-note">{V2_ACTIVE ? 'The active testnet consumer is v2, with entry ownership, delisting and a curator override. The preserved v1 contract has a known entry-replacement defect and remains historical evidence. Runtime and age checks are an application policy evaluated when invoked.' : 'The token list on the testnet is v1: any release owner can replace a token’s entry with their own approved release. The v2 source in the repository adds entry ownership, a delist call and a curator override, with regression tests; it awaits its own deployment.'}</p>
       <div className="rules-actions"><a className="btn btn-primary btn-lg" href="#/app">See the registry live<ArrowRight size={16} aria-hidden="true"/></a><a className="btn btn-ghost btn-lg" href="#/docs/middleware">Integrate the guard<ArrowRight size={16} aria-hidden="true"/></a></div>
     </Reveal>
   </section>;
