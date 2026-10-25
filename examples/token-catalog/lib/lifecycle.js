@@ -8,7 +8,7 @@ import { createBinding, evaluateBinding, summarizeEvaluation } from '../../../li
 import { demoPlan } from '../../../lib/demo.js';
 import { nativeAssetAddress } from '../../../lib/chain.js';
 import { createLocalChain } from './local-chain.js';
-import { appendBinding, buildCatalog, latestBinding, normalizeConfig } from './catalog.js';
+import { appendBinding, approvedEntry, buildCatalog, compareEntry, latestBinding, normalizeConfig } from './catalog.js';
 
 const LABEL = 'pusd-token-list';
 const DAY = 86400;
@@ -53,7 +53,11 @@ export async function runLocalLifecycle({ config: rawConfig, startAt = '2026-10-
     try { Object.assign(outcome, (await perform()) || {}); } catch (error) { outcome.reverted = error.revert || error.message; }
     const evaluation = await evaluate();
     const listed = await (async () => { try { return (await chain.readTokenList({ token })).listed; } catch { return null; } })();
-    transcript.push({ step: id, at: now.toISOString(), block: chain.height(), actor, action, outcome, listed, status: evaluation ? evaluation.status : 'unbound', available: evaluation?.enable === true, reasons: evaluation ? evaluation.reasons.map((reason) => reason.code) : ['no-binding'], summary: evaluation ? summarizeEvaluation(evaluation) : 'no binding yet', evaluation });
+    // The business action needs both: a valid policy evaluation and a published entry equal to the approved report's.
+    const current = latestBinding(bindings, token);
+    const bound = current ? reports.find((item) => item.evidenceHash === current.reportHash) : null;
+    const entry = bound ? compareEntry(config.tokens[0], approvedEntry(bound).entry) : null;
+    transcript.push({ step: id, at: now.toISOString(), block: chain.height(), actor, action, outcome, listed, status: evaluation ? evaluation.status : 'unbound', available: evaluation?.enable === true && entry?.match === true, entry: entry ? (entry.match ? 'equals the approved report' : entry.reason) : 'no binding', reasons: evaluation ? evaluation.reasons.map((reason) => reason.code) : ['no-binding'], summary: evaluation ? summarizeEvaluation(evaluation) : 'no binding yet', evaluation });
     return { outcome, evaluation };
   }
   const bind = (report, releaseId, revision, note) => { const binding = createBinding({ policy, report, releaseId, revision, boundBy: operator, boundAt: now.toISOString(), note }); bindings = appendBinding(bindings, binding, policy); return binding; };
@@ -98,12 +102,14 @@ export async function runLocalLifecycle({ config: rawConfig, startAt = '2026-10-
     if (other.status !== 'passed') throw new Error('The wrong-target report is meant to pass on its own subject.');
     const wrong = bind(other, release.releaseId, revision2.revision, 'wrong target');
     const evaluation = await evaluate();
+    const entry = compareEntry(config.tokens[0], approvedEntry(other).entry);
     bindings = appendBinding(bindings, createBinding({ policy, report: r2, releaseId: release.releaseId, revision: revision2.revision, boundBy: operator, boundAt: now.toISOString(), note: 'restored after the wrong-target binding' }), policy);
-    return { wrongBindingId: wrong.id, wrongTargetStatus: evaluation.status, wrongTargetReasons: evaluation.reasons.map((reason) => reason.code) };
+    return { wrongBindingId: wrong.id, wrongTargetStatus: evaluation.status, wrongTargetReasons: evaluation.reasons.map((reason) => reason.code), wrongTargetEntry: entry.reason };
   });
   // The wrong-target step reports the status seen while the wrong binding was current.
   transcript.at(-1).status = transcript.at(-1).outcome.wrongTargetStatus;
   transcript.at(-1).reasons = transcript.at(-1).outcome.wrongTargetReasons;
+  transcript.at(-1).entry = transcript.at(-1).outcome.wrongTargetEntry;
   transcript.at(-1).available = false;
   // 7. A runtime change on the fixture node, then an outage: neither is detected by a contract.
   await step('runtime-change', 'fixture node', 'the node reports runtime 3003; the report pinned 3002', async () => { chain.setRuntime('3003'); return { runtime: chain.observe().runtime }; });
@@ -122,7 +128,8 @@ export async function runLocalLifecycle({ config: rawConfig, startAt = '2026-10-
     return { reportHash: r3.evidenceHash, revision: revision3.revision, bindingId: binding.id };
   });
   const final = transcript.at(-1).evaluation;
-  const catalog = buildCatalog({ config, entries: [{ token, binding: latestBinding(bindings, token), evaluation: final }], generatedAt: now.toISOString() });
+  const finalBinding = latestBinding(bindings, token);
+  const catalog = buildCatalog({ config, entries: [{ token, binding: finalBinding, report: reports.find((item) => item.evidenceHash === finalBinding.reportHash), evaluation: final }], history: { current: bindings, historical: [] }, generatedAt: now.toISOString() });
   return { config, chain: { label: chain.label, registry: chain.registry, tokenList: chain.tokenList, token, accounts: chain.accounts }, transcript, bindings, reports, catalog };
 }
 

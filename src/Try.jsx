@@ -13,6 +13,7 @@ import { NETWORKS, RUNTIME_HISTORY } from '../lib/networks.js';
 import { DEMO_RELEASES, DEMO_PRECOMPILE, demoPlan, tokenListDocument } from '../lib/demo.js';
 import { downloadJson, makeShareLink } from '../lib/share.js';
 import { TOKEN_LIST } from '../lib/tokenlist.js';
+import { listReceipt, describeListReceipt, describeReviewReceipt } from './receipts.js';
 
 const TESTNET = NETWORKS.testnet, LIVE = NETWORKS.live;
 const engine = () => import('./engine.js');
@@ -430,6 +431,7 @@ function ApproveStep({ session, patch }) {
     } catch (error) { setTx((value) => ({ ...value, stage: 'error', failedAt: value.stage, error: error.message })); }
   }
   const done = session.approve?.tx && session.approve.releaseId === releaseId ? session.approve : null;
+  const decision = describeReviewReceipt(done, { releaseId, release: state?.release?.exists ? state.release : null });
   const busyTx = ['signing', 'submitted', 'in-block', 'finalized', 'readback'].includes(tx.stage);
   return <StepFrame id="approve" purpose="A reviewer decides on the current revision by naming the report hash they read. Here you can review your own submission to see the mechanism; a real release would have a second account review it."
     next={done && <a className="btn btn-primary" href="#/app/run/promote">Assess promotion<ArrowRight size={15}/></a>}>
@@ -450,9 +452,10 @@ function ApproveStep({ session, patch }) {
       <TxProgress tx={tx}/>
       {tx.stage === 'error' && <p className="form-error block" role="alert"><CircleAlert size={15}/>{tx.error}</p>}
     </>}
-    {done && <div className={`result-card ${done.approved ? 'passed' : 'failed'}`}>
-      <div className="result-head"><Badge status={done.approved ? 'approved' : 'changes-requested'}>{done.approved ? 'Approved' : 'Changes requested'}</Badge><strong>Revision {done.revision}, report {short(done.reportHash, 14)}</strong></div>
+    {done && <div className={`result-card ${decision.kind === 'historical' ? '' : done.approved ? 'passed' : 'failed'}`}>
+      <div className="result-head"><Badge status={decision.kind === 'historical' ? 'idle' : done.approved ? 'approved' : 'changes-requested'}>{decision.kind === 'historical' ? 'Historical' : done.approved ? 'Approved' : 'Changes requested'}</Badge><strong>Revision {done.revision}, report {short(done.reportHash, 14)}</strong></div>
       <TxResult result={done.tx} title="Extrinsic"/>
+      {decision.kind === 'historical' && <p className="muted">This decision stands as a record of revision {done.revision}; it does not approve the current revision: {decision.reasons.join('; ')}.</p>}
       {done.readback?.decision && <dl className="kv-list compact"><div className="kv"><dt>Read back</dt><dd>decisionOf → reviewed {String(done.readback.decision.reviewed)}, approved {String(done.readback.decision.approved)} · {done.readback.interfacesAgree ? 'both interfaces agree' : 'interfaces disagree'} at <ChainLink hash={done.readback.block.nativeHash}>#{fmt(done.readback.block.number)}</ChainLink></dd></div></dl>}
     </div>}
     <AttestCard session={session} patch={patch}/>
@@ -522,7 +525,11 @@ function ConsumeStep({ session, patch }) {
   const [fee, setFee] = useState(null);
   const [tx, setTx] = useState({ stage: 'idle' });
   const [task, run] = useTask();
-  const done = session.consume?.tx && session.consume.releaseId === releaseId ? session.consume : null;
+  // A saved receipt counts only for the exact operation in front of the visitor: this network, this consumer and version,
+  // this token, release, reviewer and the registry's current revision. Anything else is history, shown as such.
+  const receipt = describeListReceipt(session.consume, { network: TESTNET, consumer: TOKEN_LIST, token, releaseId, reviewer, release: state?.release?.exists ? { reportHash: state.release.reportHash, revision: state.release.revision } : null });
+  const done = receipt.kind === 'current' ? session.consume : null;
+  const historical = receipt.kind === 'historical' ? session.consume : null;
   // The reviewer defaults to the connected account's own EVM address; any address that approved the release can be named.
   useEffect(() => { if (reviewer || !account) return; engine().then((api) => api.accountOverview(account.address)).then((overview) => setReviewer((current) => current || overview.evm)).catch(() => {}); }, [account?.address]);
   useEffect(() => {
@@ -547,7 +554,7 @@ function ConsumeStep({ session, patch }) {
     try {
       const result = await (await walletModule()).sendContractCall(account, prepared, (status) => setTx((value) => ({ ...value, ...status })));
       if (!result.success) throw new Error(`Included in block #${result.blockNumber}, but the call failed${result.failure ? ` (${result.failure})` : ''}.`);
-      patch('consume', { token, decimals: Number(decimals), releaseId, reportHash: state.release.reportHash, reviewer, from: account.address, tx: result });
+      patch('consume', listReceipt({ network: TESTNET, consumer: TOKEN_LIST, token, decimals, releaseId, reportHash: state.release.reportHash, revision: state.release.revision, reviewer, from: account.address, sender: prepared.dryRun.sender, tx: result }));
       setTx({ stage: 'readback', result });
       const readback = await (await engine()).readTokenList({ token });
       patch('consume', (value) => ({ ...value, readback }));
@@ -574,9 +581,18 @@ function ConsumeStep({ session, patch }) {
       {tx.stage === 'error' && <p className="form-error block" role="alert"><CircleAlert size={15}/>{tx.error}</p>}
     </>}
     {done && <div className="result-card passed">
-      <div className="result-head"><Badge status={done.readback?.listed ? 'approved' : 'finalized'}>{done.readback?.listed ? 'Listed' : 'Finalized'}</Badge><strong>{short(done.token, 14)} in the VerifiedTokenList</strong></div>
+      <div className="result-head"><Badge status={receipt.listed ? 'listed' : receipt.listed === false ? 'pending' : 'finalized'}>{receipt.listed ? 'Listed' : receipt.listed === false ? 'Finalized · not listed' : 'Finalized'}</Badge><strong>{short(done.token, 14)} in the VerifiedTokenList v{done.consumer.version}</strong></div>
       <TxResult result={done.tx} title="Extrinsic"/>
-      {done.readback && <dl className="kv-list compact"><div className="kv"><dt>Read back</dt><dd>isListed → {String(done.readback.listed)} · {done.readback.interfacesAgree ? 'both interfaces agree' : 'interfaces disagree'} at <ChainLink hash={done.readback.block.nativeHash}>#{fmt(done.readback.block.number)}</ChainLink></dd></div><div className="kv"><dt>Then</dt><dd>Submit a new revision and isListed turns false until that revision is approved again.</dd></div></dl>}
+      <dl className="kv-list compact">
+        <div className="kv"><dt>Bound to</dt><dd>chain {done.network.chainId} · consumer v{done.consumer.version} <span className="mono">{short(done.consumer.address, 12)}</span> · revision {done.revision} · report <span className="mono">{short(done.reportHash, 14)}</span> · reviewer <span className="mono">{short(done.reviewer, 12)}</span></dd></div>
+        {done.readback ? <div className="kv"><dt>Read back</dt><dd>isListed → {String(done.readback.listed)} · {done.readback.interfacesAgree ? 'both interfaces agree' : 'interfaces disagree'} at <ChainLink hash={done.readback.block.nativeHash}>#{fmt(done.readback.block.number)}</ChainLink></dd></div> : <div className="kv"><dt>Read back</dt><dd>No matching readback yet. Inclusion in a block alone never shows Listed.</dd></div>}
+        <div className="kv"><dt>Eligibility</dt><dd>A finalized listing is a transaction fact. Whether the entry may be enabled now is a policy decision at a fresh checkpoint; a new revision or a revoked approval changes it without touching this receipt. <a className="text-link" href="#/app/catalog">Catalog decision<ArrowRight size={13} aria-hidden="true"/></a></dd></div>
+      </dl>
+    </div>}
+    {historical && <div className="result-card">
+      <div className="result-head"><Badge status="idle">Historical</Badge><strong>An earlier listing signed in this browser</strong></div>
+      <TxResult result={historical.tx} title="Extrinsic"/>
+      <p className="muted">Kept as history, not as completion of this operation: {receipt.reasons.join('; ')}.</p>
     </div>}
   </StepFrame>;
 }
@@ -622,7 +638,12 @@ function stepStatus(id, session) {
     case 'check': return session.check?.report ? [session.check.report.status, statusWord[session.check.report.status]] : ['idle', 'Start here'];
     case 'recheck': return session.recheck?.report ? [session.recheck.report.status, statusWord[session.recheck.report.status]] : session.check?.report ? ['idle', 'Ready'] : ['locked', 'After Check'];
     case 'store': return passed && session.store?.reportHash === passed.evidenceHash ? ['passed', session.store.retrieved?.verified ? 'On-chain' : 'Finalized'] : passed && session.replay?.reportHash === passed.evidenceHash ? [session.replay.status, 'Replayed'] : passed ? ['idle', 'Wallet'] : ['locked', 'Needs a pass'];
-    case 'consume': return session.consume?.tx && session.consume.releaseId === session.submit?.releaseId ? [session.consume.readback?.listed ? 'approved' : 'finalized', session.consume.readback?.listed ? 'Listed' : 'Finalized'] : session.approve?.tx ? ['idle', 'Wallet'] : ['locked', 'After Approve'];
+    case 'consume': {
+      const receipt = describeListReceipt(session.consume, { network: TESTNET, consumer: TOKEN_LIST, token: session.consume?.token, releaseId: session.submit?.releaseId, reviewer: session.consume?.reviewer });
+      if (receipt.kind === 'current') return receipt.listed ? ['approved', 'Listed'] : ['finalized', 'Finalized'];
+      if (receipt.kind === 'historical') return ['idle', 'Historical'];
+      return session.approve?.tx ? ['idle', 'Wallet'] : ['locked', 'After Approve'];
+    }
     case 'submit': return session.submit?.tx ? ['finalized', session.submit.readback ? `Revision ${session.submit.readback.release.revision}` : 'Finalized'] : passed ? ['idle', 'Wallet'] : ['locked', 'Needs a pass'];
     case 'approve': return session.approve?.tx ? [session.approve.approved ? 'approved' : 'changes-requested', session.approve.approved ? 'Approved' : 'Changes'] : session.remark?.verification?.verified ? ['approved', 'Remark'] : session.submit?.tx ? ['idle', 'Wallet'] : ['locked', 'After Submit'];
     case 'promote': return session.promote?.report ? [session.promote.report.status === 'passed' ? 'passed' : 'refused', session.promote.report.status === 'passed' ? 'Can stand' : 'Refused'] : passed ? ['idle', 'Ready'] : ['locked', 'Needs a pass'];
@@ -633,6 +654,7 @@ function stepStatus(id, session) {
 
 function Ledger({ session, reset }) {
   const { account, info, openDialog } = useWallet();
+  const listing = describeListReceipt(session.consume, { network: TESTNET, consumer: TOKEN_LIST, token: session.consume?.token, releaseId: session.submit?.releaseId, reviewer: session.consume?.reviewer });
   const rows = [
     session.check?.report && ['Check', session.check.report.release, session.check.report.status, session.check.report.network?.finalizedNativeBlockHash, session.check.report.network?.finalizedBlockNumber, 'block', TESTNET],
     session.recheck?.report && ['Recheck', session.recheck.report.release, session.recheck.report.status, session.recheck.report.network?.finalizedNativeBlockHash, session.recheck.report.network?.finalizedBlockNumber, 'block', TESTNET],
@@ -641,7 +663,7 @@ function Ledger({ session, reset }) {
     session.submit?.tx && ['Submit', session.submit.label, 'finalized', session.submit.tx.extrinsicHash || session.submit.tx.blockHash, session.submit.tx.blockNumber, session.submit.tx.extrinsicHash ? 'extrinsic' : 'block', TESTNET],
     session.approve?.tx && ['Approve', session.approve.approved ? 'Approved' : 'Changes', session.approve.approved ? 'approved' : 'changes-requested', session.approve.tx.extrinsicHash || session.approve.tx.blockHash, session.approve.tx.blockNumber, session.approve.tx.extrinsicHash ? 'extrinsic' : 'block', TESTNET],
     session.remark?.tx && ['Remark', session.remark.decision === 'accepted' ? 'Accepted' : 'Changes', session.remark.verification?.verified ? 'passed' : 'pending', session.remark.tx.extrinsicHash, session.remark.tx.blockNumber, 'extrinsic', TESTNET],
-    session.consume?.tx && ['Consume', session.consume.readback?.listed ? 'Listed' : 'Finalized', session.consume.readback?.listed ? 'approved' : 'finalized', session.consume.tx.extrinsicHash, session.consume.tx.blockNumber, 'extrinsic', TESTNET],
+    session.consume?.tx && ['Consume', listing.kind === 'historical' ? 'Historical' : listing.listed ? 'Listed' : 'Finalized', listing.kind === 'historical' ? 'idle' : listing.listed ? 'approved' : 'finalized', session.consume.tx.extrinsicHash, session.consume.tx.blockNumber, 'extrinsic', TESTNET],
     session.promote?.report && ['Promote', session.promote.report.status === 'passed' ? 'Can stand' : 'Refused', session.promote.report.status === 'passed' ? 'passed' : 'refused', session.promote.report.network?.finalizedNativeBlockHash, session.promote.report.network?.finalizedBlockNumber, 'block', LIVE],
     session.watch?.report && ['Watch', 'Rechecked', session.watch.report.status, session.watch.report.network?.finalizedNativeBlockHash, session.watch.report.network?.finalizedBlockNumber, 'block', TESTNET],
   ].filter(Boolean);
@@ -655,9 +677,10 @@ function Ledger({ session, reset }) {
 
 function Completion({ session }) {
   if (!session.submit?.tx || !session.approve?.tx || !session.approve.approved) return null;
+  const listing = describeListReceipt(session.consume, { network: TESTNET, consumer: TOKEN_LIST, token: session.consume?.token, releaseId: session.submit.releaseId, reviewer: session.consume?.reviewer, release: { reportHash: session.approve.reportHash, revision: session.approve.revision } });
   return <div className="completion" role="status">
     <ShieldCheck size={20} aria-hidden="true"/>
-    <div><strong>Revision {session.approve.revision} of “{session.submit.label}” is approved on-chain.</strong><p>Submitted in <ChainLink hash={session.submit.tx.blockHash}>#{fmt(session.submit.tx.blockNumber)}</ChainLink>, approved in <ChainLink hash={session.approve.tx.blockHash}>#{fmt(session.approve.tx.blockNumber)}</ChainLink>, read back through both interfaces.{session.store?.tx ? ` Its report is stored on-chain in #${fmt(session.store.tx.blockNumber)}.` : ''}{session.consume?.readback?.listed ? ` The VerifiedTokenList lists ${short(session.consume.token, 10)} on that approval.` : ''} {session.promote?.report ? `V3 Live ${session.promote.report.status === 'passed' ? 'can accept it' : 'refused it, as the record shows it should'}.` : 'Assess promotion to finish the loop.'}</p></div>
+    <div><strong>Revision {session.approve.revision} of “{session.submit.label}” is approved on-chain.</strong><p>Submitted in <ChainLink hash={session.submit.tx.blockHash}>#{fmt(session.submit.tx.blockNumber)}</ChainLink>, approved in <ChainLink hash={session.approve.tx.blockHash}>#{fmt(session.approve.tx.blockNumber)}</ChainLink>, read back through both interfaces.{session.store?.tx ? ` Its report is stored on-chain in #${fmt(session.store.tx.blockNumber)}.` : ''}{listing.kind === 'current' && listing.listed ? ` The VerifiedTokenList v${session.consume.consumer.version} lists ${short(session.consume.token, 10)} on that approval, read back at #${fmt(session.consume.readback.block.number)}.` : ''} {session.promote?.report ? `V3 Live ${session.promote.report.status === 'passed' ? 'can accept it' : 'refused it, as the record shows it should'}.` : 'Assess promotion to finish the loop.'} Transaction records stay as they are; whether the entry may be enabled now is a separate policy decision.</p></div>
   </div>;
 }
 

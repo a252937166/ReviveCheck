@@ -3,8 +3,9 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
+import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { runLocalLifecycle, checkTranscript, EXPECTED } from '../examples/token-catalog/lib/lifecycle.js';
-import { normalizeConfig, appendBinding, latestBinding, buildCatalog } from '../examples/token-catalog/lib/catalog.js';
+import { normalizeConfig, appendBinding, latestBinding, buildCatalog, approvedEntry, compareEntry, entryIdentity, assertEntryApproved, classifyBindings } from '../examples/token-catalog/lib/catalog.js';
 import { createLocalChain, FIXTURE } from '../examples/token-catalog/lib/local-chain.js';
 import { createBinding, verifyBinding } from '../lib/policy.js';
 import { verifyRun, validateImportedRun } from '../lib/report.js';
@@ -38,6 +39,10 @@ test('the lifecycle runs A submits → B approves → A lists → revision inval
   assert.equal(lifecycle.bindings.length, 5, 'first, rebind, wrong target, restore, renew: history is kept');
   assert.ok(lifecycle.bindings.every((binding) => verifyBinding(binding, lifecycle.config.policy)));
   assert.equal(lifecycle.catalog.tokens[0].available, true);
+  assert.equal(lifecycle.catalog.tokens[0].entry.match, true, 'the final catalog publishes the entry the renewed report approved');
+  assert.equal(lifecycle.catalog.tokens[0].entry.source, 'approved-report');
+  assert.equal(byStep['wrong-target'].entry.includes('address'), true, 'a report about another asset is also a different entry');
+  assert.equal(byStep.list.entry, 'equals the approved report');
   assert.equal(lifecycle.catalog.simulation, true);
   assert.match(lifecycle.catalog.caveat, /SIMULATED EVIDENCE/);
   assert.match(lifecycle.chain.label, /controlled by this example/);
@@ -97,13 +102,97 @@ test('the catalog document exposes availability only for a valid evaluation and 
   assert.ok(Object.isFrozen(history));
   const unbound = buildCatalog({ config, entries: [] });
   assert.deepEqual([unbound.tokens[0].available, unbound.tokens[0].status, unbound.tokens[0].reasons], [false, 'unbound', ['no-binding']]);
-  const blocked = buildCatalog({ config, entries: [{ token: FIXTURE.token, binding: second, evaluation: { status: 'unknown', enable: false, reasons: [{ code: 'registry-unavailable' }], checks: [], evaluatedAt: 'x', checkpoint: {}, evaluationHash: 'y', nextAction: 'z' } }] });
+  const blocked = buildCatalog({ config, entries: [{ token: FIXTURE.token, binding: second, report, evaluation: { status: 'unknown', enable: false, reasons: [{ code: 'registry-unavailable' }], checks: [], evaluatedAt: 'x', checkpoint: {}, evaluationHash: 'y', nextAction: 'z' } }] });
   assert.equal(blocked.tokens[0].available, false);
   assert.deepEqual(blocked.tokens[0].reasons, ['registry-unavailable']);
+  const unloaded = buildCatalog({ config, entries: [{ token: FIXTURE.token, binding: second, evaluation: { status: 'valid', enable: true, reasons: [], checks: [], evaluatedAt: 'x', checkpoint: {}, evaluationHash: 'y', nextAction: 'z' } }] });
+  assert.deepEqual([unloaded.tokens[0].available, unloaded.tokens[0].reasons], [false, ['entry-unverified']], 'a binding whose report was not loaded publishes nothing');
   assert.equal(blocked.summary.available, 0);
   assert.throws(() => normalizeConfig({ ...localConfig, mode: 'testnet' }), /local catalog uses a local-rehearsal policy/);
   assert.throws(() => normalizeConfig({ ...localConfig, roles: { owner: { control: 'x' } } }), /roles.reviewer.control/);
   assert.throws(() => normalizeConfig({ ...localConfig, tokens: [{ ...localConfig.tokens[0], address: `0x${'ee'.repeat(20)}` }] }), /policy subject/);
+});
+
+// Assessment 2026-10-25, A-01: the entry the catalog publishes is derived from the approved
+// report; a configured entry that differs is withheld under an unchanged approval.
+test('a changed configured decimals value cannot stay available under an unchanged approval, and the differing field is named', async () => {
+  const config = normalizeConfig(localConfig);
+  const chain = await createLocalChain();
+  const report = await chain.check(demoPlan('v1.0.1'));
+  const approved = approvedEntry(report);
+  assert.deepEqual(approved.entry, { chainId: 420420777, address: FIXTURE.token, symbol: 'pUSD', name: 'Portaldot USD (test)', decimals: 6, assetId: '7777' });
+  const releaseId = `0x${'ab'.repeat(32)}`;
+  const binding = createBinding({ policy: config.policy, report, releaseId, revision: '1', boundBy: 'operator (test)', id: 'b-entry' });
+  const valid = { status: 'valid', enable: true, reasons: [], checks: [{ id: 'registry.approvals', status: 'passed' }], evaluatedAt: '2026-10-25T00:00:00.000Z', checkpoint: {}, evaluationHash: 'e', nextAction: 'Enable.' };
+  const published = buildCatalog({ config, entries: [{ token: FIXTURE.token, binding, report, evaluation: valid }] });
+  assert.equal(published.tokens[0].available, true, 'the correct approved entry passes the normal path');
+  assert.equal(published.tokens[0].entry.source, 'approved-report');
+  assert.equal(published.tokens[0].entry.identity, entryIdentity(approved.entry));
+  assert.deepEqual(published.tokens[0].reasons, []);
+  const wrong = normalizeConfig({ ...localConfig, tokens: [{ ...localConfig.tokens[0], decimals: 18 }] });
+  const withheld = buildCatalog({ config: wrong, entries: [{ token: FIXTURE.token, binding, report, evaluation: valid }] });
+  assert.equal(withheld.tokens[0].available, false, 'a valid policy evaluation never publishes an entry the report did not approve');
+  assert.equal(withheld.tokens[0].status, 'valid', 'the policy status is reported as it is; the business action is what changes');
+  assert.deepEqual(withheld.tokens[0].reasons, ['entry-mismatch:decimals']);
+  assert.deepEqual(withheld.tokens[0].entry.mismatches, [{ field: 'decimals', configured: 18, approved: 6 }]);
+  assert.equal(withheld.tokens[0].entry.source, 'configuration (unverified; withheld)');
+  assert.match(withheld.tokens[0].nextAction, /Do not publish this entry/);
+  assert.equal(withheld.summary.available, 0);
+  assert.throws(() => assertEntryApproved(wrong.tokens[0], report), /decimals \(configured 18, approved 6\)/);
+  // Canonical property order and address casing do not create false mismatches.
+  const spelled = normalizeConfig({ ...localConfig, tokens: [{ decimals: '6', name: 'Portaldot USD (test)', address: `0x${FIXTURE.token.slice(2).toUpperCase()}`, symbol: 'pUSD', assetId: 7777 }] });
+  assert.equal(compareEntry(spelled.tokens[0], approved.entry).match, true);
+  assert.equal(entryIdentity({ assetId: '7777', decimals: 6, name: 'Portaldot USD (test)', symbol: 'pUSD', address: `0x${FIXTURE.token.slice(2).toUpperCase()}`, chainId: '420420777' }), entryIdentity(approved.entry));
+  // Missing approved metadata blocks publication: a passed report without a listing approves no entry.
+  const bare = await chain.check({ ...demoPlan('v1.0.1'), listing: undefined });
+  assert.equal(bare.status, 'passed');
+  assert.match(approvedEntry(bare).reason, /no token-list entry/);
+  const unverified = buildCatalog({ config, entries: [{ token: FIXTURE.token, binding: createBinding({ policy: config.policy, report: bare, releaseId, revision: '1', boundBy: 'operator (test)', id: 'b-bare' }), report: bare, evaluation: valid }] });
+  assert.deepEqual([unverified.tokens[0].available, unverified.tokens[0].reasons], [false, ['entry-unverified']]);
+  // An intact checksum never overrides a mismatch, and a broken seal never approves anything.
+  const tampered = { ...report, input: { ...report.input, listing: { ...report.input.listing, decimals: 18 } } };
+  assert.match(approvedEntry(tampered).reason, /integrity/);
+  const failed = await chain.check(demoPlan('v1.0.0'));
+  assert.equal(failed.status, 'failed');
+  assert.match(approvedEntry(failed).reason, /did not pass/);
+});
+
+test('the bind command refuses a configured entry that is not the approved one, before any binding is written', async () => {
+  const cli = new URL('examples/token-catalog/catalog.js', root).pathname;
+  const dir = 'artifacts/local/token-catalog/test-entry-mismatch';
+  await rm(new URL(dir, root), { recursive: true, force: true });
+  await mkdir(new URL(`${dir}/reports`, root), { recursive: true });
+  const chain = await createLocalChain();
+  const report = await chain.check(demoPlan('v1.0.1'));
+  await writeFile(new URL(`${dir}/reports/${report.evidenceHash}.json`, root), JSON.stringify(report));
+  const config = { ...localConfig, tokens: [{ ...localConfig.tokens[0], decimals: 18 }], data: dir, reports: `${dir}/reports` };
+  await writeFile(new URL(`${dir}/config.json`, root), JSON.stringify(config));
+  const options = { cwd: root.pathname, env: { ...process.env, NODE_NO_WARNINGS: '1' } };
+  const refused = await run(process.execPath, [cli, 'bind', '--config', `${dir}/config.json`, '--token', FIXTURE.token, '--report', report.evidenceHash, '--release-id', `0x${'ab'.repeat(32)}`, '--revision', '1'], options).then(() => ({ code: 0 }), (error) => ({ code: error.code, stderr: error.stderr }));
+  assert.equal(refused.code, 1);
+  assert.match(refused.stderr, /not the approved entry: decimals \(configured 18, approved 6\)/);
+  await assert.rejects(readFile(new URL(`${dir}/bindings.json`, root)), /ENOENT/, 'nothing was bound');
+  await writeFile(new URL(`${dir}/config.json`, root), JSON.stringify({ ...config, tokens: localConfig.tokens }));
+  const accepted = await run(process.execPath, [cli, 'bind', '--config', `${dir}/config.json`, '--token', FIXTURE.token, '--report', report.evidenceHash, '--release-id', `0x${'ab'.repeat(32)}`, '--revision', '1'], options);
+  assert.match(accepted.stdout, /1 in history, 1 under the current policy/);
+});
+
+test('bindings made under a superseded policy are kept as history, never selected, and an unlisted policy is an error', async () => {
+  const config = normalizeConfig(localConfig);
+  const chain = await createLocalChain();
+  const report = await chain.check(demoPlan('v1.0.1'));
+  const other = { ...localConfig.policy, evidence: { ...localConfig.policy.evidence, maxAgeSeconds: 3600 } };
+  const old = createBinding({ policy: other, report, releaseId: `0x${'ab'.repeat(32)}`, revision: '1', boundBy: 'operator (test)', id: 'b-old' });
+  const current = createBinding({ policy: config.policy, report, releaseId: `0x${'ab'.repeat(32)}`, revision: '2', boundBy: 'operator (test)', id: 'b-new' });
+  assert.throws(() => classifyBindings([old, current], config), /neither uses nor lists as superseded/);
+  const tolerant = normalizeConfig({ ...localConfig, supersededPolicies: [{ policyHash: old.policyHash, note: 'shorter age limit' }] });
+  const history = classifyBindings([old, current], tolerant);
+  assert.deepEqual(history.current.map((item) => item.id), ['b-new']);
+  assert.deepEqual(history.historical.map((item) => [item.id, item.historical.note]), [['b-old', 'shorter age limit']]);
+  assert.equal(latestBinding(history.current, FIXTURE.token).id, 'b-new');
+  assert.throws(() => classifyBindings([{ ...old, revision: '9' }], tolerant), /not intact/);
+  const catalog = buildCatalog({ config: tolerant, entries: [], history });
+  assert.equal(catalog.history.historical[0].id, 'b-old');
 });
 
 test('the testnet configuration is a live policy over the deployed contracts and the recorded studio run', () => {
