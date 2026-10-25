@@ -11,6 +11,7 @@
     "./current": "./lib/current.js",
     "./decision": "./lib/decision.js",
     "./catalog-release": "./lib/catalog-release.js",
+    "./health": "./lib/health.js",
     "./service": "./lib/service.js",
     "./report": "./lib/report.js",
     "./registry": "./lib/registry.js",
@@ -62,7 +63,8 @@
     "hosting:verify": "node scripts/verify-hosting.mjs",
     "journey:studio": "node test/browser/studio-journey.mjs",
     "journey:projects": "node test/browser/projects-journey.mjs",
-    "catalog:release": "node scripts/catalog-release.js"
+    "catalog:release": "node scripts/catalog-release.js",
+    "renewal:prepare": "node scripts/renewal-prepare.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.1",

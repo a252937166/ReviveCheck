@@ -37,8 +37,18 @@ The separate consumer (`revivecheck-consumer-example`) then names the new report
 - Stale observations, a revoked approval, a superseded revision and unavailable reads each withhold the entry (`test/policy.test.js`, the consumer's refusal fixtures, `examples/token-catalog` CI).
 - After renewal: the new binding evaluates `valid`; the old binding evaluates `revision-superseded`; both are visible in the binding history; the status record's `evaluated` level names the new evaluation.
 
-## Timing
+## Timing, and the gap stated
 
 Renewing on October 25 would expire again on November 1, before the freeze. The sensible window is November 3 or 4, 2026: the renewed evidence then covers the freeze (November 6, 04:00 UTC) and the following days. The same sequence applies whenever the evidence is renewed later for judging; the policy value is not widened to keep a green state.
+
+That choice leaves an expected denial period: from the expiry at 2026-11-01T09:29:17.646Z until the successor report is approved, bound and listed (planned 2026-11-03), every evaluation of the published catalog returns `expired` and the entry is withheld, although nothing on the chain changes. The period is stated on the App's **Evidence health** page (`#/app/health`) with the policy lifetime against the freeze, and it will be recorded like the 2026-10-25 steps when it happens. A maintainer who needs continuous availability renews before the first expiry instead; the policy's `maxAgeSeconds` is the maintainer's choice, and the gap is the consequence of this one.
+
+## Preparing the renewal (read-only)
+
+```sh
+node scripts/renewal-prepare.js --planned 2026-11-03T12:00:00.000Z --consumer examples/release-gate-starter/project.json
+```
+
+The command reads the registry for every trusted reviewer, the consumer listing and the finalized head, checks `system.accountNextIndex` against the nonce of both signing accounts (a pending send is a stop condition), scans `public/reports` for a successor report under the same plan fingerprint, retrieves its stored copy when one is recorded, and writes `artifacts/local/renewal/evidence-health.json` (`revivecheck.evidence-health.v1`: expiry, each read's lapse, the standing approval and listing, the next revision derived from the registry, the next role, warnings) and `renewal-plan.json` (`revivecheck.renewal-plan.v1`: the seven stages above with their verified state and the dry-run command of the next pending one). With `--consumer` and a successor it also writes the successor consumer configuration and a diff against the current one; the operator adopts that configuration only after the successor is approved, bound and listed. `--capture <inputs.json> --now <ISO>` runs the same derivation offline on a recorded step. The App's Evidence health page shows the same facts from the recorded last step and from a live read. A stage is `done` only when verified state shows it, so an interrupted renewal resumes from the first pending stage without a duplicate send.
 
 Writing this runbook performed no transaction. Each broadcast requires an explicit decision at the time, with the wallets that live outside this worktree.

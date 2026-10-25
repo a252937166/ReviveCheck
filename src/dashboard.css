@@ -202,3 +202,7 @@
 .steps { margin: .5rem 0 0; padding-left: 1.2rem; display: grid; gap: .35rem; font-size: .875rem; color: var(--ink-2); }
 @media (max-width: 960px) { .project-grid { grid-template-columns: 1fr; } .project-grid > .card { grid-column: auto; } }
 .project-policy .assurance { font-size: .8125rem; align-self: end; margin: 0; }
+.health-reads { list-style: none; margin: 0; padding: 0; display: grid; gap: .3rem; }
+.health-reads li { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+.renewal-table tr.next th, .renewal-table tr.next td { background: var(--accent-soft, #eef6ff); }
+.renewal-table code.block { display: block; font-size: .75rem; margin-top: .2rem; white-space: pre-wrap; overflow-wrap: anywhere; }
