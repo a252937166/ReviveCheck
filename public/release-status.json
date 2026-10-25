@@ -1,7 +1,7 @@
 {
   "schema": "revivecheck.release-status.v2",
-  "checkedAt": "2026-10-25T13:47:24.711Z",
-  "commit": "6b7402f3bed22247a4ee427333b43d66d123c36d",
+  "checkedAt": "2026-10-25T16:18:52.140Z",
+  "commit": "9df9f5b32d11ccf2a9e7f3c6f132ec89f4ef52f0",
   "status": "ok",
   "network": {
     "key": "testnet",
