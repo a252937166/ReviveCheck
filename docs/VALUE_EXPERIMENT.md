@@ -176,6 +176,27 @@ The scripts load no wallet and sign nothing. Use new output names so the retaine
 
 ---
 
+## The complete maintainer task (2026-10-25, product plan D-08)
+
+Measured by `examples/token-catalog/benchmark/run-task.mjs` on the shipped release gate starter and the installed artifact alone; results in `benchmark/results-task-2026-10-25.json`. The operator was the ReviveCheck project (an AI agent on the author's machine), so this measures the task, not adoption or willingness to pay. The signed steps (the reviewer's revocation and re-approval) are the recorded 2026-10-25 transactions replayed from captured reads; the run sent no transaction.
+
+| Step | Role | What happened | Time |
+| --- | --- | --- | --- |
+| Cold start | maintainer | `npm pack` (55 files), copy the starter to an empty directory, `npm install` (204 packages) | install 17.6 s |
+| Configure | maintainer | adopt the consumer configuration (46 fields, 25 of them the policy); the App's My projects page exports the same document | — |
+| Detect incorrect metadata | release gate | the configuration claiming 18 decimals is refused: `/entry/configured/decimals` configured 18, approved 6, role operator, checkpoint #187136; no release file | 0.6 s |
+| Inspect the exact evidence | maintainer | `decision-evidence.json` reconstructs from the document alone (11 checks); report `1faef921…`, explanation `entry-mismatch:decimals`, who acts: operator | 0.6 s |
+| Correct and review | maintainer, gate | decimals corrected to 6; permitted; catalog release 1 written (`5f9bd716…`, 1 entry, permission until 2026-10-25T09:58:29Z on the captured reads) | 0.6 s |
+| Consume | a separate process | `read-example.mjs` verifies release 1 and fills the selector at the generation clock; the next day the same file is `lapsed` and nothing is usable | 1.1 s |
+| Invalidate | reviewer (recorded), gate | on the revoked reads (step 11) the gate refuses: `approval-revoked`, `consumer-not-listed`; no release 2; the next action names the reviewer | 0.6 s |
+| Recover | reviewer (recorded), gate | on the re-approved reads (step 12) release 2 is written, chained to release 1 (`previousReleaseHash` equal), the comparison shows the same entry with new evidence | 1.1 s |
+| Live gate | gate | fresh reads of the public testnet, the report retrieved from chain data: permitted, release 3 (`50c17fe6…`) at #192883, permission until 2026-10-25T19:21:41Z | 21.3 s, nearly all network |
+| Live read | a separate process | release 3 read with fresh reads: re-evaluated `valid` under the release's own policy, 1 entry usable | 20.5 s, nearly all network |
+
+Totals: 10 steps, 0 failed, 66.4 s of which 41.9 s were the public nodes answering; two refusals (wrong metadata, revocation) and two recoveries (correction, re-approval); eight retained artifacts, each hashed in the results file. Assistance: the starter README shipped in the package and the package documentation; no source file of the repository was read. Compared with the 2026-10-24 baseline task (a maintainer script over raw reads, no release artifact, no reconstructable refusal), this run adds a versioned output another process consumed and a refusal a second reader reconstructs; it does not show speed, since the live steps are bounded by the nodes in both cases.
+
+What it does not show: an outside maintainer, demand, or revenue. The same script with `--live` repeats the live steps at the current head.
+
 ## Historical: the 2026-10-24 scripted run (numbers unchanged)
 
 Internal exploratory run by the project author on 2026-10-24 against the public Portaldot V3 testnet nodes (review finding F-10). Both paths were executed as code. One models the raw operations a maintainer might otherwise assemble; the other invokes ReviveCheck's documented commands. The run records their outputs and script timings. It does not measure a person's work, saved time, error rate, external adoption or willingness to pay. The paths did not perform identical verification and ran at different checkpoints, which is what the 2026-10-25 comparison above corrects.

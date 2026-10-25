@@ -1,0 +1,226 @@
+{
+  "schema": "revivecheck.task-measurement.v1",
+  "measuredAt": "2026-10-25T19:06:01.735Z",
+  "node": "v22.23.1",
+  "platform": "darwin arm64",
+  "operator": "the ReviveCheck project (an AI agent on the author's machine); not an outside maintainer",
+  "mode": "offline captures plus live",
+  "assistance": [
+    "Cold start used the starter README shipped in the package and nothing else."
+  ],
+  "steps": [
+    {
+      "id": "cold-start",
+      "role": "maintainer",
+      "what": "pack the artifact, copy the shipped starter to an empty directory, npm install",
+      "ms": 18080,
+      "starter": "/var/folders/1z/3g2cx2kj2j39z3g972d8fjgw0000gn/T/revivecheck-task-ySFLAP/starter",
+      "artifact": {
+        "filename": "revivecheck-0.5.0.tgz",
+        "bytes": 154345,
+        "files": 55,
+        "sha256": "4235e93138232ac6c281a6f0cbea19c59207a2fd9710a71484453bc7d46c0628"
+      },
+      "installMs": 17611,
+      "packages": 204,
+      "assistance": "none: the starter README and the package docs only"
+    },
+    {
+      "id": "configure",
+      "role": "maintainer",
+      "what": "adopt the consumer configuration (the App exports it; the starter ships the pUSD example)",
+      "ms": 0,
+      "fields": 46,
+      "policyFields": 25,
+      "source": "examples/release-gate-starter/project.json (identical to the consumer example's config/allowlist.json apart from its name and role text)"
+    },
+    {
+      "id": "detect",
+      "role": "release gate",
+      "what": "gate the wrong configuration on the captured approved reads",
+      "ms": 2417,
+      "exit": 1,
+      "outcome": "refused",
+      "reasons": [
+        "entry-mismatch:decimals"
+      ],
+      "diagnostic": {
+        "pointer": "/entry/configured/decimals",
+        "configured": 18,
+        "approved": 6,
+        "role": "operator",
+        "checkpoint": "187136"
+      },
+      "releaseWritten": false
+    },
+    {
+      "id": "inspect",
+      "role": "maintainer",
+      "what": "reconstruct the refusal from decision-evidence.json alone",
+      "ms": 556,
+      "checks": 11,
+      "consistent": true,
+      "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+      "reportCheckpoint": "187136",
+      "explanation": {
+        "code": "entry-mismatch:decimals",
+        "who": "operator"
+      }
+    },
+    {
+      "id": "correct-and-gate",
+      "role": "maintainer, then release gate",
+      "what": "correct decimals to the approved value and gate again",
+      "ms": 639,
+      "exit": 0,
+      "outcome": "permitted",
+      "release": {
+        "version": 1,
+        "releaseHash": "5f9bd716bab622f61383cefbc0c8eff918410d55f3a5329ef4959ddb624b7a85",
+        "entries": 1,
+        "validUntil": "2026-10-25T09:58:29.145Z",
+        "generatedAt": "2026-10-25T09:43:18.329Z"
+      },
+      "file": "/var/folders/1z/3g2cx2kj2j39z3g972d8fjgw0000gn/T/revivecheck-task-ySFLAP/starter/out/releases/catalog-release-1.json"
+    },
+    {
+      "id": "consume",
+      "role": "reader (separate process)",
+      "what": "read release 1 with read-example.mjs at its generation clock",
+      "ms": 1147,
+      "usableAtGeneration": true,
+      "usableNextDay": false,
+      "lapsedReason": "lapsed"
+    },
+    {
+      "id": "invalidate",
+      "role": "trusted reviewer (recorded), then release gate",
+      "what": "gate on the revoked reads with release 1 as the predecessor",
+      "ms": 585,
+      "exit": 1,
+      "outcome": "refused",
+      "reasons": [
+        "approval-revoked",
+        "consumer-not-listed"
+      ],
+      "nextAction": "The reviewer who requested changes resolves them: after the fix, approve the exact hash again, or approve a new revision.",
+      "releaseWritten": false
+    },
+    {
+      "id": "recover",
+      "role": "trusted reviewer (recorded), then release gate",
+      "what": "gate on the re-approved reads with release 1 as the predecessor, then compare",
+      "ms": 1142,
+      "exit": 0,
+      "release": {
+        "version": 2,
+        "releaseHash": "a1317b4ce7269f7ec0a0bab7bd0435ddc61a1782482b05962f289cb5a222ac15",
+        "previousReleaseHash": "5f9bd716bab622f61383cefbc0c8eff918410d55f3a5329ef4959ddb624b7a85"
+      },
+      "chained": true,
+      "summary": {
+        "added": 0,
+        "removed": 0,
+        "changed": 1,
+        "unchanged": 0
+      }
+    },
+    {
+      "id": "live-gate",
+      "role": "release gate",
+      "what": "gate on fresh reads of the public testnet (report retrieved from chain data)",
+      "ms": 21331,
+      "exit": 0,
+      "outcome": "permitted",
+      "networkMs": 21329,
+      "release": {
+        "version": 3,
+        "releaseHash": "50c17fe6daab4f250719e1a9f9b7652a9f9bb584575284edfdb27a7947132438",
+        "validUntil": "2026-10-25T19:21:41.457Z",
+        "checkpoint": "192883"
+      },
+      "note": "the elapsed time is almost entirely the public nodes answering; computation is milliseconds"
+    },
+    {
+      "id": "live-read",
+      "role": "reader (separate process)",
+      "what": "read release 3 with fresh reads (re-evaluation under the release's own policy)",
+      "ms": 20543,
+      "exit": 0,
+      "networkMs": 20543,
+      "freshness": "fresh-reads",
+      "usable": 1,
+      "status": "valid"
+    }
+  ],
+  "retained": [
+    {
+      "label": "outcome of the wrong configuration",
+      "file": "outcome.json",
+      "bytes": 1341,
+      "sha256": "98d9521c3ba65d97e77017b65754b0530afad991d95873e4420fabd6882e07a7"
+    },
+    {
+      "label": "decision evidence of the refusal",
+      "file": "decision-evidence.json",
+      "bytes": 36634,
+      "sha256": "69b0244a1e07d50789a40a599eef226e83a5d1441e1b845de8d2e4debdfda434"
+    },
+    {
+      "label": "outcome of the corrected configuration",
+      "file": "outcome.json",
+      "bytes": 672,
+      "sha256": "de3681e4e73bb0c1ed856f672e714e95c3cb79e49c4df701d4f5f6a4f53ab7a5"
+    },
+    {
+      "label": "catalog release 1",
+      "file": "catalog-release-1.json",
+      "bytes": 43952,
+      "sha256": "91c822b92d78c0713ad464d6e10f322b5778632a52ec047152d1d6861e43ae48"
+    },
+    {
+      "label": "outcome after the revocation",
+      "file": "outcome.json",
+      "bytes": 2162,
+      "sha256": "327bb1d172a9c3eb4b247690379ce855e5a036a33804b0da331f3558eec99959"
+    },
+    {
+      "label": "catalog release 2",
+      "file": "catalog-release-2.json",
+      "bytes": 44008,
+      "sha256": "3fe619d9c2aa957ef5353824fd7ba84783efdd02a0890a92b6f903f21c4b8d85"
+    },
+    {
+      "label": "outcome of the live gate",
+      "file": "outcome.json",
+      "bytes": 672,
+      "sha256": "290d067ae09c04fafbcd3434e0f532322bfb99e2250b025e053aa1e8dfb988f3"
+    },
+    {
+      "label": "catalog release 3 (live)",
+      "file": "catalog-release-3.json",
+      "bytes": 44082,
+      "sha256": "5704c24b9d5109c1b6c8310efb2f441096ea3a9d0a4630af953e5824dbc7214e"
+    }
+  ],
+  "summary": {
+    "stepsCompleted": 10,
+    "stepsFailed": 0,
+    "totalMs": 66440,
+    "networkMs": 41872,
+    "refusals": [
+      "detect",
+      "invalidate"
+    ],
+    "releases": [
+      "1:5f9bd716bab6",
+      "2:a1317b4ce726",
+      "3:50c17fe6daab"
+    ]
+  },
+  "limits": [
+    "Author-operated; it measures the task on the shipped starter, not adoption or willingness to pay.",
+    "The signed steps (revocation, re-approval) are the recorded 2026-10-25 transactions replayed from captured reads; no transaction was sent by this run.",
+    "Offline steps are computation only; the live steps include the public nodes' response time, which dominates."
+  ]
+}
