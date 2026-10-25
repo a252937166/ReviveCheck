@@ -38,6 +38,10 @@ test('the evidence document carries every item a second reader needs, hashed, an
   assert.equal(document.storage.extrinsicHash, binding.storage.extrinsicHash);
   assert.equal(document.storage.blockNumber, '187145');
   assert.equal(document.evidenceAge.expiresAt, '2026-11-01T09:29:17.646Z');
+  assert.equal(document.validity.validUntil, '2026-10-25T09:58:29.145Z', 'the network read at 09:43:29.145 plus 900 s is the earliest deadline');
+  assert.equal(document.validity.limitedBy, 'observation');
+  assert.deepEqual(document.validity.missing, []);
+  assert.equal(document.validity.deadlines.report.until, '2026-11-01T09:29:17.646Z');
   assert.equal(document.checkpoints.registry.number, '187279');
   assert.equal(document.checkpoints.report.number, report.binding.checkpoint.number);
   assert.equal(document.links.report, `https://revivecheck.axiqo.xyz/?report=${report.evidenceHash}#/review`);
@@ -89,6 +93,9 @@ test('tampering is caught: a changed outcome, entry, input or report fails recon
     ['registry input', (copy) => { copy.inputs.registry.release.revision = '3'; }],
     ['report', (copy) => { copy.report.status = 'failed'; }],
     ['policy', (copy) => { copy.policy.reviewers.trusted = ['0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b']; }],
+    ['validity deadline', (copy) => { copy.validity.validUntil = '2026-10-25T10:58:29.145Z'; }],
+    ['validity limit', (copy) => { copy.validity.limitedBy = 'report'; }],
+    ['validity removed', (copy) => { delete copy.validity; }],
   ]) {
     const { fingerprint } = await_fingerprint();
     const payload = reseal(mutate);

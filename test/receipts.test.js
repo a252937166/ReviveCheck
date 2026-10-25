@@ -138,3 +138,64 @@ test('the assessment reproduction (a readback naming another operation and an ol
   assert.equal(failed.listed, false);
   assert.equal(matchReadback(synthetic).matched, false);
 });
+
+// Remaining fixes 2026-10-25, item 2: the consumer version in the readback identity is
+// a separate required fact. Only a known version established by a named source and
+// equal to the receipt's version matches; absence, null or a malformed value is never
+// agreement, and the code-verified legacy deployment identifies v1 only.
+import { knownVersion, VERSION_SOURCES } from '../src/receipts.js';
+
+test('a known version equal to the receipt matches in both supported representations', () => {
+  for (const version of [2, '2']) {
+    const described = describeListReceipt({ ...receipt(), readback: { ...matchingReadback(), identity: { ...V2_IDENTITY, version } } }, context);
+    assert.equal(described.listed, true, String(version));
+    assert.deepEqual(described.readback.reasons, []);
+  }
+  assert.equal(knownVersion(2), 2);
+  assert.equal(knownVersion('2'), 2);
+  assert.deepEqual(Object.keys(VERSION_SOURCES), ['on-chain-version-getter', 'known-deployment-runtime-code']);
+});
+
+test('a missing, null, empty, boolean, malformed, fractional, nonpositive, padded or unsafe version never matches, and says so', () => {
+  const values = { missing: undefined, null: null, empty: '', boolean: true, malformed: 'two', hex: '0x2', fractional: 2.5, 'fractional string': '2.0', zero: 0, negative: -2, padded: '02', 'with spaces': ' 2', unsafe: 2 ** 53, 'unsafe string': '9007199254740993', NaN: NaN, object: { version: 2 } };
+  for (const [what, version] of Object.entries(values)) {
+    assert.equal(knownVersion(version), null, what);
+    const identity = { ...V2_IDENTITY };
+    if (version === undefined) delete identity.version; else identity.version = version;
+    const described = describeListReceipt({ ...receipt(), readback: { ...matchingReadback(), identity } }, context);
+    assert.equal(described.listed, false, what);
+    assert.equal(described.readback.matched, false, what);
+    assert.ok(described.readback.reasons.some((reason) => /no known consumer version/.test(reason)), `${what}: ${described.readback.reasons.join('; ')}`);
+    assert.equal(described.completion, 'finalized', `${what}: the transaction stays a finalized fact`);
+  }
+});
+
+test('a known different version, an unnamed source, or the legacy path claiming a later version fails', () => {
+  const different = describeListReceipt({ ...receipt(), readback: { ...matchingReadback(), identity: { ...V2_IDENTITY, version: 1 } } }, context);
+  assert.equal(different.listed, false);
+  assert.match(different.readback.reasons[0], /consumer version 1 \(the version\(\) getter read through both interfaces\), the receipt is v2/);
+  const unsourced = describeListReceipt({ ...receipt(), readback: { ...matchingReadback(), identity: { ...V2_IDENTITY, versionSource: undefined } } }, context);
+  assert.equal(unsourced.listed, false);
+  assert.match(unsourced.readback.reasons[0], /does not say how its version was established/);
+  const legacyClaimsV2 = describeListReceipt({ ...receipt(), readback: { ...matchingReadback(), identity: { ...V2_IDENTITY, versionSource: 'known-deployment-runtime-code' } } }, context);
+  assert.equal(legacyClaimsV2.listed, false);
+  assert.match(legacyClaimsV2.readback.reasons[0], /identifies v1 only/);
+  // The code-verified legacy path still identifies the one v1 deployment, separately.
+  const onV1 = { ...receipt(), consumer: V1 };
+  const legacyReadback = { ...matchingReadback(), list: V1.address, identity: { ...V2_IDENTITY, address: V1.address, version: 1, versionSource: 'known-deployment-runtime-code', evm: { version: null }, native: { version: null } } };
+  assert.equal(matchReadback(onV1, legacyReadback).matched, true);
+  assert.equal(describeListReceipt({ ...onV1, readback: legacyReadback }, { ...context, consumer: V1 }).listed, true);
+  assert.equal(describeListReceipt({ ...onV1, readback: legacyReadback }, context).kind, 'historical', 'against the v2 operation the v1 receipt is history');
+});
+
+test('a receipt without a known consumer version is refused when written and kept as history when read', () => {
+  for (const version of [undefined, null, '', 0, 'two', 2.5]) assert.throws(() => listReceipt({ network: TESTNET, consumer: { address: V2.address, version }, token: TOKEN, decimals: 6, releaseId: RELEASE, reportHash: REPORT, revision: '1', reviewer: OWNER, tx }), /consumer contract and its version/, String(version));
+  const stored = { ...receipt(), consumer: { address: V2.address, version: null }, readback: matchingReadback() };
+  const described = describeListReceipt(stored, context);
+  assert.equal(described.kind, 'historical');
+  assert.match(described.reasons[0], /recorded without a known consumer version/);
+  assert.equal(described.listed, false);
+  assert.ok(described.readback.reasons.some((reason) => /receipt names no known consumer version/.test(reason)));
+  const nullContext = describeListReceipt(receipt(), { ...context, consumer: { address: V2.address, version: null } });
+  assert.equal(nullContext.kind, 'historical', 'an unknown expected version never equals the receipt');
+});

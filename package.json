@@ -1,6 +1,6 @@
 {
   "name": "revivecheck",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "private": true,
   "type": "module",
   "description": "Check Portaldot V3 releases against the chain, approve them on-chain, and assess promotion to V3 Live",
@@ -54,7 +54,8 @@
     "catalog": "node examples/token-catalog/catalog.js",
     "release:status": "node scripts/release-status.js",
     "package:verify": "node scripts/verify-artifact.mjs",
-    "hosting:manifest": "node scripts/hosting-manifest.mjs"
+    "hosting:manifest": "node scripts/hosting-manifest.mjs",
+    "hosting:verify": "node scripts/verify-hosting.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.1",

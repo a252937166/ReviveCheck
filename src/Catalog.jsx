@@ -5,17 +5,19 @@
 // policy eligibility (an evaluation at a checkpoint and time). The headline is the
 // CURRENT state only: not checked, checking, valid, recheck required, expired or
 // unknown. Beginning a refresh withdraws any permission until a fresh acceptable
-// result exists; a failed, timed-out or orphaned refresh is unknown; a result older
-// than the observation limit lapses. The last verified result and the recorded
-// snapshot are shown as history with their own checkpoint and time. "Evaluate now"
-// runs the same evaluator the CLI and the Token Catalog use, in this browser. No wallet.
+// result exists; a failed, timed-out or orphaned refresh is unknown; a result lapses at
+// the deadline its own evidence sets (the report's age limit, or the freshness limit of
+// the earliest read), checked against the clock whenever it is shown, not only when a
+// timer ran. The last verified result and the recorded snapshot are shown as history
+// with their own checkpoint and time. "Evaluate now" runs the same evaluator the CLI
+// and the Token Catalog use, in this browser. No wallet.
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowUpRight, Check, CircleAlert, LoaderCircle, RefreshCw, X } from 'lucide-react';
 import { Badge, ChainLink, CopyButton, useSubRoute } from './site.jsx';
 import { short } from './components.jsx';
 import { fetchJson, reviewerLink, fmt, when } from './records.js';
 import { ENTRY_FIELDS, entryDecision } from '../lib/entry.js';
-import { initialDecision, beginCheck, settleCheck, failCheck, changeSelection, ageDecision, canAct, describeDecision, CURRENT_WORDS } from '../lib/current.js';
+import { initialDecision, beginCheck, settleCheck, failCheck, changeSelection, ageDecision, checkPermission, describeDecision, CURRENT_WORDS, VALIDITY_LIMITS } from '../lib/current.js';
 import { explainReason, evidenceExpiry, RENEWAL_STEPS } from '../lib/decision.js';
 
 const engine = () => import('./engine.js');
@@ -31,6 +33,7 @@ const RECEIPT_WORD = { store: 'Report stored', submit: 'Submitted', review: 'Rev
 const TIMEOUT_MS = 90_000;
 const span = (value) => !Number.isFinite(value) ? '—' : Math.abs(value) >= 86400 ? `${(value / 86400).toFixed(1)} days` : Math.abs(value) >= 3600 ? `${(value / 3600).toFixed(1)} hours` : `${Math.round(value)} s`;
 const RENEWAL_DOC = 'https://github.com/a252937166/ReviveCheck/blob/main/docs/RENEWAL.md';
+const LIMIT_WORDS = { report: "the report's age limit", observation: 'the network read', registry: 'the registry read', listing: 'the listing read' };
 
 function useCatalog(id) {
   const [state, setState] = useState({ id, loading: true });
@@ -113,8 +116,18 @@ function Bindings({ catalog, bindings }) {
   </>;
 }
 
+/** When the fresh result stops permitting anything, limit by limit; derived from its own evidence, never from the evaluation time. */
+function Validity({ validity, now }) {
+  if (!validity) return 'unknown';
+  const left = validity.validUntil ? Math.floor((Date.parse(validity.validUntil) - now.getTime()) / 1000) : null;
+  return <>
+    {validity.validUntil ? <>{when(validity.validUntil)} · {LIMIT_WORDS[validity.limitedBy]} · {left > 0 ? `${span(left)} left` : 'passed'}</> : <strong>no deadline can be derived (missing: {validity.missing.join(', ')}); nothing is permitted</strong>}
+    <small className="block">{VALIDITY_LIMITS.map((kind) => validity.deadlines[kind] ? `${kind}: ${validity.deadlines[kind].until ? when(validity.deadlines[kind].until) : 'undated'}` : `${kind}: not required`).join(' · ')}. A change on the chain since these reads is seen by a new check only.</small>
+  </>;
+}
+
 /** The fresh result in this browser: the authoritative current state. */
-function CurrentResult({ decision }) {
+function CurrentResult({ decision, now }) {
   const { current } = decision;
   const { evaluation, entry, inputs } = current;
   const observed = Object.fromEntries(evaluation.checks.filter((check) => check.status !== 'passed').flatMap((check) => evaluation.reasons.filter((reason) => check.id.startsWith(reason.code.split('-')[0])).map((reason) => [reason.code, check.observed])));
@@ -122,6 +135,7 @@ function CurrentResult({ decision }) {
   return <dl className="kv-list compact current-result">
     <div className="kv"><dt>Reasons</dt><dd><Reasons codes={codes} observed={observed}/></dd></div>
     <div className="kv"><dt>Checkpoints</dt><dd>registry #{fmt(inputs?.registry?.block?.number)} · listing #{fmt(inputs?.listing?.block?.number)} · observation #{fmt(inputs?.observation?.finalized?.number)} · {inputs?.observation?.runtime || 'runtime not read'} · evaluated at {when(evaluation.evaluatedAt)}</dd></div>
+    <div className="kv"><dt>Permission ends</dt><dd><Validity validity={current.validity} now={now}/></dd></div>
     <div className="kv"><dt>Next action</dt><dd>{current.available ? evaluation.nextAction : entry.match ? evaluation.nextAction : 'Do not publish this entry: correct the configuration to the approved values, or check and approve a release that carries the configured values.'}</dd></div>
     <div className="kv"><dt>Evaluation hash</dt><dd className="mono">{short(evaluation.evaluationHash, 24)}<CopyButton value={evaluation.evaluationHash}/></dd></div>
   </dl>;
@@ -137,15 +151,22 @@ export default function CatalogPage() {
   decisionRef.current = decision;
   const [elapsed, setElapsed] = useState(0);
   const [now, setNow] = useState(() => new Date());
-  const maxObservation = catalog?.policy?.evidence?.maxObservationAgeSeconds;
   useEffect(() => { setDecision((current) => changeSelection(current, { catalog: id })); }, [id]);
-  // The permission lapses with time and when the tab comes back; nothing revives it but a new check.
+  // The permission lapses at its own deadline and is re-read when the tab comes back; nothing revives it but a new check.
   useEffect(() => {
-    const tick = () => { const at = new Date(); setNow(at); if (maxObservation) setDecision((current) => ageDecision(current, { now: at, maxObservationAgeSeconds: maxObservation })); };
+    const tick = () => { const at = new Date(); setNow(at); setDecision((current) => ageDecision(current, { now: at })); };
     const timer = setInterval(tick, 15_000);
     document.addEventListener('visibilitychange', tick);
     return () => { clearInterval(timer); document.removeEventListener('visibilitychange', tick); };
-  }, [maxObservation]);
+  }, []);
+  // A precise timer at the deadline itself, so the screen changes at that instant and not at the next tick. The words and the tone check the clock on every render regardless.
+  const lapsesAt = decision.current?.validity?.lapsesAt ?? null;
+  useEffect(() => {
+    const until = Date.parse(lapsesAt);
+    if (!Number.isFinite(until)) return undefined;
+    const timer = setTimeout(() => { const at = new Date(); setNow(at); setDecision((current) => ageDecision(current, { now: at })); }, Math.min(Math.max(0, until - Date.now() + 1), 2_147_483_647));
+    return () => clearTimeout(timer);
+  }, [lapsesAt]);
   useEffect(() => {
     if (decision.state !== 'checking') { setElapsed(0); return undefined; }
     const started = Date.parse(decision.startedAt);
@@ -172,7 +193,7 @@ export default function CatalogPage() {
         const api = await engine();
         const inputs = await api.collectPolicyInputs({ policy, binding });
         const result = api.evaluateBinding({ policy, binding, report, registry: inputs.registry, observation: inputs.observation, listing: inputs.listing, evidence: inputs.evidence, now: new Date() });
-        return { evaluation: result, entry: entryDecision(token.entry.configured, report), inputs };
+        return { evaluation: result, entry: entryDecision(token.entry.configured, report), inputs, policy, report };
       })();
       const timeout = new Promise((_, reject) => setTimeout(() => reject(Object.assign(new Error(`No answer within ${TIMEOUT_MS / 1000} s. The public nodes can be slow; read again.`), { kind: 'timeout' })), TIMEOUT_MS));
       const result = await Promise.race([work, timeout]);
@@ -180,8 +201,9 @@ export default function CatalogPage() {
     } catch (error) { fail(error, error?.kind === 'timeout' ? 'timeout' : 'error'); }
   }
 
-  const described = describeDecision(decision, { subject: 'the published entry' });
-  const tone = decision.state === 'checking' ? 'checking' : canAct(decision) ? 'available' : decision.state === 'not-checked' ? 'idle' : 'withheld';
+  const permission = checkPermission(decision, { now });
+  const described = describeDecision(decision, { subject: 'the published entry', now });
+  const tone = decision.state === 'checking' ? 'checking' : permission.allowed ? 'available' : decision.state === 'not-checked' ? 'idle' : 'withheld';
   const buttonWord = decision.state === 'checking' ? 'Evaluating…' : decision.error ? 'Retry the evaluation' : decision.current ? 'Refresh status' : 'Evaluate now';
   return <>
     <div className="page-head">
@@ -200,13 +222,14 @@ export default function CatalogPage() {
             <div className="decision-facts"><Badge status={STATUS_BADGE[decision.state] || 'idle'}>Current: {described.word}</Badge>{decision.current && <Badge status={decision.current.entry.match ? 'passed' : 'failed'}>{decision.current.entry.match ? 'Entry equals the approved report' : `Entry differs: ${decision.current.entry.mismatches.map((item) => item.field).join(', ')}`}</Badge>}</div>
           </div>
           <p className="decision-detail">{described.detail}</p>
-          {decision.current && !decision.stale && <CurrentResult decision={decision}/>}
-          {decision.current && decision.stale && <p className="muted">The lapsed answer was <strong>{STATUS_WORD[decision.current.status]}</strong>, evaluated at {when(decision.current.evaluatedAt)} · evaluation <span className="mono">{short(decision.current.evaluation.evaluationHash, 16)}</span>. It stays visible as what it was; it permits nothing now.</p>}
+          {permission.allowed && <p className="decision-deadline"><strong>Permission ends {when(permission.validUntil)}</strong> ({LIMIT_WORDS[permission.limitedBy]}; {span(permission.secondsLeft)} left at {when(now)}). Checked against the clock every time this page is drawn, and again before any action.</p>}
+          {decision.current && permission.reason !== 'lapsed' && <CurrentResult decision={decision} now={now}/>}
+          {decision.current && permission.reason === 'lapsed' && <p className="muted">The lapsed answer was <strong>{STATUS_WORD[decision.current.status]}</strong>, evaluated at {when(decision.current.evaluatedAt)} · evaluation <span className="mono">{short(decision.current.evaluation.evaluationHash, 16)}</span> · its permission ended at {when(decision.current.validity.validUntil ?? decision.current.validity.lapsesAt)}. It stays visible as what it was; it permits nothing now.</p>}
           <div className="step-actions"><button type="button" className="btn btn-primary" onClick={evaluateNow} disabled={decision.state === 'checking' || !token.binding}>{decision.state === 'checking' ? <LoaderCircle className="spin" size={15} aria-hidden="true"/> : <RefreshCw size={15} aria-hidden="true"/>}{buttonWord}</button><span className="muted">The same evaluator the CLI and the Token Catalog use, run in this browser against the current finalized block. Nothing is signed; the result holds at its checkpoints and time only.</span></div>
           {decision.state === 'checking' && <div className="working" role="status"><LoaderCircle className="spin" size={16} aria-hidden="true"/><div><strong>Reading the registry, the token list, the stored report and the finalized head through both interfaces…</strong><span>{elapsed ? `${elapsed} s` : ''}{elapsed > 8 ? ' · the public node can take up to a minute to hand out metadata on first contact' : ''}{elapsed > 60 ? ` · gives up at ${TIMEOUT_MS / 1000} s` : ''}</span></div></div>}
           {decision.error && <div className="form-error block" role="alert"><CircleAlert size={15} aria-hidden="true"/><div><strong>Nothing was evaluated.</strong> {decision.error.message}</div></div>}
           <div className="history-grid">
-            <div className="history-block"><h3>Last verified in this browser</h3>{decision.lastVerified ? <p>{when(decision.lastVerified.evaluatedAt)} · registry #{fmt(decision.lastVerified.checkpoint?.registry?.number)} · listing #{fmt(decision.lastVerified.checkpoint?.listing?.number)} · evaluation <span className="mono">{short(decision.lastVerified.evaluationHash, 16)}</span><small className="block">History: a past valid result is not a current permission.</small></p> : <p className="muted">No valid result has been verified in this browser yet.</p>}</div>
+            <div className="history-block"><h3>Last verified in this browser</h3>{decision.lastVerified ? <p>{when(decision.lastVerified.evaluatedAt)} · registry #{fmt(decision.lastVerified.checkpoint?.registry?.number)} · listing #{fmt(decision.lastVerified.checkpoint?.listing?.number)} · evaluation <span className="mono">{short(decision.lastVerified.evaluationHash, 16)}</span> · permitted until {when(decision.lastVerified.validUntil)}<small className="block">History: a past valid result is not a current permission.</small></p> : <p className="muted">No valid result has been verified in this browser yet.</p>}</div>
             <div className="history-block"><h3>Recorded snapshot</h3>{token.evaluation ? <p><Badge status={token.available ? 'passed' : 'failed'}>{token.available ? 'available' : 'withheld'}</Badge> <Badge status={STATUS_BADGE[token.status]}>{STATUS_WORD[token.status]}</Badge> {when(token.evaluation.evaluatedAt)} · evaluation <span className="mono">{short(token.evaluation.evaluationHash, 16)}</span> · {token.evaluation.checks} checks{token.evaluation.failed.length ? `, failed: ${token.evaluation.failed.join(', ')}` : ', all passed'}<small className="block">Published with the catalog records at that checkpoint and time; it is evidence of what held then, not a permission now.</small>{codes.length > 0 && <small className="block">Recorded reasons: {codes.join(', ')}.</small>}</p> : <p className="muted">No evaluation is recorded for this catalog.</p>}</div>
           </div>
         </div>

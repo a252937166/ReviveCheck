@@ -315,7 +315,7 @@ function Activity({ data, head }) {
 
 function Audience() {
   const cards = [
-    ['Token issuers and listing teams', 'Publish a release with proof that the chain agrees.', 'Check the list against the chain, store the report, submit its hash, and let wallets and DEX allow-lists read the approval on-chain instead of trusting a file.', ['Run the pUSD release', '#/app/run']],
+    ['Token issuers and listing teams', 'Publish a release with proof that the chain agrees.', 'Check your own token-list entry against the chain, store the report, submit its hash, and let wallets and DEX allow-lists read the approval on-chain instead of trusting a file.', ['Check your own token', '#/app/check']],
     ['Protocol teams gating launches', 'Put a launch behind an approval a contract checks.', 'Gate a launchpad, a router allow-list or an upgrade with three lines of Solidity. The gate lapses the moment a new revision is submitted.', ['Integrate the guard', '#/docs/middleware']],
     ['Reviewers, auditors, agents and CI', 'Verify from anywhere, sign from your own wallet.', 'Check a release through both V3 interfaces, replay it at its block, and sign a decision from a wallet or a pipeline. Thirteen tools, one implementation.', ['Read the API docs', '#/docs/api']],
   ];

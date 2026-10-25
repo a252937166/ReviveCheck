@@ -153,3 +153,22 @@
   .activity-list li { grid-template-columns: minmax(0, 1fr) auto; }
   .activity-list li .kind-chip { grid-column: 1 / -1; justify-self: start; }
 }
+
+/* Check my token: the visitor's own release, its effective plan and the stated limits. */
+.own-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 1.25rem; align-items: start; }
+.own-form form { display: grid; gap: .9rem; }
+.own-form .field-row { margin: 0; }
+.own-form label { display: grid; gap: .3rem; font-size: .875rem; font-weight: 500; color: var(--ink-2); margin: 0; }
+.own-form input, .own-import textarea { width: 100%; font: inherit; font-size: .9375rem; padding: .55rem .7rem; border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--bg); color: var(--ink); }
+.own-form input:focus-visible, .own-import textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.own-import textarea { font-family: var(--mono); font-size: .8125rem; margin: .5rem 0 .6rem; resize: vertical; }
+.own-more, .own-import { border: 1px solid var(--line); border-radius: var(--radius); padding: .6rem .85rem; }
+.own-more summary, .own-import summary { cursor: pointer; font-size: .875rem; font-weight: 500; color: var(--ink-2); display: flex; align-items: center; gap: .4rem; }
+.own-more[open] summary, .own-import[open] summary { margin-bottom: .7rem; }
+.own-more .field-row { margin-bottom: .75rem; }
+.own-derived { font-size: .875rem; color: var(--ink-2); margin: 0; display: flex; align-items: center; gap: .35rem; flex-wrap: wrap; }
+.own-check { display: inline-block; margin: 0 .4rem .3rem 0; }
+.own-next { margin: .9rem 0 .75rem; max-width: 76ch; }
+.own-import { margin-top: 1rem; }
+.code-block.entry pre { max-height: 22rem; }
+@media (max-width: 960px) { .own-grid { grid-template-columns: 1fr; } }

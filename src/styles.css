@@ -708,6 +708,7 @@ a.network-pill:hover { border-color: var(--line-strong); color: var(--ink); }
 .decision-card.withheld { border-color: color-mix(in srgb, var(--fail) 40%, var(--line)); background: color-mix(in srgb, var(--fail) 3%, var(--bg)); }
 .decision-card.checking { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
 .decision-detail { margin: 0 0 .75rem; color: var(--ink-2); max-width: 72ch; }
+.decision-deadline { margin: 0 0 .75rem; color: var(--ink-2); max-width: 72ch; font-size: .92rem; }
 .current-result { border-top: 1px solid var(--line); padding-top: .4rem; margin-bottom: .5rem; }
 .reason-list .observed { color: var(--ink-3); font-style: normal; }
 .reason-list .recovery { color: var(--ink-3); margin-top: .15rem; }

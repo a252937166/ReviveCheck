@@ -66,6 +66,7 @@
 .baseline-line { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; font-size: .875rem; color: var(--ink-3); }
 .release-chooser { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
 .segmented-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .6rem; }
+.segmented-cards.four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .segmented-cards legend { font-size: .875rem; font-weight: 500; color: var(--ink-2); margin-bottom: .5rem; }
 .segmented-cards label { position: relative; display: grid; gap: .15rem; margin: 0; padding: .75rem .85rem; border: 1px solid var(--line); border-radius: var(--radius); cursor: pointer; transition: border-color .16s var(--ease), box-shadow .16s var(--ease); }
 .segmented-cards label:hover { border-color: var(--line-strong); }

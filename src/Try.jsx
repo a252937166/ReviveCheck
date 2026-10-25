@@ -55,17 +55,20 @@ function Working({ task, children }) {
 
 const passedReport = (session) => [session.recheck?.report, session.check?.report].find((report) => report?.status === 'passed') || null;
 function planFor(choice, custom) {
+  if (choice === 'own' && custom?.plan) return custom.plan; // a visitor's own release, built and validated on the Check my token page
   if (choice !== 'custom') return demoPlan(choice);
   const base = demoPlan('v1.0.1');
   return { ...base, release: 'custom', sourceRevision: 'pusd-token-list@custom', listing: { ...base.listing, symbol: custom.symbol, name: custom.name, decimals: Number(custom.decimals) } };
 }
 
 function ReleaseChooser({ choice, setChoice, custom, setCustom, disabled }) {
-  const listing = planFor(choice, custom).listing;
+  const own = custom?.plan ? planFor('own', custom) : null;
+  const plan = planFor(choice, custom);
+  const listing = plan.listing;
   const changed = choice === 'v1.0.0' ? 'decimals' : choice === 'custom' ? 'decimals' : '';
-  const options = [['v1.0.0', 'v1.0.0', 'Lists 18 decimals, the Ethereum default'], ['v1.0.1', 'v1.0.1', 'Lists the 6 decimals the chain reports'], ['custom', 'Your edit', 'Change the listed symbol, name or decimals']];
+  const options = [['v1.0.0', 'v1.0.0', 'Lists 18 decimals, the Ethereum default'], ['v1.0.1', 'v1.0.1', 'Lists the 6 decimals the chain reports'], ['custom', 'Your edit', 'Change the listed symbol, name or decimals'], ...(own ? [['own', 'Your token', `${own.name} · ${own.release}; edit it on Check my token`]] : [])];
   return <div className="release-chooser">
-    <fieldset className="segmented-cards" disabled={disabled}><legend>Release to check</legend>
+    <fieldset className={`segmented-cards ${own ? 'four' : ''}`} disabled={disabled}><legend>Release to check</legend>
       {options.map(([id, title, note]) => <label key={id} className={choice === id ? 'selected' : ''}><input type="radio" name="release" value={id} checked={choice === id} onChange={() => setChoice(id)}/><strong>{title}</strong><span>{note}</span></label>)}
     </fieldset>
     {choice === 'custom' && <div className="field-row">
@@ -74,13 +77,13 @@ function ReleaseChooser({ choice, setChoice, custom, setCustom, disabled }) {
       <label>Decimals<input type="number" min="0" max="255" value={custom.decimals} onChange={(event) => setCustom({ ...custom, decimals: event.target.value })} disabled={disabled}/></label>
     </div>}
     <figure className="code-block entry">
-      <figcaption><span>pusd-token-list · tokens[0]</span></figcaption>
-      <pre><code>{'{\n'}{Object.entries({ chainId: listing.chainId, address: `"${listing.address}"`, symbol: `"${listing.symbol}"`, name: `"${listing.name}"`, decimals: listing.decimals }).map(([key, value]) => <span key={key} className={key === changed || (choice === 'custom' && listing[key] !== DEMO_RELEASES['v1.0.1'].listing[key]) ? 'mark' : ''}>{`  "${key}": ${value},\n`}</span>)}{'  "extensions": { "nativeAssetId": "7777" }\n}'}</code></pre>
+      <figcaption><span>{choice === 'own' ? plan.logicalContractId : 'pusd-token-list'} · tokens[0]</span></figcaption>
+      <pre><code>{'{\n'}{Object.entries({ chainId: listing.chainId, address: `"${listing.address}"`, symbol: `"${listing.symbol}"`, name: `"${listing.name}"`, decimals: listing.decimals }).map(([key, value]) => <span key={key} className={choice !== 'own' && (key === changed || (choice === 'custom' && listing[key] !== DEMO_RELEASES['v1.0.1'].listing[key])) ? 'mark' : ''}>{`  "${key}": ${value},\n`}</span>)}{`  "extensions": { "nativeAssetId": "${plan.nativeAsset?.assetId ?? '7777'}" }\n}`}</code></pre>
     </figure>
   </div>;
 }
 
-function ReportResult({ report, title }) {
+export function ReportResult({ report, title }) {
   const [link, setLink] = useState('');
   useEffect(() => { let alive = true; setLink(''); makeShareLink(report, { checkPublished: false }).then((share) => alive && setLink(share.url || share.qrUrl)).catch(() => {}); return () => { alive = false; }; }, [report.evidenceHash]);
   const network = report.scope === LIVE.scope ? LIVE : TESTNET;
@@ -186,8 +189,8 @@ function CheckStep({ session, patch, go }) {
 
 function RecheckStep({ session, patch }) {
   const previous = session.check?.report;
-  const [choice, setChoice] = useState(session.recheck?.choice || (previous?.release === 'v1.0.1' ? 'custom' : 'v1.0.1'));
-  const [custom, setCustom] = useState(session.recheck?.custom || { symbol: 'pUSD', name: 'Portaldot USD (test)', decimals: 6 });
+  const [choice, setChoice] = useState(session.recheck?.choice || (session.check?.choice === 'own' && session.check?.custom?.plan ? 'own' : previous?.release === 'v1.0.1' ? 'custom' : 'v1.0.1'));
+  const [custom, setCustom] = useState(session.recheck?.custom || session.check?.custom || { symbol: 'pUSD', name: 'Portaldot USD (test)', decimals: 6 });
   const [task, run] = useTask();
   const { report, comparison } = session.recheck || {};
   async function start() {

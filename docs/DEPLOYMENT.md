@@ -87,11 +87,16 @@ node scripts/hosting-manifest.mjs --dist dist --release "$RELEASE" --payload "re
 # 2. Upload the payload and hosting.json; extract into releases/$RELEASE; verify every file against the manifest
 #    (sha256sum -c) and that no ._* file was extracted; place hosting.json in the release directory.
 # 3. Switch the `current` symlink atomically (ln -s … current.tmp && mv -Tf current.tmp current); Nginx needs no reload.
-# 4. Fetch every file over HTTPS and compare with the manifest; fetch /hosting.json and compare its sourceCommit with the commit built.
+# 4. Fetch every file over HTTPS and compare with the manifest, then verify the manifest itself:
+node scripts/verify-hosting.mjs --site https://revivecheck.axiqo.xyz/ --commit "$(git rev-parse HEAD)" --release "$RELEASE" --out "hosting-verification-$RELEASE.json"
 # 5. Keep the previous release directories for rollback; record the receipt in docs/PUBLICATION_<date>.md.
 ```
 
-`https://revivecheck.axiqo.xyz/hosting.json` therefore identifies the actual hosted build (source commit, release ID, build time, per-file manifest hash, payload hash). It is not part of the repository.
+`https://revivecheck.axiqo.xyz/hosting.json` therefore identifies the actual hosted build (source commit, release ID, build time, per-file manifest hash, payload hash). It is not part of the repository. `scripts/verify-hosting.mjs` (`npm run hosting:verify -- --commit <sha>`) fetches it, requires a JSON content type and a parseable document of a known schema (an HTTP 200 proves nothing by itself: the single-page fallback answers every unknown path with the HTML shell), compares `sourceCommit` and `release` with what was built, and compares the served `index.html` with the hash the manifest lists. On 2026-10-25, before the next republish, the same command reported `FAILED manifest.content-type text/html`: the live site predates the manifest, as `docs/PUBLICATION_2026-10-25.md` states.
+
+### The separate consumer on the same server
+
+The Token eligibility demo (`revivecheck-consumer-example`) is deployed by its own procedure (`docs/DEPLOYMENT.md` in that repository): the same release-directory and `current`-symlink layout under `/var/www/revivecheck-demo/`, its own `hosting.json` (schema `revivecheck-consumer.hosting-manifest.v1`, written by its `scripts/hosting-manifest.mjs`), either on its own host name (`demo.revivecheck.axiqo.xyz`, one DNS record, a certificate and a vhost) or as `/demo/` under the App's vhost. `scripts/verify-hosting.mjs --site <its url> --commit <its commit>` verifies it the same way.
 
 ## Costs recorded so far
 
