@@ -1,0 +1,26 @@
+{
+  "schema": "revivecheck.token-catalog-publication.v1",
+  "name": "pUSD token catalog (Portaldot V3 testnet, consumer v2)",
+  "mode": "testnet",
+  "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
+  "source": "examples/token-catalog/data/testnet-v2",
+  "publishedAt": "2026-10-25T09:44:24.484Z",
+  "files": [
+    "catalog.json",
+    "bindings.json",
+    "lifecycle.json",
+    "evaluations/0x00001e6100000000000000000000000000010000.json",
+    "captures/01-check-r1.inputs.json",
+    "captures/02-submit-r1.inputs.json",
+    "captures/03-approve-r1.inputs.json",
+    "captures/04-wrong-decimals-refused.inputs.json",
+    "captures/05-list-r1.inputs.json",
+    "captures/06-recheck-r2.inputs.json",
+    "captures/07-submit-r2.inputs.json",
+    "captures/08-approve-r2.inputs.json",
+    "captures/09-rebind-r2.inputs.json",
+    "captures/10-relist-r2.inputs.json",
+    "captures/11-revoke-r2.inputs.json",
+    "captures/12-reapprove-r2.inputs.json"
+  ]
+}

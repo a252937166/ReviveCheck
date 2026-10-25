@@ -1,0 +1,13 @@
+{
+  "schema": "revivecheck.token-catalog-publication.v1",
+  "name": "pUSD token catalog (Portaldot V3 testnet)",
+  "mode": "testnet",
+  "policyHash": "bf084b036a4a692fe239c9fcc54adfe818cb16c0f00218ca2ea6a12ef791a2bc",
+  "source": "examples/token-catalog/data/testnet",
+  "publishedAt": "2026-10-25T09:44:27.392Z",
+  "files": [
+    "catalog.json",
+    "bindings.json",
+    "evaluations/0x00001e6100000000000000000000000000010000.json"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "schema": "revivecheck.token-catalog-publication.v1",
+  "name": "pUSD token catalog (Portaldot V3 testnet, consumer v2): a configuration that claims 18 decimals",
+  "mode": "testnet",
+  "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
+  "source": "examples/token-catalog/data/testnet-v2-wrong-entry",
+  "publishedAt": "2026-10-25T09:44:25.906Z",
+  "files": [
+    "catalog.json",
+    "bindings.json",
+    "acceptance.json",
+    "evaluations/0x00001e6100000000000000000000000000010000.json"
+  ]
+}
