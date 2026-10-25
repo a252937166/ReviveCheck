@@ -1,5 +1,7 @@
 # ReviveCheck v0.3 project-page copy
 
+> Historical: the project-page copy of the 2026-10-24 release. The current copy is [SUBMISSION_FINAL.md](SUBMISSION_FINAL.md); the live v2 lifecycle recorded on 2026-10-25 is not reflected here.
+
 Prepared for the existing DoraHacks Build 50176. This document is editable publication copy, not a receipt that the platform fields have been updated.
 
 ## Vision

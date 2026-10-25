@@ -209,8 +209,8 @@ There is no background watcher. A recheck runs when you or your CI start it.
 ### Decide with a policy
 
 ```sh
-npm run rc -- evaluate_policy --policy "$(cat examples/token-catalog/config/testnet.json | jq -c .policy)" \
-  --binding "$(jq -c '.bindings[-1]' examples/token-catalog/data/testnet/bindings.json)"
+npm run rc -- evaluate_policy --policy "$(cat examples/token-catalog/config/testnet-v2.json | jq -c .policy)" \
+  --binding "$(jq -c '.bindings[-1]' examples/token-catalog/data/testnet-v2/bindings.json)"
 ```
 
 ```js
@@ -221,14 +221,22 @@ const evaluation = await evaluatePolicy({ policy, binding, report });
 
 The service reads the network observation, the registry for every trusted reviewer, the consumer listing when the policy requires it and the stored report when it requires that, in one call, then evaluates. A read that fails comes back as `unknown` rather than throwing. The policy, binding and evaluation formats, every reason code and the rules (explicit reviewer trust, new approval plus explicit rebinding for a new report, expiry as a policy clock, drift detected only from a fresh observation) are in [POLICY.md](POLICY.md). The Token Catalog under `examples/token-catalog/` is the worked consumer.
 
+### Publish only the approved entry, and show the decision
+
+A consumer that publishes an entry derives the verified fields (chain, address, symbol, name, decimals, asset) from the approved report, never from its own configuration: a passed native-asset report carries the listing it checked and a `token.listing` check with every field confirmed through both interfaces. The Token Catalog implements that with `approvedEntry` and `compareEntry` (`examples/token-catalog/lib/catalog.js`): a configured entry that differs is refused at `bind` and withheld at `build` with the field named, even when the policy evaluation is `valid`. Its `record` command appends each live step with its receipts to `lifecycle.json`, and `publish` copies the catalog's records under `public/catalog/` for the app's Catalog decision page (`#/app/catalog`), where a reader sees the published entry against the approved report, the on-chain approval, the listing, the policy verdict and reasons, evidence age against the policy clock, checkpoints, the next action and the binding history, and can evaluate again in the browser without a wallet.
+
+In the studio, a saved listing receipt is bound to the network and genesis, the consumer address and version, the token, the release, the exact report and revision and the reviewer (`src/receipts.js`). A receipt that does not match the operation in front of the visitor is history, not completion; a superseded revision makes it history without rewriting it; Listed requires a matching readback through both interfaces, never inclusion alone.
+
 ## VerifiedTokenList and ReviveCheckGuard
 
 | | |
 | --- | --- |
-| Address | `0xd0bd833b4b8658b1230a0e9a99640935b3c65819` (V3 testnet), curator open |
-| Deployed | block #164,220, extrinsic [`0xe3efb1e7…56570`](https://scanner-testnet-v3.portaldot.dev/#/extrinsics/0xe3efb1e79d8544a42aa1ee4472c291e1f61538b1c6a2346ae9746ee004f56570), code deposit 178.158 tPOT |
-| Sources | `contracts/ReviveCheckGuard.sol`, `contracts/VerifiedTokenList.sol`, SHA-256 `7febe10635efcb22fa6f6db186284f6a28c893185287024cd9a51f475be31c69` |
-| Compiler | solc 0.8.24, Paris, optimizer 1; 2,116 bytes of runtime code |
+| Address (v2, active) | `0xedaf8a25bb583ad164a94191b762414277198df9` (V3 testnet), curator open |
+| Deployed | block #177,354, extrinsic [`0xb0264f2b…beabab`](https://scanner-testnet-v3.portaldot.dev/#/extrinsics/0xb0264f2bd82e55a791a21c265f1188c112c5b0b7bda60d5fe558666cbee5abab), code deposit up to 225.738 tPOT, nine verification checks; record `public/lifecycle/token-list-v2.json` |
+| Listings | pUSD on release `pusd-catalog-v2`: #187,124 (revision 1) and #187,205 (revision 2), reviewer `0x95db300103ec8b45884b13ed85230fbf02114065` |
+| Sources | `contracts/ReviveCheckGuard.sol`, `contracts/VerifiedTokenList.sol`, SHA-256 `e710ec145dcc8fae642218657725348c2c00d3c7686c88178344020a11768d1f` |
+| Compiler | solc 0.8.24, Paris, optimizer 1; 2,726 bytes of runtime code |
+| v1, historical | `0xd0bd833b4b8658b1230a0e9a99640935b3c65819`, block #164,220, sources under `contracts/deployed/v1` (SHA-256 `7febe106…be31c69`), pUSD listed at #164,313; any release owner could replace an entry (review F-02), so new writes to it are refused |
 
 ```solidity
 library ReviveCheckGuard {

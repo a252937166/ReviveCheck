@@ -24,4 +24,4 @@ jobs:
       - run: npm test
       - run: npx vite build
       - name: Feed and lifecycle records parse
-        run: node -e "for (const f of ['public/api/registry.json','public/lifecycle/registry.json','public/lifecycle/token-list.json','public/lifecycle/evidence.json']) JSON.parse(require('fs').readFileSync(f,'utf8')); console.log('records ok')"
+        run: node -e "for (const f of ['public/api/registry.json','public/lifecycle/registry.json','public/lifecycle/token-list.json','public/lifecycle/token-list-v2.json','public/lifecycle/evidence.json','public/lifecycle/registry-writes.json','public/lifecycle/funding.json','public/release-status.json','public/catalog/testnet-v2/lifecycle.json']) JSON.parse(require('fs').readFileSync(f,'utf8')); console.log('records ok')"

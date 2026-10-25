@@ -1,0 +1,51 @@
+{
+  "schema": "revivecheck.assessment-read-only-observation.v1",
+  "observedAt": "2026-10-25T08:28:59.851Z",
+  "command": "node scripts/revivecheck.js token_list_status --token 0x00001e6100000000000000000000000000010000",
+  "scope": "Current read-only observation, not a sealed acceptance report or a transaction receipt",
+  "token": "0x00001e6100000000000000000000000000010000",
+  "consumer": "0xedaf8a25bb583ad164a94191b762414277198df9",
+  "checkpoint": {
+    "number": "186536",
+    "nativeHash": "0x36dbbecdd1ed9cd97e934878c24d6a67bef6c0a999ed0259700f8a54ebc15487",
+    "evmHash": "0xaeadef7667b2136cdbb0cd6aa1b4178804014c4a72b8185564263273da4c9706"
+  },
+  "listed": false,
+  "entry": null,
+  "interfacesAgree": true,
+  "views": {
+    "isListed": {
+      "evm": false,
+      "native": false,
+      "match": true
+    },
+    "entryOf": {
+      "evm": [
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x0000000000000000000000000000000000000000"
+      ],
+      "native": [
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x0000000000000000000000000000000000000000"
+      ],
+      "match": true
+    }
+  },
+  "identity": {
+    "evm": {
+      "version": "2",
+      "registry": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339",
+      "curator": "0x0000000000000000000000000000000000000000"
+    },
+    "native": {
+      "version": "2",
+      "registry": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339",
+      "curator": "0x0000000000000000000000000000000000000000"
+    },
+    "interfacesAgree": true,
+    "runtimeCodeHash": "0xf43602cb2e6593f029d9ce84e9e18c38d36079689e0fa5a2251d0be6c360074d",
+    "versionSource": "on-chain-version-getter"
+  }
+}

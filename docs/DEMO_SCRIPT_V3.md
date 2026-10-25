@@ -1,5 +1,7 @@
 # Demo script, v0.3: release attestation middleware with a policy and a consumer
 
+> Historical: the script of the 2026-10-24 recording, which predates the live v2 lifecycle. The current script is [DEMO_SCRIPT_V4.md](DEMO_SCRIPT_V4.md).
+
 Prepared 2026-10-24 for the final submission video (under three minutes). It replaces the structure of the v0.1 walkthrough for the next recording; `docs/DEMO_SCRIPT.md` and the published Check-in video stay as the historical record. Every scene names what the viewer is looking at: a recorded testnet transaction, a live read, or a simulation.
 
 Recording setup: the production build (`npm run build && npm start`, `http://127.0.0.1:4173`), a terminal at the repository root, 1920 × 1080, 30 fps, English captions. No wallet signs anything during the recording; the writes shown are the recorded ones with their block links.

@@ -15,7 +15,7 @@ What exists:
 
 Gaps and the fix:
 
-- Source and public artifacts must match the current release. Verified publication receipts belong in `docs/RELEASE_V03.md`; a local commit or build alone does not establish public delivery.
+- Source and public artifacts must match the current release. The publication receipts of the 2026-10-24 release are in `docs/PUBLICATION_2026-10-24.md`; the hosted site, video and build describe that release until they are republished from a commit that carries the 2026-10-25 lifecycle. A local commit or build alone does not establish public delivery; `docs/RELEASE_STATUS.md` says so.
 - Delivery history is concentrated in a short period. Future commits should correspond to actual improvements and evidence, rather than manufacturing activity for the judging criterion.
 - Only the Polkadot-wallet route has a recorded end-to-end run; the EVM-wallet route is implemented and dry-run tested but not recorded.
 
@@ -33,7 +33,7 @@ What exists:
 Gaps:
 
 - Gasless reviewer decisions through V3's MetaTx module are on the roadmap, not built.
-- The demo's owner and reviewer are one test account; a second independent reviewer account would show the mechanism with two parties.
+- The 2026-10-23 demo's owner and reviewer are one test account. The 2026-10-25 v2 lifecycle uses a separate reviewer account, still controlled by the project: two parties on-chain, not independent review.
 
 ## Ecosystem Contribution (20%)
 
@@ -70,7 +70,7 @@ Gaps:
 
 ## Where a judge verifies
 
-- Site: the landing with the recorded run and block links, the app (registry dashboard with live lookups, the lifecycle run, the reviewer), the docs. Publication evidence is recorded in `docs/RELEASE_V03.md`.
+- Site: the landing with the recorded run and block links, the app (registry dashboard with live lookups, the Catalog decision page, the lifecycle run, the reviewer), the docs. Publication evidence of the 2026-10-24 release is in `docs/PUBLICATION_2026-10-24.md`; the current status record is `public/release-status.json`.
 - Explorer: <https://scanner-testnet-v3.portaldot.dev>, every extrinsic hash in `docs/LIFECYCLE.md`.
 - Repository: `npm test` offline, CI on GitHub, `contracts/`, `lib/`, `mcp/`, `scripts/`.
 
@@ -81,14 +81,28 @@ An independent same-day review ([2026-10-24_revivecheck-improvement-review.md](2
 | Finding | Status |
 | --- | --- |
 | F-01 duplicate reviewers inflate a quorum | Fixed in `contracts/ReviveCheckGuard.sol` (distinct reviewers; an overload bound to the exact report hash); regression tests. |
-| F-02 any release owner can replace a token entry | Fixed in `contracts/VerifiedTokenList.sol` v2 (entry ownership, `delist`, curator override); regression tests. Deployment tooling rebuilt around a validated manifest (`deployments/token-list-v2.manifest.json`, `lib/deployment.js`, `docs/DEPLOYMENT.md`): public-address estimation without wallet secrets, versioned records beside the preserved v1 ones, code and dual-interface identity verified before activation. The v1 testnet deployment is immutable and still active; v2 is estimated at 226.37 tPOT and pending about 147.6 tPOT of funding. |
+| F-02 any release owner can replace a token entry | Fixed in `contracts/VerifiedTokenList.sol` v2 (entry ownership, `delist`, curator override); regression tests. Deployment tooling rebuilt around a validated manifest (`deployments/token-list-v2.manifest.json`, `lib/deployment.js`, `docs/DEPLOYMENT.md`): public-address estimation without wallet secrets, versioned records beside the preserved v1 ones, code and dual-interface identity verified before activation. v2 was deployed on 2026-10-24 (#177354, nine verification checks) and activated; pUSD is listed on it (#187124, #187205). The v1 deployment is immutable and historical; writes to it are refused. |
 | F-03 replay over-claims for contract reports | Fixed in `lib/replay.js`: `partial` with `coverage.unsupported`; tests in `test/replay-coverage.test.js`. |
 | F-04 the studio could not consume another reviewer's approval | Fixed: the Consume step takes a reviewer address (own address by default). |
 | F-05 approval freshness is not continuous | Fixed as a policy envelope (`lib/policy.js`, `evaluate_policy`, `docs/POLICY.md`): acceptance bound to network and genesis, subject (asset or contract code identity), plan fingerprint, supported runtimes, evidence age and an explicit trusted reviewer set, evaluated against fresh finalized reads; `valid`, `recheck-required`, `expired` or `unknown`, and only `valid` enables. New reports need new approval and an explicit rebinding; history is kept. Expiry is a policy clock, drift is detected only from the observation supplied; nothing watches continuously. Provenance, consumer identity and report-binding regressions are included. |
 | F-06 counts and copy exceed the evidence | Fixed: unique listed tokens, token symbols from the feed, the rules band names which rule is the service's; a v1 note on the band. |
-| F-07 no independently runnable reference application | Fixed: `examples/token-catalog/` with its own entry point, two configurations, README and acceptance workflow, built only on the documented interfaces. The local lifecycle (A submits, B approves, A lists, revision invalidates, recheck, reapproval, explicit rebinding, plus revocation, expiry, wrong-target, runtime change, node outage, a stranger's replacement attempt) runs on an in-memory chain with VerifiedTokenList v2 and is checked step by step in CI. The testnet configuration evaluated the recorded pUSD release `valid` live on 2026-10-24. Real v2 transactions are pending funding; roles and simulated evidence are labelled. |
-| F-08 public artifacts lag the local work | Publication is being completed for v0.3; verify the actual source, Pages, video and project-page receipts in `docs/RELEASE_V03.md`. |
+| F-07 no independently runnable reference application | Fixed: `examples/token-catalog/` with its own entry point, two configurations, README and acceptance workflow, built only on the documented interfaces. The local lifecycle (A submits, B approves, A lists, revision invalidates, recheck, reapproval, explicit rebinding, plus revocation, expiry, wrong-target, runtime change, node outage, a stranger's replacement attempt) runs on an in-memory chain with VerifiedTokenList v2 and is checked step by step in CI. The testnet configuration evaluated the recorded pUSD release `valid` live on 2026-10-24. On 2026-10-25 the v2 configuration recorded the lifecycle live with a distinct reviewer account (`examples/token-catalog/data/testnet-v2/lifecycle.json`); roles and simulated evidence are labelled. |
+| F-08 public artifacts lag the local work | The v0.3 release was published on 2026-10-24 (`docs/PUBLICATION_2026-10-24.md`: source, site, video). The 2026-10-25 work is committed but not yet republished; `docs/RELEASE_STATUS.md` lists that as pending. |
 | F-09 CI and test claims | Fixed: the workflow describes the in-memory MCP transport; the public-site lookup is opt-in (`REVIVECHECK_PUBLIC_FALLBACK=1`), so tests stay offline. |
 | F-10 unvalidated business hypothesis | A scripted internal experiment is recorded in `docs/VALUE_EXPERIMENT.md`: 12 modeled raw operations and two configured commands, both retaining outputs. Timing coverage differs; no human-time saving, observed intervention reduction or comparative error-rate improvement is established. ReviveCheck emits standard report and policy-decision artifacts and executed one wrong-decimals refusal case. External adoption, maintainer usability and paying demand remain unverified. |
 | F-11 non-English text | Fixed: the research and Obsidian notes, the wallet note template and the share-test fixture are in English; vault note titles stay as identifiers; recovery material unchanged. |
+
+## 2026-10-25 assessment: findings and remediation
+
+A second assessment ([2026-10-25_score-improvement-report.md](2026-10-25_score-improvement-report.md)) rated the published 2026-10-24 release 75/100 and set seven items. Status after the work of 2026-10-25:
+
+| Item | Status |
+| --- | --- |
+| A-01 bind the emitted catalog entry to the approved evidence | Done: the catalog derives the published fields from the approved report (`approvedEntry`, `compareEntry` in `examples/token-catalog/lib/catalog.js`); `bind` refuses a differing configured entry; `build` withholds it with `entry-mismatch:<field>` even under a `valid` evaluation; canonical casing and key order; a report without a complete entry publishes nothing; a broken seal approves nothing. Proven in `test/token-catalog.test.js`, in CI on the live step-12 inputs (`config/testnet-v2-wrong-entry.json` must fail) and on the Catalog decision page. |
+| A-02 bind persisted receipts to the operation | Done: `src/receipts.js` binds a studio listing receipt to network and genesis, consumer address and version, token, release, exact report and revision, and reviewer; a mismatching or pre-identity receipt is shown as Historical and never completes the current operation; a superseded revision marks it history without rewriting it; Listed requires a matching dual-interface readback. Tests in `test/receipts.test.js`. |
+| A-03 prove invalidation and recovery on the testnet | Done on 2026-10-25 with a separate project-controlled reviewer account: twelve recorded steps and ten finalized receipts on release `pusd-catalog-v2` and VerifiedTokenList v2 (listing #187124; revision 2 at #187165 un-lists; approval #187181 alone insufficient; explicit rebind; relist #187205; revoke #187230; re-approve #187271), each with the policy decision at that moment (`docs/LIFECYCLE.md`, `docs/RELEASE_STATUS.md`). Two project-controlled signers show role separation, not independent review. Expiry, unsupported runtime and node outage remain simulated. |
+| A-04 expose the business decision and its recovery path | Done: the Catalog decision page (`#/app/catalog`) shows the published entry against the approved report, the on-chain approval, the listing, the policy verdict with reason codes, evidence age against the policy clock, observation freshness, checkpoints, the next action, the recorded execution with explorer links and the append-only binding history; "Evaluate now" runs the same evaluator in the browser. Three catalogs: v2 current, the wrong-entry demonstration, v1 historical. No wallet is needed. |
+| A-05 prove integration from a clean consumer environment | Partly: the package now has `exports`, a `files` whitelist and `bin`; a second consumer (a DEX allow-list) is installed from the packed artifact in a separate repository with its own policy, refusal cases, CI workflow and onboarding log. It was built and run by the author, so it shows portability, not independent execution or adoption. |
+| A-06 replace assumed efficiency with observed outcomes | Partly: `docs/VALUE_EXPERIMENT.md` now compares equivalent checks at identical captured checkpoints across five scenarios, splits installation, active effort and network waiting, and tests decision reconstruction; `docs/PILOT_PROTOCOL.md` defines the maintainer study. No human participant has run it; no speed, adoption or willingness-to-pay claim is made. |
+| A-07 remove contradictions across materials | Done for the repository: one authoritative record (`public/release-status.json`, mirrored by `docs/RELEASE_STATUS.md`) with six levels and every transaction; README, deployment, catalog, policy, integration, product and design documents and the landing copy agree with it; the missing `docs/RELEASE_V03.md` links are gone. Pending: republishing the site, the video and the build from this source, and recording the final video (`docs/DEMO_SCRIPT_V4.md`, `docs/FINAL_DECK.md`). |
 

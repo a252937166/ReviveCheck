@@ -1,13 +1,134 @@
 {
-  "schema": "revivecheck.release-status.v1",
-  "checkedAt": "2026-10-24T17:25:40.469Z",
-  "commit": "92f309159ec114e5c4d6a772cb0decb65181aa1a",
+  "schema": "revivecheck.release-status.v2",
+  "checkedAt": "2026-10-25T09:53:48.804Z",
+  "commit": "4dfb1e36000d09ff14a95855ee6bd8080c273542",
   "status": "ok",
+  "network": {
+    "key": "testnet",
+    "name": "Portaldot V3 Testnet",
+    "chainId": 420420777,
+    "genesisHash": "0xd4f9acbcf7f52388d8b095abe3c198d19fc510e0343e643e87cfbccb155283bd",
+    "runtime": "portaldot-v3/3002",
+    "lastObservedAt": "2026-10-25T09:43:29.145Z",
+    "lastFinalized": {
+      "number": "187279",
+      "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+      "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39"
+    }
+  },
+  "consumer": {
+    "active": "v2",
+    "version": 2,
+    "address": "0xedaf8a25bb583ad164a94191b762414277198df9",
+    "deployBlock": "177354",
+    "registry": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339",
+    "knownIssue": null,
+    "historical": {
+      "version": 1,
+      "address": "0xd0bd833b4b8658b1230a0e9a99640935b3c65819",
+      "deployBlock": "164220",
+      "knownIssue": "v1: any release owner can replace a token entry with their own approved release (review F-02, 2026-10-24); v2 adds entry ownership, delist and a curator override"
+    }
+  },
+  "levels": [
+    {
+      "level": "records-intact",
+      "established": true,
+      "evidence": "13 of 13 integrity checks passed",
+      "boundary": "Integrity of the published files. It implies nothing about deployment, listing, evaluation or adoption."
+    },
+    {
+      "level": "deployed",
+      "established": true,
+      "evidence": {
+        "address": "0xedaf8a25bb583ad164a94191b762414277198df9",
+        "extrinsicHash": "0xb0264f2bd82e55a791a21c265f1188c112c5b0b7bda60d5fe558666cbee5abab",
+        "blockNumber": "177354",
+        "verification": 9
+      },
+      "boundary": "The contract exists with verified code, version, registry and curator. It implies no listing or decision."
+    },
+    {
+      "level": "listed",
+      "established": true,
+      "evidence": {
+        "established": true,
+        "extrinsicHash": "0x435979c0ff353ecd887e031490752671f9739f249d2344b9967d7292cb0f7eb3",
+        "blockNumber": "187205",
+        "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+        "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+        "revision": "2",
+        "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+        "readbackBlock": "187205"
+      },
+      "boundary": "The consumer carries the entry on a trusted approval of the exact bound report, read back through both interfaces. It implies no current policy decision."
+    },
+    {
+      "level": "evaluated",
+      "established": true,
+      "evidence": {
+        "established": true,
+        "evaluationHash": "9dfc49fad1a14aecd56f1b4c36ae23133055a4d84922a5bb74a22cf834d2fec4",
+        "evaluatedAt": "2026-10-25T09:43:18.329Z",
+        "checkpoint": {
+          "number": "187279",
+          "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+          "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba"
+        },
+        "checks": 35,
+        "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
+        "bindingId": "cfff0845-b6a1-4f77-a5c9-1245ae3df3f0",
+        "entryIdentity": "3bbb9cc2ff10f7ea08b51556ceab5fd87b923191682c1c3758a5aaace105138c",
+        "scope": "a recorded point-in-time evaluation; nothing monitors continuously"
+      },
+      "boundary": "The policy evaluated valid and the published entry equals the approved report at the recorded checkpoint and time. Validity is point-in-time; evaluate again before each use."
+    },
+    {
+      "level": "lifecycle-complete",
+      "established": true,
+      "evidence": {
+        "established": true,
+        "steps": 12,
+        "receipts": 10,
+        "signers": [
+          "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+          "5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ"
+        ],
+        "transitions": {
+          "invalidated": true,
+          "approvalAloneInsufficient": true,
+          "rebound": true,
+          "restored": true,
+          "revoked": true,
+          "recovered": true
+        },
+        "first": "2026-10-25T09:21:51.696Z",
+        "last": "2026-10-25T09:43:18.329Z",
+        "lastCheckpoint": {
+          "number": "187279",
+          "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+          "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba"
+        },
+        "scope": "live Portaldot V3 testnet transactions signed by two project-controlled accounts (owner and reviewer); role separation, not independent review. Expiry, unsupported-runtime and node-outage cases remain local simulations."
+      },
+      "boundary": "The revision invalidation, re-approval, explicit rebinding, relisting, revocation and restoration happened on the testnet with finalized receipts. Two project-controlled signers show role separation, not independent review."
+    },
+    {
+      "level": "independently-adopted",
+      "established": false,
+      "evidence": {
+        "secondConsumer": "a self-built second consumer (DEX allow-list) installed from the packed artifact is recorded separately; it shows portability, not adoption",
+        "externalBuilder": null,
+        "pilot": "docs/PILOT_PROTOCOL.md: not yet run"
+      },
+      "boundary": "No builder outside the project has installed, configured or used ReviveCheck. Nothing here claims adoption, revenue or an organizer decision."
+    }
+  ],
   "checks": [
     {
       "id": "reports.sealed",
       "status": "passed",
-      "detail": "12 sealed reports verify; 10 indexed"
+      "detail": "14 sealed reports verify; 12 indexed"
     },
     {
       "id": "baseline.bound",
@@ -17,12 +138,12 @@
     {
       "id": "token-list.v1.sources",
       "status": "passed",
-      "detail": "v1 at 0xd0bd833b4b8658b1230a0e9a99640935b3c65819 (#164220), sources 7febe10635ef…"
+      "detail": "v1 at 0xd0bd833b4b8658b1230a0e9a99640935b3c65819 (#164220), sources 7febe10635ef…, 1 recorded listing kept"
     },
     {
       "id": "token-list.v2.manifest",
       "status": "passed",
-      "detail": "v2 sources e710ec145dcc… match the manifest (2726 runtime bytes); deployed at 0xedaf8a25bb583ad164a94191b762414277198df9"
+      "detail": "v2 sources e710ec145dcc… match the manifest (2726 runtime bytes); deployed at 0xedaf8a25bb583ad164a94191b762414277198df9, 9 verification checks passed"
     },
     {
       "id": "token-list.deployments-module",
@@ -37,17 +158,32 @@
     {
       "id": "feed.consistent",
       "status": "passed",
-      "detail": "feed indexed to #177549: 1 releases, 1 listings, 2 stored reports"
+      "detail": "feed indexed to #187283: 2 releases, 3 listings, 4 stored reports"
     },
     {
       "id": "catalog.bindings",
       "status": "passed",
-      "detail": "1 testnet binding verify under policy bf084b036a4a…"
+      "detail": "1 historical v1 binding verify under policy bf084b036a4a…"
     },
     {
-      "id": "catalog.v2.binding-and-evaluation",
+      "id": "catalog.v2.binding-listing-evaluation",
       "status": "passed",
-      "detail": "The v2 deployment record has no matching finalized listing and agreeing readback. Pending; the original v1 catalog remains preserved."
+      "detail": "v2 listing 0x435979c0ff353ecd887e031490752671f9739f249d2344b9967d7292cb0f7eb3 and policy evaluation 9dfc49fad1a14aecd56f1b4c36ae23133055a4d84922a5bb74a22cf834d2fec4 verify at #187279; the published entry equals the approved report"
+    },
+    {
+      "id": "lifecycle.v2.recorded",
+      "status": "passed",
+      "detail": "12 live steps, 10 receipts each found in the public records; check-r1=unbound-, submit-r1=recheck-required-, approve-r1=recheck-required-, wrong-decimals-refused=recheck-required-, list-r1=valid+, recheck-r2=valid+, submit-r2=recheck-required-, approve-r2=recheck-required-, rebind-r2=recheck-required-, relist-r2=valid+, revoke-r2=recheck-required-, reapprove-r2=valid+"
+    },
+    {
+      "id": "roles.separated",
+      "status": "passed",
+      "detail": "owner 5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt signed 2 submissions, reviewer 5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ signed 4 decisions (funded in #187050); both are project-controlled"
+    },
+    {
+      "id": "catalog.published",
+      "status": "passed",
+      "detail": "testnet-v2 and testnet-v2-wrong-entry published unchanged; the wrong-entry demonstration withholds a valid approval (entry-mismatch:decimals); v1 published as history"
     },
     {
       "id": "language.english",
@@ -55,27 +191,166 @@
       "detail": "no non-English text in authored files (vault note identifiers in docs/OBSIDIAN_INPUTS.md excepted)"
     }
   ],
-  "deployed": {
-    "registry": {
-      "address": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339",
-      "block": "162962"
-    },
-    "tokenList": {
-      "active": "v2",
-      "version": 2,
-      "address": "0xedaf8a25bb583ad164a94191b762414277198df9",
-      "block": "177354",
-      "knownIssue": null
+  "catalogV2": {
+    "ready": true,
+    "evidenceScope": "recorded live listing, policy evaluation and a complete recorded lifecycle on the v2 consumer with distinct owner and reviewer signers; expiry, unsupported runtime and node outage remain local simulations",
+    "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
+    "bindingId": "cfff0845-b6a1-4f77-a5c9-1245ae3df3f0",
+    "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+    "version": 2,
+    "address": "0xedaf8a25bb583ad164a94191b762414277198df9",
+    "listing": "0x435979c0ff353ecd887e031490752671f9739f249d2344b9967d7292cb0f7eb3",
+    "evaluatedAt": "2026-10-25T09:43:18.329Z",
+    "checkpoint": {
+      "number": "187279",
+      "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+      "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba"
     }
   },
-  "catalogV2": {
-    "ready": false,
-    "why": "The v2 deployment record has no matching finalized listing and agreeing readback."
+  "completedTransactions": [
+    {
+      "kind": "store",
+      "what": "report cbd78faa85f8… stored (7404 bytes)",
+      "extrinsicHash": "0x14b66988c9b160c1442485eae729ec92731fedd45820f8b63718f2c6405520ac",
+      "blockNumber": "164266",
+      "finalizedAt": "2026-10-23T19:07:49.126Z",
+      "signer": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt"
+    },
+    {
+      "kind": "list",
+      "what": "pUSD listed on v1 (historical) · 0xcbd78faa85f8…",
+      "extrinsicHash": "0x395e5fce8acd48d8e6036c12a2b7da1eebf7c10426c053970f367afeb7494f8d",
+      "blockNumber": "164313",
+      "finalizedAt": "2026-10-23T19:12:30.771Z",
+      "signer": null
+    },
+    {
+      "kind": "store",
+      "what": "report 9707ec92029b… stored (7404 bytes)",
+      "extrinsicHash": "0xfac6d3d2761091c9ed678a5fc590d6a3f7fcb6403fc79bfbf9ba9493711cbe04",
+      "blockNumber": "164335",
+      "finalizedAt": "2026-10-23T19:14:42.955Z",
+      "signer": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt"
+    },
+    {
+      "kind": "deploy",
+      "what": "VerifiedTokenList v2 instantiated",
+      "extrinsicHash": "0xb0264f2bd82e55a791a21c265f1188c112c5b0b7bda60d5fe558666cbee5abab",
+      "blockNumber": "177354",
+      "finalizedAt": "2026-10-24T17:05:12.151Z",
+      "signer": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt"
+    },
+    {
+      "kind": "transfer",
+      "what": "12 tPOT to the reviewer account",
+      "extrinsicHash": "0x5319ce555383c07e16243b4983a23b502ee952bfa4e73d3c0a7dc97a1b32fbac",
+      "blockNumber": "187050",
+      "finalizedAt": "2026-10-25T09:20:31.137Z",
+      "signer": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt"
+    },
+    {
+      "kind": "store",
+      "what": "report eb960cc73214… stored (7369 bytes)",
+      "extrinsicHash": "0x2489bd65a330e17e422ef6ff0ce87132a6ecdb0d20554bbbc04560654fa15b44",
+      "blockNumber": "187058",
+      "finalizedAt": "2026-10-25T09:21:19.191Z",
+      "signer": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt"
+    },
+    {
+      "kind": "submit",
+      "what": "pusd-catalog-v2 revision 1 · 0xeb960cc73214…",
+      "extrinsicHash": "0x4d09c15021e03f1123819bac1715ee880b64a262aadecc1453af182b3358e505",
+      "blockNumber": "187069",
+      "finalizedAt": "2026-10-25T09:22:24.603Z",
+      "signer": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt"
+    },
+    {
+      "kind": "approve",
+      "what": "revision 1 approved · 0xeb960cc73214…",
+      "extrinsicHash": "0xf90702ef780e0a832c7ec07ec1001e48200d3107fa7b598cc46e681736fd4ceb",
+      "blockNumber": "187095",
+      "finalizedAt": "2026-10-25T09:25:00.794Z",
+      "signer": "5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ"
+    },
+    {
+      "kind": "list",
+      "what": "pUSD listed on v2 · 0xeb960cc73214…",
+      "extrinsicHash": "0xc1af7571d02e3e2ed95e300ee019bcc37287bbf72b3b9b81ee6a2d807134c3d1",
+      "blockNumber": "187124",
+      "finalizedAt": "2026-10-25T09:27:54.351Z",
+      "signer": null
+    },
+    {
+      "kind": "store",
+      "what": "report 1faef921a720… stored (7404 bytes)",
+      "extrinsicHash": "0x80d46a8611bb486f3b71bdd6e9e15c96e522c536e2671c9f35d0a4496792feb3",
+      "blockNumber": "187145",
+      "finalizedAt": "2026-10-25T09:30:01.162Z",
+      "signer": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt"
+    },
+    {
+      "kind": "submit",
+      "what": "pusd-catalog-v2 revision 2 · 0x1faef921a720…",
+      "extrinsicHash": "0xd4818dec55ef294fa4d643bf5897f64044923f9493aab560e2bc2cb160740eab",
+      "blockNumber": "187165",
+      "finalizedAt": "2026-10-25T09:31:59.964Z",
+      "signer": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt"
+    },
+    {
+      "kind": "approve",
+      "what": "revision 2 approved · 0x1faef921a720…",
+      "extrinsicHash": "0x5af1743333c313c4109005318f22343404d0ee7780df4f9557af12816a8b521a",
+      "blockNumber": "187181",
+      "finalizedAt": "2026-10-25T09:33:36.090Z",
+      "signer": "5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ"
+    },
+    {
+      "kind": "list",
+      "what": "pUSD listed on v2 · 0x1faef921a720…",
+      "extrinsicHash": "0x435979c0ff353ecd887e031490752671f9739f249d2344b9967d7292cb0f7eb3",
+      "blockNumber": "187205",
+      "finalizedAt": "2026-10-25T09:36:00.311Z",
+      "signer": null
+    },
+    {
+      "kind": "changes-requested",
+      "what": "revision 2 changes requested · 0x1faef921a720…",
+      "extrinsicHash": "0xa1b8688bfbcf775aecef7289866eab710444eb9fed04d7c12f2034373cf56766",
+      "blockNumber": "187230",
+      "finalizedAt": "2026-10-25T09:38:31.127Z",
+      "signer": "5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ"
+    },
+    {
+      "kind": "approve",
+      "what": "revision 2 approved · 0x1faef921a720…",
+      "extrinsicHash": "0x6cee3f89def64b4e669242a518c14c6e1b1629cc012ddb522e90d1e29580b71a",
+      "blockNumber": "187271",
+      "finalizedAt": "2026-10-25T09:42:36.774Z",
+      "signer": "5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ"
+    }
+  ],
+  "publication": {
+    "site": "https://revivecheck.axiqo.xyz/",
+    "sourceRepository": "https://github.com/a252937166/ReviveCheck",
+    "build": "https://dorahacks.io/build/50176",
+    "video": "https://www.youtube.com/watch?v=CvpzlQfya4U",
+    "videoRecordedAgainst": "2026-10-24 release (v0.3): the v2 deployment and the simulated catalog lifecycle; it predates the live v2 lifecycle recorded on 2026-10-25",
+    "deck": "docs/FINAL_DECK.md",
+    "historicalDeck": "artifacts/ReviveCheck-Check-in-Deck.pdf",
+    "freeze": "2026-11-06T04:00:00Z (November 5, 2026, 23:00 EST)"
   },
   "pending": [
     {
-      "item": "Token Catalog on v2",
-      "why": "The v2 deployment record has no matching finalized listing and agreeing readback."
+      "item": "Independent adoption",
+      "why": "No external builder has installed or configured ReviveCheck; the second consumer and the benchmark are author-run."
+    },
+    {
+      "item": "Maintainer pilot",
+      "why": "docs/PILOT_PROTOCOL.md describes the study; no participant has run it."
+    },
+    {
+      "item": "Publication of this source",
+      "why": "The hosted site, the video and the DoraHacks build describe the 2026-10-24 release until they are republished from this commit; the video predates the live v2 lifecycle."
     }
   ]
 }

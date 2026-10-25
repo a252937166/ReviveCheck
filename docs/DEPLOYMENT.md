@@ -7,10 +7,10 @@ Updated 2026-10-24. This file covers the VerifiedTokenList v2 deployment tooling
 | Contract | Version | Address | Block | Status |
 | --- | --- | --- | --- | --- |
 | ReleaseRegistry | 1 | `0xe949b200edf070b9d425b206ed24dc8fe5b7d339` | #162962 | deployed, active, reused by every token-list version |
-| VerifiedTokenList | 1 | `0xd0bd833b4b8658b1230a0e9a99640935b3c65819` | #164220 | deployed, active; known issue F-02 (any release owner can replace any entry) |
-| VerifiedTokenList | 2 | none | none | **pending funding**: sources, manifest, tests and tooling are complete; the deployment needs about 147.6 tPOT more than the project wallet holds |
+| VerifiedTokenList | 1 | `0xd0bd833b4b8658b1230a0e9a99640935b3c65819` | #164220 | historical; known issue F-02 (any release owner can replace any entry); the application and the shared script helper refuse new writes to it; its pUSD listing at #164313 is preserved |
+| VerifiedTokenList | 2 | `0xedaf8a25bb583ad164a94191b762414277198df9` | #177354 | **deployed, verified and active** (extrinsic `0xb0264f2b…abab`, 2026-10-24 17:05 UTC; nine verification checks; activated after re-verification at #177362); pUSD listed at #187124 and #187205 on release `pusd-catalog-v2` (`public/lifecycle/token-list-v2.json`) |
 
-The v2 estimate on 2026-10-24 (`deployments/token-list-v2.estimate-2026-10-24.json`, produced from the public deployer address without reading any wallet):
+The deployment followed the estimate below after the wallet was funded. The estimate of 2026-10-24 (`deployments/token-list-v2.estimate-2026-10-24.json`, produced from the public deployer address without reading any wallet) is kept as the record of what was committed before signing:
 
 | | tPOT |
 | --- | --- |
@@ -21,7 +21,7 @@ The v2 estimate on 2026-10-24 (`deployments/token-list-v2.estimate-2026-10-24.js
 | Shortfall | 147.578 |
 | Manifest budget cap | 250 |
 
-The deployer cannot pay the deposit, so the chain refuses even the dry-run from that account. The estimate therefore simulated the instantiation from the official guide's public example account, which does not change the deposit or the weight, and read the balance and nonce of the real deployer. The result is labelled with that basis. No wallet file was read.
+At the time of that estimate the deployer could not pay the deposit, so the chain refused even the dry-run from that account. The estimate therefore simulated the instantiation from the official guide's public example account, which does not change the deposit or the weight, and read the balance and nonce of the real deployer. The result is labelled with that basis. No wallet file was read.
 
 ## Why a manifest
 
@@ -81,7 +81,12 @@ Activation re-reads the chain rather than trusting the record, then regenerates 
 | pUSD listing in the v1 list | #164313 | 11.525 | 0.031 |
 | ReleaseGate revision 2 submit and review | #161790, #161839 | 3.842 (review) | 0.036 |
 | Report stored with `remark.store`, 7,404 bytes | #164266, #164335 | none | 0.752 each |
-| VerifiedTokenList v2 deployment (estimate) | pending | 225.738 | 0.316 |
+| VerifiedTokenList v2 deployment | #177354 | 225.738 (maximum; the record carries the held amount) | 0.316 |
+| Reviewer account funded with 12 tPOT (transfer) | #187050 | none | 0.015 |
+| Reports stored with `remark.store`, 7,369 and 7,404 bytes | #187058, #187145 | none | 0.748, 0.752 |
+| `pusd-catalog-v2` submit, revisions 1 and 2 | #187069, #187165 | release storage per dry-run | 0.022, 0.021 |
+| Reviewer decisions on `pusd-catalog-v2` (approve, approve, changes, approve) | #187095, #187181, #187230, #187271 | up to 3.8415 (decision storage, reused) | 0.025, 0.024, 0.024, 0.024 |
+| pUSD listings in the v2 list, revisions 1 and 2 | #187124, #187205 | entry storage per dry-run | 0.031, 0.031 |
 
 Deposits are held for code and contract storage; fees are spent. A held deposit is not automatically available again. Recovering a code deposit requires the uploader to remove the code after its instance reference count reaches zero. The deployed contracts have live instances and no ordinary teardown interface, so their full code and instance deposits have no demonstrated recovery path. Deleting a supported storage entry may release its own deposit, subject to the runtime's accounting, but that does not remove the contract or recover its code deposit. This release does not attempt recovery, and its deployment budget assumes existing deposits remain held.
 

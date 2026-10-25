@@ -62,7 +62,7 @@ function Hero({ data, head }) {
         </aside>
       </div>
     </div>
-    <p className="hero-note">Recorded on the V3 testnet by one isolated test account acting as both owner and reviewer: the mechanism, not independent review. Every block number links to the official explorer.</p>
+    <p className="hero-note">The recorded 2026-10-23 run used one isolated test account as owner and reviewer; the v2 lifecycle recorded on 2026-10-25 used two project-controlled accounts, a distinct owner and reviewer. Both show the mechanism, not independent review. Every block number links to the official explorer.</p>
   </section>;
 }
 
@@ -72,12 +72,12 @@ function ReleaseUpdate() {
     <div className="release-grid">
       <figure className="release-video visual-card">
         <iframe src="https://www.youtube-nocookie.com/embed/CvpzlQfya4U" title="ReviveCheck v0.3 demonstration" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen/>
-        <figcaption>Current product footage. The local lifecycle is labelled SIMULATED; historical testnet transactions and live reads are identified separately. <a className="text-link" href="https://www.youtube.com/watch?v=CvpzlQfya4U" target="_blank" rel="noreferrer">Watch on YouTube</a>.</figcaption>
+        <figcaption>Footage from the 2026-10-24 release; it predates the live v2 lifecycle recorded on 2026-10-25. The local lifecycle it shows is labelled SIMULATED; historical testnet transactions and live reads are identified separately. <a className="text-link" href="https://www.youtube.com/watch?v=CvpzlQfya4U" target="_blank" rel="noreferrer">Watch on YouTube</a>.</figcaption>
       </figure>
       <div className="release-summary">
         <article><h3>Evidence that can expire</h3><p>The application policy checks the target, plan, runtime, evidence age and trusted reviewer. Expired or unavailable verification blocks use. A policy decision is separate from an on-chain approval.</p><a className="link-arrow" href="#/docs/policy">Inspect the policy<ArrowRight size={14}/></a></article>
-        <article><h3>A consumer you can reproduce</h3><p>The standalone Token Catalog exercises approval, revision invalidation, revocation and explicit rebinding on a local chain. {V2_ACTIVE ? 'Its separate v2 testnet configuration and explicit binding are prepared; its first v2 listing and live Catalog acceptance remain pending.' : 'Its testnet mode reads the recorded v1 release.'}</p><a className="link-arrow" href={`${REPO}/tree/main/examples/token-catalog`} target="_blank" rel="noreferrer">Run the Token Catalog<ArrowUpRight size={14}/></a></article>
-        <p className="release-boundary"><strong>{V2_ACTIVE ? 'v2 deployed and verified' : 'v1 deployed · v2 deployment pending'}</strong>{V2_ACTIVE ? 'Entry ownership and delisting fixes are deployed and verified on the V3 testnet. The first v2 listing and live v2 Catalog acceptance remain pending. Historical v1 receipts stay preserved. The full 17-step lifecycle is a local SIMULATED demonstration.' : 'Historical v1 reads remain available. New token-list writes are disabled until the corrected v2 deployment is verified and activated.'}</p>
+        <article><h3>A decision you can inspect</h3><p>The Token Catalog publishes an entry only from the exact report that was approved, and withholds it when the configured entry differs. {V2_ACTIVE ? 'On the testnet it recorded the whole sequence live on 2026-10-25: listing, a revision that un-lists, re-approval, explicit rebinding, relisting, revocation and restoration, each step with its receipt and its policy decision.' : 'Its testnet mode reads the recorded v1 release.'}</p><a className="link-arrow" href="#/app/catalog">Open the Catalog decision<ArrowRight size={14}/></a></article>
+        <p className="release-boundary"><strong>{V2_ACTIVE ? 'v2 deployed, listed and evaluated' : 'v1 deployed · v2 deployment pending'}</strong>{V2_ACTIVE ? 'Entry ownership and delisting fixes are deployed and verified on the V3 testnet. pUSD is listed on v2 on a separate project-controlled reviewer account’s approval, and the live lifecycle is recorded with receipts. Historical v1 receipts stay preserved. Expiry, a runtime change and a node outage remain local SIMULATED cases.' : 'Historical v1 reads remain available. New token-list writes are disabled until the corrected v2 deployment is verified and activated.'}</p>
       </div>
     </div>
     <p className="stats-note">The value experiment compares a scripted baseline with two packaged commands. It records repeatability and decision evidence; it does not establish human time savings or external adoption. <a className="text-link" href={`${REPO}/blob/main/docs/VALUE_EXPERIMENT.md`} target="_blank" rel="noreferrer">Read the experiment</a>.</p>

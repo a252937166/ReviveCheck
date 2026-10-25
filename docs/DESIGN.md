@@ -890,6 +890,6 @@ Hash matching means the content is unchanged. It does not authenticate the sourc
 
 Two fix rounds on the scored fix table: eight fixes and two regressions, all resolved. The detector reports 0 anti-patterns; the hero's masked grid is kept deliberately because the user's named reference (arcurrent.site) carries it.
 
-- Owner and reviewer are one isolated test account; the recorded run shows the mechanism, not independent review.
+- In the 2026-10-23 recorded run, owner and reviewer are one isolated test account; the 2026-10-25 v2 lifecycle uses a separate project-controlled reviewer account. Both show the mechanism, not independent review.
 - The EVM-wallet signing route for registry calls has no recorded end-to-end run; the studio run signed through the project test wallet.
 - The mobile section strip's left-edge fade (`.side-nav` mask with `at-start` / `at-end` classes) is a mask the review stills cannot confirm.

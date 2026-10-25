@@ -139,3 +139,24 @@ node scripts/attest-report.js --report <published report hash>        # remark e
 `--publish`, `--broadcast` and an explicit cost cap are required before anything is written or signed.
 
 The public RPC nodes were intermittently slow on 2026-10-23. Native WebSocket handshakes took 6 seconds to over 60 seconds, with Cloudflare 525 errors. A step that cannot reach a node is reported as a retry, never a result, and the header falls back to the explorer index for the finalized height.
+
+## 2026-10-25: the v2 lifecycle with a distinct owner and reviewer
+
+VerifiedTokenList v2 (`0xedaf8a25bb583ad164a94191b762414277198df9`, deployed at #177354) consumed a new release, `pusd-catalog-v2`, owned by the development account `5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt` (EVM `0x48b9e37a…6b9a6a71b`) and reviewed by a separate project-controlled account `5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ` (EVM `0x95db3001…02114065`), funded with 12 tPOT in extrinsic [`0x5319ce55…32fbac`](https://scanner-testnet-v3.portaldot.dev/#/extrinsics/0x5319ce555383c07e16243b4983a23b502ee952bfa4e73d3c0a7dc97a1b32fbac) (#187050). Two signers show role separation; both are controlled by the project, so this is still not independent review. Each step was evaluated by the Token Catalog policy right after it; the per-step captures and the recorded decisions are in `examples/token-catalog/data/testnet-v2/`, and the app shows them at `#/app/catalog`.
+
+| # | Step | Signer | Native extrinsic | Block | Policy after the step | Available |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | check-r1 | owner | [`0x2489bd65…a15b44`](https://scanner-testnet-v3.portaldot.dev/#/extrinsics/0x2489bd65a330e17e422ef6ff0ce87132a6ecdb0d20554bbbc04560654fa15b44) | #187058 | unbound: no-binding | no |
+| 2 | submit-r1 | owner | [`0x4d09c150…58e505`](https://scanner-testnet-v3.portaldot.dev/#/extrinsics/0x4d09c15021e03f1123819bac1715ee880b64a262aadecc1453af182b3358e505) | #187069 | recheck-required: approval-missing, consumer-not-listed | no |
+| 3 | approve-r1 | reviewer | [`0xf90702ef…fd4ceb`](https://scanner-testnet-v3.portaldot.dev/#/extrinsics/0xf90702ef780e0a832c7ec07ec1001e48200d3107fa7b598cc46e681736fd4ceb) | #187095 | recheck-required: consumer-not-listed | no |
+| 4 | wrong-decimals-refused | owner | none (dry-run) | read at #187113 | recheck-required: consumer-not-listed | no |
+| 5 | list-r1 | owner | [`0xc1af7571…34c3d1`](https://scanner-testnet-v3.portaldot.dev/#/extrinsics/0xc1af7571d02e3e2ed95e300ee019bcc37287bbf72b3b9b81ee6a2d807134c3d1) | #187124 | valid | **yes** |
+| 6 | recheck-r2 | owner | [`0x80d46a86…92feb3`](https://scanner-testnet-v3.portaldot.dev/#/extrinsics/0x80d46a8611bb486f3b71bdd6e9e15c96e522c536e2671c9f35d0a4496792feb3) | #187145 | valid | **yes** |
+| 7 | submit-r2 | owner | [`0xd4818dec…740eab`](https://scanner-testnet-v3.portaldot.dev/#/extrinsics/0xd4818dec55ef294fa4d643bf5897f64044923f9493aab560e2bc2cb160740eab) | #187165 | recheck-required: revision-superseded, approval-missing, consumer-not-listed | no |
+| 8 | approve-r2 | reviewer | [`0x5af17433…8b521a`](https://scanner-testnet-v3.portaldot.dev/#/extrinsics/0x5af1743333c313c4109005318f22343404d0ee7780df4f9557af12816a8b521a) | #187181 | recheck-required: revision-superseded, consumer-not-listed | no |
+| 9 | rebind-r2 | operator | none (operator binding) | read at #187194 | recheck-required: consumer-not-listed | no |
+| 10 | relist-r2 | owner | [`0x435979c0…0f7eb3`](https://scanner-testnet-v3.portaldot.dev/#/extrinsics/0x435979c0ff353ecd887e031490752671f9739f249d2344b9967d7292cb0f7eb3) | #187205 | valid | **yes** |
+| 11 | revoke-r2 | reviewer | [`0xa1b8688b…f56766`](https://scanner-testnet-v3.portaldot.dev/#/extrinsics/0xa1b8688bfbcf775aecef7289866eab710444eb9fed04d7c12f2034373cf56766) | #187230 | recheck-required: approval-revoked, consumer-not-listed | no |
+| 12 | reapprove-r2 | reviewer | [`0x6cee3f89…80b71a`](https://scanner-testnet-v3.portaldot.dev/#/extrinsics/0x6cee3f89def64b4e669242a518c14c6e1b1629cc012ddb522e90d1e29580b71a) | #187271 | valid | **yes** |
+
+Reports: `eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8` (revision 1, stored at #187058) and `1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51` (revision 2, stored at #187145), both in `public/reports/`. Step 4 is the contract refusing a listing that claims 18 decimals (`DecimalsMismatch` in the ReviveApi dry-run; nothing was signed). The off-chain counterpart, a catalog configuration that claims 18 decimals under the same approval, is withheld with `entry-mismatch:decimals` (`examples/token-catalog/config/testnet-v2-wrong-entry.json`).
