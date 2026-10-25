@@ -51,3 +51,7 @@ Release `20261025-e7044d1-public-r2` superseded r1 at 2026-10-25T11:38:11Z. It w
 | Rollback | `current` → `releases/20261025-8aee632-public-r1` by the same symlink replacement; r1 and r3 are retained |
 
 Receipts: `deployment-20261025-8aee632-public-r1.json` and `deployment-20261025-e7044d1-public-r2.json` with their manifests, under `/var/www/revivecheck/ops/` on the server and in the author's local release bundle.
+
+## Hosting metadata, separated
+
+From this record on, which build the site serves is stated by a hosting manifest (`/hosting.json`, schema `revivecheck.hosting-manifest.v1`) that the publishing procedure in `docs/DEPLOYMENT.md` writes after the build and places beside the served files. `public/release-status.json` no longer names a site release or publication time: it describes the published evidence records at its own commit. The releases above predate the manifest; their provenance is this document and the receipts under `ops/`.

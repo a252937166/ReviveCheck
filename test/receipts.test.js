@@ -54,18 +54,87 @@ test('changing the token, network, reviewer, report or revision invalidates curr
 test('finalized inclusion without a successful matching readback never shows Listed', () => {
   const saved = receipt();
   assert.equal(describeListReceipt(saved, context).listed, null);
-  assert.equal(describeListReceipt({ ...saved, readback: { listed: true, interfacesAgree: false } }, context).listed, false);
-  assert.equal(describeListReceipt({ ...saved, readback: { listed: false, interfacesAgree: true } }, context).listed, false);
-  assert.equal(describeListReceipt({ ...saved, readback: { listed: true, interfacesAgree: true } }, context).listed, true);
+  assert.equal(describeListReceipt({ ...saved, readback: { ...matchingReadback(), interfacesAgree: false } }, context).listed, false);
+  assert.equal(describeListReceipt({ ...saved, readback: { ...matchingReadback(), listed: false, entry: null } }, context).listed, false);
+  assert.equal(describeListReceipt({ ...saved, readback: { listed: true, interfacesAgree: true } }, context).listed, false, 'a readback that does not say what it read vouches for nothing');
+  assert.equal(describeListReceipt({ ...saved, readback: matchingReadback() }, context).listed, true);
   assert.equal(describeListReceipt({ ...saved, tx: { ...tx, success: false } }, context).completion, 'failed');
 });
 
 test('a saved session keeps the distinctions after a reload, and a later revision changes eligibility without rewriting the receipt', () => {
-  const saved = JSON.parse(JSON.stringify({ ...receipt(), readback: { listed: true, interfacesAgree: true, block: { number: '190001' } } }));
-  assert.deepEqual(describeListReceipt(saved, context), { kind: 'current', completion: 'finalized', listed: true, reasons: [] });
+  const saved = JSON.parse(JSON.stringify({ ...receipt(), readback: matchingReadback() }));
+  const described = describeListReceipt(saved, context);
+  assert.deepEqual({ kind: described.kind, completion: described.completion, listed: described.listed, reasons: described.reasons }, { kind: 'current', completion: 'finalized', listed: true, reasons: [] });
   const later = describeListReceipt(saved, { ...context, release: { reportHash: `0x${REPORT2}`, revision: '2' } });
   assert.equal(later.kind, 'historical');
   assert.equal(saved.readback.listed, true, 'the receipt itself is unchanged; only its relation to the current revision changed');
   assert.equal(describeReviewReceipt({ releaseId: RELEASE, reportHash: `0x${REPORT}`, revision: '1', tx }, { releaseId: RELEASE, release: { reportHash: `0x${REPORT2}`, revision: '2' } }).kind, 'historical');
   assert.equal(describeReviewReceipt({ releaseId: RELEASE, reportHash: `0x${REPORT}`, revision: '1', tx }, { releaseId: RELEASE, release: { reportHash: `0x${REPORT}`, revision: '1' } }).kind, 'current');
+});
+
+// Assessment 2026-10-25, O-01: the attached readback must describe this exact operation.
+// A readback of another consumer, token, release, report or reviewer, an unidentified
+// readback, one taken before the transaction's block, or one attached to a failed
+// transaction never completes the selected operation as Listed.
+import { matchReadback } from '../src/receipts.js';
+const V2_IDENTITY = { address: V2.address, interfacesAgree: true, version: 2, versionSource: 'on-chain-version-getter', evm: { version: '2' }, native: { version: '2' } };
+const matchingReadback = () => ({ token: TOKEN, list: V2.address, listed: true, interfacesAgree: true, block: { number: '190003', nativeHash: `0x${'33'.repeat(32)}`, evmHash: `0x${'44'.repeat(32)}` }, entry: { releaseId: RELEASE, reportHash: `0x${REPORT}`, reviewer: OWNER }, identity: V2_IDENTITY, observedAt: '2026-10-25T12:00:00.000Z' });
+
+test('a fully matching successful readback completes the operation as Listed', () => {
+  const described = describeListReceipt({ ...receipt(), readback: matchingReadback() }, context);
+  assert.deepEqual({ kind: described.kind, completion: described.completion, listed: described.listed }, { kind: 'current', completion: 'finalized', listed: true });
+  assert.equal(described.readback.matched, true);
+  assert.deepEqual(described.readback.reasons, []);
+});
+
+test('a readback of another operation never completes this one, and says why', () => {
+  const cases = {
+    'another consumer': (readback) => ({ ...readback, list: V1.address, identity: { ...V2_IDENTITY, address: V1.address } }),
+    'another consumer version': (readback) => ({ ...readback, identity: { ...V2_IDENTITY, version: 1 } }),
+    'another token': (readback) => ({ ...readback, token: `0x${'ee'.repeat(20)}` }),
+    'another release': (readback) => ({ ...readback, entry: { ...readback.entry, releaseId: `0x${'ff'.repeat(32)}` } }),
+    'another report': (readback) => ({ ...readback, entry: { ...readback.entry, reportHash: `0x${REPORT2}` } }),
+    'another reviewer': (readback) => ({ ...readback, entry: { ...readback.entry, reviewer: `0x${'ab'.repeat(20)}` } }),
+    'an older checkpoint': (readback) => ({ ...readback, block: { ...readback.block, number: '189999' } }),
+    'no identity': (readback) => ({ ...readback, identity: { error: 'not read' } }),
+    'no entry': (readback) => ({ ...readback, entry: null }),
+    'no block': (readback) => ({ ...readback, block: null }),
+    'absent provenance': () => ({ listed: true, interfacesAgree: true }),
+    'disagreeing interfaces': (readback) => ({ ...readback, interfacesAgree: false }),
+  };
+  for (const [what, mutate] of Object.entries(cases)) {
+    const described = describeListReceipt({ ...receipt(), readback: mutate(matchingReadback()) }, context);
+    assert.equal(described.listed, false, what);
+    assert.equal(described.readback.matched, false, what);
+    assert.ok(described.readback.reasons.length > 0, what);
+    assert.equal(described.completion, 'finalized', `${what}: the transaction itself stays a finalized fact`);
+  }
+  const elsewhere = describeListReceipt({ ...receipt(), readback: matchingReadback() }, { ...context, network: NETWORKS.live });
+  assert.equal(elsewhere.kind, 'historical', 'a receipt signed on another network is history even with a matching readback');
+});
+
+test('a failed transaction is never Listed, whatever readback is attached', () => {
+  const described = describeListReceipt({ ...receipt(), tx: { ...tx, success: false }, readback: matchingReadback() }, context);
+  assert.equal(described.completion, 'failed');
+  assert.equal(described.listed, false);
+  assert.equal(describeReviewReceipt({ releaseId: RELEASE, reportHash: `0x${REPORT}`, revision: '1', tx: { ...tx, success: false } }, { releaseId: RELEASE }).completion, 'failed');
+});
+
+test('the assessment reproduction (a readback naming another operation and an older block, then a failed transaction) no longer reads as listed', () => {
+  const address = (value) => `0x${value.repeat(40)}`, hash = (value) => `0x${value.repeat(64)}`;
+  const network = { key: 'testnet', chainId: 420420777, genesisHash: hash('a') };
+  const consumer = { address: address('b'), version: 2 };
+  const synthetic = listReceipt({ network, consumer, token: address('c'), decimals: 6, releaseId: hash('d'), reportHash: hash('e'), revision: 2, reviewer: address('f'), from: 'synthetic', sender: address('1'), tx: { success: true, blockNumber: 100 } });
+  synthetic.readback = { listed: true, interfacesAgree: true, address: address('2'), version: '1', token: address('3'), entry: { releaseId: hash('4'), reportHash: hash('5'), reviewer: address('6'), decimals: 18 }, block: { number: 99 } };
+  const synthContext = { network, consumer, token: address('c'), releaseId: hash('d'), reviewer: address('f'), release: { reportHash: hash('e'), revision: 2 } };
+  const mismatched = describeListReceipt(synthetic, synthContext);
+  assert.equal(mismatched.kind, 'current');
+  assert.equal(mismatched.listed, false);
+  assert.ok(mismatched.readback.reasons.some((reason) => /another token/.test(reason)));
+  assert.ok(mismatched.readback.reasons.some((reason) => /before the transaction/.test(reason)));
+  synthetic.tx.success = false;
+  const failed = describeListReceipt(synthetic, synthContext);
+  assert.equal(failed.completion, 'failed');
+  assert.equal(failed.listed, false);
+  assert.equal(matchReadback(synthetic).matched, false);
 });

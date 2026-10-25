@@ -1,7 +1,7 @@
 {
   "schema": "revivecheck.release-status.v2",
-  "checkedAt": "2026-10-25T11:36:37.826Z",
-  "commit": "1af6ae81bfeb315d61ba83412f68589440886cd7",
+  "checkedAt": "2026-10-25T13:37:38.085Z",
+  "commit": "455cc60692980d1297285c496634e03dd4d9c3e2",
   "status": "ok",
   "network": {
     "key": "testnet",
@@ -331,14 +331,20 @@
   ],
   "publication": {
     "site": "https://revivecheck.axiqo.xyz/",
-    "siteRelease": "20261025-8aee632-public-r1",
-    "siteSourceCommit": "8aee632f9eff67211e482605527a043d89aa6b8a",
-    "sitePublishedAt": "2026-10-25T11:27:50Z",
-    "siteRecord": "docs/PUBLICATION_2026-10-25.md",
+    "hostingManifest": "https://revivecheck.axiqo.xyz/hosting.json",
+    "hostingProcedure": "docs/DEPLOYMENT.md",
+    "publicationRecords": [
+      "docs/PUBLICATION_2026-10-24.md",
+      "docs/PUBLICATION_2026-10-25.md"
+    ],
     "sourceRepository": "https://github.com/a252937166/ReviveCheck",
     "sourceBranch": "main",
     "build": "https://dorahacks.io/build/50176",
     "buildDescribes": "the 2026-10-24 release; not yet updated",
+    "consumerExample": {
+      "repository": "revivecheck-consumer-example (separate repository; published state is recorded in its README)",
+      "interface": "Token eligibility demo (browser) and a command line; author-built, portability not adoption"
+    },
     "video": "https://www.youtube.com/watch?v=CvpzlQfya4U",
     "videoRecordedAgainst": "2026-10-24 release (v0.3): the v2 deployment and the simulated catalog lifecycle; it predates the live v2 lifecycle recorded on 2026-10-25",
     "deck": "docs/FINAL_DECK.md",
@@ -356,7 +362,11 @@
     },
     {
       "item": "Video and DoraHacks build",
-      "why": "The site was republished from commit 8aee632 on 2026-10-25 (release 20261025-8aee632-public-r1, docs/PUBLICATION_2026-10-25.md); the video, recorded on 2026-10-24, and the DoraHacks build description still describe the 2026-10-24 release."
+      "why": "The video, recorded on 2026-10-24, and the DoraHacks build description still describe the 2026-10-24 release; the hosted build is identified by hosting.json on the site, not by this record."
+    },
+    {
+      "item": "Evidence renewal",
+      "why": "The bound report 1faef921a720… is acceptable under the seven-day policy until 2026-11-01T09:29:17.646Z; docs/RENEWAL.md is the runbook. No renewal transaction has been sent."
     }
   ]
 }

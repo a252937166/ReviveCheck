@@ -20,3 +20,4 @@ scratchpad/
 .impeccable/review/
 .impeccable/build/
 .impeccable/hook.cache.json
+.playwright-cli/

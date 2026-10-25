@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1920">
+<title>ReviveCheck final deck</title>
+<style>
+  @page { size: 1920px 1080px; margin: 0; }
+
+  :root {
+    --ink: #0b0c0f;
+    --secondary: #3b3f48;
+    --line: #e6e8ec;
+    --accent: #4353ff;
+    --paper: #ffffff;
+    --ground: #fafafb;
+    --sans: Inter, 'Helvetica Neue', Arial, sans-serif;
+    --mono: 'SF Mono', Menlo, Consolas, monospace;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .slide {
+    position: relative;
+    box-sizing: border-box;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    padding: 96px 112px 0;
+    background: var(--paper);
+    page-break-after: always;
+    break-after: page;
+  }
+  .slide:last-of-type { page-break-after: auto; break-after: auto; }
+
+  h1 {
+    margin: 0 0 36px;
+    font-size: 64px;
+    line-height: 1.1;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .title { padding-top: 272px; }
+  .title h1 { font-size: 72px; margin-bottom: 20px; }
+  .sub {
+    margin: 0 0 44px;
+    font-size: 40px;
+    line-height: 1.3;
+    font-weight: 500;
+    color: var(--secondary);
+  }
+
+  .lines p {
+    margin: 0 0 22px;
+    max-width: 1560px;
+    font-size: 32px;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  .lines p:last-child { margin-bottom: 0; }
+
+  .lead {
+    margin: 0 0 28px;
+    max-width: 1640px;
+    font-size: 30px;
+    line-height: 1.4;
+    color: var(--secondary);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 28px;
+    line-height: 1.35;
+  }
+  th {
+    text-align: left;
+    vertical-align: bottom;
+    padding: 0 24px 14px 0;
+    font-weight: 600;
+    color: var(--secondary);
+    border-bottom: 2px solid var(--line);
+  }
+  td {
+    vertical-align: top;
+    padding: 16px 24px 16px 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+  }
+  th:last-child, td:last-child { padding-right: 0; }
+  .num { color: var(--secondary); }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.92em;
+    color: inherit;
+  }
+  .accent { color: var(--accent); font-weight: 600; }
+
+  footer {
+    position: absolute;
+    left: 112px;
+    right: 112px;
+    bottom: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    font-size: 22px;
+    line-height: 1.2;
+    color: var(--secondary);
+  }
+
+  @media screen {
+    body { background: var(--line); }
+    .slide { margin: 24px auto; }
+  }
+  @media print {
+    body { background: var(--paper); }
+    .slide { margin: 0; }
+  }
+</style>
+</head>
+<body>
+
+<section class="slide title">
+  <h1>ReviveCheck</h1>
+  <p class="sub">Release attestation middleware for Portaldot V3.</p>
+  <div class="lines">
+    <p>Approvals that contracts enforce: a release owner commits a sealed report's hash to the ReleaseRegistry, reviewers approve that exact hash, and any V3 contract reads it through the ReviveCheckGuard library.</p>
+    <p>Evidence on-chain: the sealed report itself is stored through the native Remark module and retrieved from any node by its hashes.</p>
+    <p>A decision a maintainer can inspect: a policy evaluation against fresh finalized reads, with every check, reason and next action.</p>
+    <p>Portaldot Hacker House 2026, track Modular Cloud and Middleware. Deployed and recorded on the V3 testnet.</p>
+  </div>
+  <footer>ReviveCheck · Portaldot Hacker House 2026 · slide 1 of 12</footer>
+</section>
+
+<section class="slide">
+  <h1>The maintainer's problem</h1>
+  <div class="lines">
+    <p>A Portaldot wallet or DEX token-list maintainer publishes entries that wallets and DEX allow-lists read.</p>
+    <p>Where the approval lives today: a JSON token list, a spreadsheet or a chat thread. No contract can read it.</p>
+    <p>What was approved: "the release", with no record of what the reviewer saw.</p>
+    <p>The evidence: a screenshot, or a link whose content can change.</p>
+    <p>Checking the chain: someone opens an explorer and reads one interface.</p>
+    <p>Nothing tells them when it stopped holding.</p>
+  </div>
+  <footer>ReviveCheck · Portaldot Hacker House 2026 · slide 2 of 12</footer>
+</section>
+
+<section class="slide">
+  <h1>The promise</h1>
+  <div class="lines">
+    <p>Publish entries supported by the exact approved evidence.</p>
+    <p>Understand why an entry is no longer eligible.</p>
+    <p>Restore eligibility through a new review and explicit binding.</p>
+    <p>A policy states what a business action needs beyond the contract's answer: the right network and genesis, the subject, the plan fingerprint, supported runtimes, evidence age, an explicit trusted reviewer set, the consumer's listing and the stored report, each checked against fresh finalized reads.</p>
+    <p>The evaluation returns <code>valid</code>, <code>recheck-required</code>, <code>expired</code> or <code>unknown</code>. <span class="accent">Only valid enables</span>; an unavailable read is <code>unknown</code>, never a pass.</p>
+    <p>A new report needs a new approval and an explicit rebinding; history is kept.</p>
+  </div>
+  <footer>ReviveCheck · Portaldot Hacker House 2026 · slide 3 of 12</footer>
+</section>
+
+<section class="slide">
+  <h1>Refusal</h1>
+  <p class="lead">Release v1.0.0 copies the Ethereum default of 18 decimals; the chain reports 6 through both interfaces. Three places refuse it.</p>
+  <table>
+    <colgroup><col style="width:330px"><col style="width:880px"><col style="width:486px"></colgroup>
+    <thead><tr><th>Where</th><th>Refusal</th><th>Record</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Live check, both interfaces</td>
+        <td><code>token.listing</code> failed: <code>decimals: listed 18, chain 6</code>. Remediation: publish a release whose entry uses the chain's decimals (6), then recheck.</td>
+        <td>Report <code>7f01ed85…</code>, testnet #163478</td>
+      </tr>
+      <tr>
+        <td>Catalog, under a valid approval</td>
+        <td>A configuration that claims 18 decimals is withheld: <code>entry-mismatch:decimals</code> (configured 18, approved 6). The policy evaluation itself is <code>valid</code>.</td>
+        <td><code>public/catalog/testnet-v2-wrong-entry</code>, on the inputs captured at lifecycle step 10 and in CI</td>
+      </tr>
+      <tr>
+        <td>Contract, dry-run</td>
+        <td><code>list</code> with 18 decimals reverts with <code>DecimalsMismatch</code> in the ReviveApi dry-run; nothing was signed.</td>
+        <td>Lifecycle step 4, owner, no transaction</td>
+      </tr>
+    </tbody>
+  </table>
+  <footer>ReviveCheck · Portaldot Hacker House 2026 · slide 4 of 12</footer>
+</section>
+
+<section class="slide">
+  <h1>Correction, review, listing</h1>
+  <p class="lead">Steps 1 to 5 of the run recorded on 2026-10-25: release <code>pusd-catalog-v2</code> on VerifiedTokenList v2. Step 4 is the dry-run refusal on the previous slide.</p>
+  <table>
+    <colgroup><col style="width:70px"><col style="width:560px"><col style="width:130px"><col style="width:220px"><col style="width:140px"><col style="width:426px"><col style="width:150px"></colgroup>
+    <thead><tr><th>Step</th><th>Action</th><th>Signer</th><th>Extrinsic</th><th>Block</th><th>Policy after the step</th><th>Entry</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>check pUSD v1.0.1 live, publish report <code>eb960cc7…</code>, store it on-chain</td><td>owner</td><td><code>0x2489bd65…</code></td><td>#187058</td><td>unbound</td><td>withheld</td></tr>
+      <tr><td class="num">2</td><td>submit it as revision 1 of <code>pusd-catalog-v2</code>; the operator binds it</td><td>owner</td><td><code>0x4d09c150…</code></td><td>#187069</td><td>recheck-required: approval missing, not listed</td><td>withheld</td></tr>
+      <tr><td class="num">3</td><td>approve revision 1</td><td>reviewer</td><td><code>0xf90702ef…</code></td><td>#187095</td><td>recheck-required: not listed</td><td>withheld</td></tr>
+      <tr><td class="num">5</td><td>list pUSD on v2, 6 decimals</td><td>owner</td><td><code>0xc1af7571…</code></td><td>#187124</td><td>valid</td><td><span class="accent">available</span></td></tr>
+    </tbody>
+  </table>
+  <footer>ReviveCheck · Portaldot Hacker House 2026 · slide 5 of 12</footer>
+</section>
+
+<section class="slide">
+  <h1>Invalidation</h1>
+  <p class="lead">Steps 6 to 8. A new submission opens a new revision and clears every decision, so nothing carries over silently. The approval alone does not move the binding.</p>
+  <table>
+    <colgroup><col style="width:70px"><col style="width:560px"><col style="width:130px"><col style="width:220px"><col style="width:140px"><col style="width:426px"><col style="width:150px"></colgroup>
+    <thead><tr><th>Step</th><th>Action</th><th>Signer</th><th>Extrinsic</th><th>Block</th><th>Policy after the step</th><th>Entry</th></tr></thead>
+    <tbody>
+      <tr><td class="num">6</td><td>recheck live, publish report <code>1faef921…</code>, store it on-chain</td><td>owner</td><td><code>0x80d46a86…</code></td><td>#187145</td><td>valid</td><td>available</td></tr>
+      <tr><td class="num">7</td><td>submit it as revision 2: the approval clears and v2 stops listing pUSD</td><td>owner</td><td><code>0xd4818dec…</code></td><td>#187165</td><td>recheck-required: revision superseded, approval missing, not listed</td><td>withheld</td></tr>
+      <tr><td class="num">8</td><td>approve revision 2; the catalog still holds the revision-1 binding, so this changes nothing for the old binding</td><td>reviewer</td><td><code>0x5af17433…</code></td><td>#187181</td><td>recheck-required: revision superseded, not listed</td><td>withheld</td></tr>
+    </tbody>
+  </table>
+  <footer>ReviveCheck · Portaldot Hacker House 2026 · slide 6 of 12</footer>
+</section>
+
+<section class="slide">
+  <h1>Recovery and revocation</h1>
+  <p class="lead">Steps 9 to 12. Every step with its receipt and its policy decision.</p>
+  <table>
+    <colgroup><col style="width:70px"><col style="width:560px"><col style="width:130px"><col style="width:220px"><col style="width:140px"><col style="width:426px"><col style="width:150px"></colgroup>
+    <thead><tr><th>Step</th><th>Action</th><th>Signer</th><th>Extrinsic</th><th>Block</th><th>Policy after the step</th><th>Entry</th></tr></thead>
+    <tbody>
+      <tr><td class="num">9</td><td>bind the revision-2 report explicitly</td><td>operator</td><td>none (operator binding)</td><td>no transaction</td><td>recheck-required: not listed</td><td>withheld</td></tr>
+      <tr><td class="num">10</td><td>list pUSD again on revision 2</td><td>owner</td><td><code>0x435979c0…</code></td><td>#187205</td><td>valid</td><td>available</td></tr>
+      <tr><td class="num">11</td><td>request changes on revision 2: the contract un-lists pUSD</td><td>reviewer</td><td><code>0xa1b8688b…</code></td><td>#187230</td><td>recheck-required: approval revoked, not listed</td><td>withheld</td></tr>
+      <tr><td class="num">12</td><td>approve revision 2 again</td><td>reviewer</td><td><code>0x6cee3f89…</code></td><td>#187271</td><td>valid</td><td><span class="accent">available</span></td></tr>
+    </tbody>
+  </table>
+  <footer>ReviveCheck · Portaldot Hacker House 2026 · slide 7 of 12</footer>
+</section>
+
+<section class="slide">
+  <h1>The decision screen</h1>
+  <div class="lines">
+    <p>The Catalog decision page, <code>#/app/catalog</code>: the published entry against the approved report, the on-chain approval, the listing, the policy verdict with its reasons, evidence age against the policy clock, the checkpoints, the next action and the binding history.</p>
+    <p>Three facts are kept apart: the on-chain approval (the registry's decision), the recorded execution (finalized receipts, each linked to its block) and the current policy eligibility (an evaluation at a checkpoint and time).</p>
+    <p><span class="accent">Evaluate now</span> runs the same evaluator the CLI and the Token Catalog use, in the browser, against the current finalized block. No wallet; nothing is signed.</p>
+    <p>Recorded evaluation <code>9dfc49fa…</code> at #187279: <code>valid</code>, 35 checks; the published entry equals the approved report <code>1faef921…</code> field by field.</p>
+    <p>Validity is point-in-time: evaluate again before each use.</p>
+  </div>
+  <footer>ReviveCheck · Portaldot Hacker House 2026 · slide 8 of 12</footer>
+</section>
+
+<section class="slide">
+  <h1>Portaldot modules</h1>
+  <p class="lead">Two views of one runtime: the same contract is reached as an EVM transaction or a native <code>revive.call</code>, and read back through both <code>eth_call</code> and <code>ReviveApi.call</code>.</p>
+  <table>
+    <colgroup><col style="width:380px"><col style="width:1316px"></colgroup>
+    <thead><tr><th>Module</th><th>What it does here</th></tr></thead>
+    <tbody>
+      <tr><td>Revive</td><td>Runs the contracts: ReleaseRegistry <code>0xe949b200edf070b9d425b206ed24dc8fe5b7d339</code> (#162962) and VerifiedTokenList v2 <code>0xedaf8a25bb583ad164a94191b762414277198df9</code> (#177354).</td></tr>
+      <tr><td>ReviveApi</td><td>Maps accounts (<code>account_id</code> and <code>address</code> must round-trip) and finalized blocks (<code>ethBlockHash</code>), so every read is checked through both interfaces at one finalized height.</td></tr>
+      <tr><td>Assets and its ERC-20 precompile</td><td>Two views of the token: asset 7777 (pUSD) at <code>0x00001E6100000000000000000000000000010000</code>. Native Assets storage is compared with the precompile's supply, holder balance and decimals at one checkpoint; the address adapter is scoped to the observed spec 3002.</td></tr>
+      <tr><td>Remark</td><td><code>remark.store</code> keeps the report bytes in the block; <code>Remark.Stored</code> carries the publisher and the blake2-256 of the bytes; retrieval recomputes the SHA-256. Reports stored at #164266, #164335, #187058 and #187145, about 0.75 tPOT each.</td></tr>
+    </tbody>
+  </table>
+  <footer>ReviveCheck · Portaldot Hacker House 2026 · slide 9 of 12</footer>
+</section>
+
+<section class="slide">
+  <h1>Reuse</h1>
+  <div class="lines">
+    <p>One implementation, <code>lib/service.js</code>, behind the browser, the MCP server, REST, the JavaScript module and the CLI: thirteen read-only tools. Writes are dry-run, then signed in the user's own wallet.</p>
+    <p>The package declares fourteen <code>exports</code> specifiers (<code>.</code>, <code>./policy</code>, <code>./service</code>, <code>./report</code> and ten more), a <code>files</code> whitelist and two <code>bin</code> commands, <code>revivecheck</code> and <code>revivecheck-mcp</code>.</p>
+    <p>A packed artifact, <code>revivecheck-0.3.0.tgz</code> (SHA-256 <code>472a85e3…</code>, 38 files), produced with <code>npm pack</code> from commit <code>8aee632f…</code>; a second consumer installs it from the tarball with <code>npm ci</code>.</p>
+    <p>That consumer is a DEX allow-list in a separate repository with its own policy (hash <code>795942d6…</code>), six offline scenarios, 10 passing tests and a CI workflow that has not yet run; its one live run on 2026-10-25 allowed pUSD: <code>valid</code>, 35 of 35 checks, finalized block #187437. The repository is local and unpublished.</p>
+    <p>Author-run: <span class="accent">portability, not adoption</span>. No builder outside the project has installed or configured ReviveCheck; an external builder running it is the next gate.</p>
+  </div>
+  <footer>ReviveCheck · Portaldot Hacker House 2026 · slide 10 of 12</footer>
+</section>
+
+<section class="slide">
+  <h1>Measured value</h1>
+  <p class="lead">Equivalent checks both ways at identical captured checkpoints, reported as measured: no speed difference is established. The maintainer pilot, <code>docs/PILOT_PROTOCOL.md</code>, is <span class="accent">defined and not yet run</span>.</p>
+  <table>
+    <colgroup><col style="width:400px"><col style="width:560px"><col style="width:736px"></colgroup>
+    <thead><tr><th>Measure</th><th>Baseline script over raw reads</th><th>ReviveCheck</th></tr></thead>
+    <tbody>
+      <tr><td>Decisions: 5 scenarios on captured inputs, 3 live</td><td>8 of 8 as predefined; 0 false enables, 0 false refusals</td><td>8 of 8 as predefined; 0 false enables, 0 false refusals; the arms agreed in every scenario</td></tr>
+      <tr><td>Live repeat decision, two pairs</td><td>19.1 s and 17.1 s; 99 % of wall time waiting for the public nodes</td><td>17.3 s (faster) and 24.0 s (slower: more round trips, every value read through both interfaces)</td></tr>
+      <tr><td>Set-up, once; human time not measured</td><td>a 217-line script: 19 constants and 10 facts about the chain and the contracts</td><td><code>npm ci</code> 4.9 s warm or 14.4 s empty cache; 25 policy fields, 17 catalog fields, one binding per revision</td></tr>
+      <tr><td>Second reader, from the artifact alone</td><td>5 of 6 required items, no next action; 0 of 4 extras</td><td>6 of 6 required items; 4 of 4 extras: integrity hash, trust basis, policy identity, role control</td></tr>
+    </tbody>
+  </table>
+  <footer>ReviveCheck · Portaldot Hacker House 2026 · slide 11 of 12</footer>
+</section>
+
+<section class="slide">
+  <h1>Status and boundaries</h1>
+  <div class="lines">
+    <p>Established: records intact, deployed, listed, evaluated, lifecycle complete. Not established: independently adopted.</p>
+    <p>Two project-controlled signers: owner <code>5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt</code> and reviewer <code>5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ</code>. Role separation on-chain; both accounts belong to the project.</p>
+    <p>Expiry, runtime change and node outage: simulated locally, not recorded on the testnet.</p>
+    <p>Portaldot V3 testnet, chain 420420777, runtime <code>portaldot-v3/3002</code>; last checkpoint #187279; 12 live steps with 10 finalized receipts.</p>
+    <p>Site https://revivecheck.axiqo.xyz/ · source https://github.com/a252937166/ReviveCheck · explorer https://scanner-testnet-v3.portaldot.dev/ · status record: public/release-status.json</p>
+    <p>Source commit <code class="accent">{{SOURCE_COMMIT}}</code>, rendered after <code>node scripts/release-status.js</code> reported <code>ok</code> on it.</p>
+  </div>
+  <footer>ReviveCheck · Portaldot Hacker House 2026 · slide 12 of 12</footer>
+</section>
+
+</body>
+</html>

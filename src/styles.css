@@ -703,9 +703,21 @@ a.network-pill:hover { border-color: var(--line-strong); color: var(--ink); }
 }
 
 /* Catalog decision: the verdict first, then three facts kept apart. */
-.decision-card { border-left: 4px solid var(--hold); }
-.decision-card.available { border-left-color: var(--pass); }
-.decision-card.withheld { border-left-color: var(--fail); }
+.decision-card { border: 1px solid var(--line-strong); }
+.decision-card.available { border-color: color-mix(in srgb, var(--pass) 45%, var(--line)); background: color-mix(in srgb, var(--pass) 4%, var(--bg)); }
+.decision-card.withheld { border-color: color-mix(in srgb, var(--fail) 40%, var(--line)); background: color-mix(in srgb, var(--fail) 3%, var(--bg)); }
+.decision-card.checking { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+.decision-detail { margin: 0 0 .75rem; color: var(--ink-2); max-width: 72ch; }
+.current-result { border-top: 1px solid var(--line); padding-top: .4rem; margin-bottom: .5rem; }
+.reason-list .observed { color: var(--ink-3); font-style: normal; }
+.reason-list .recovery { color: var(--ink-3); margin-top: .15rem; }
+.history-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 1rem; padding-top: .9rem; border-top: 1px solid var(--line); }
+.history-block h3 { font-size: .8125rem; font-weight: 600; color: var(--ink-3); margin: 0 0 .35rem; text-transform: none; letter-spacing: 0; }
+.history-block p { margin: 0; font-size: .875rem; }
+.history-block small.block, .reason-list small.block { font-size: .8125rem; margin-top: .2rem; }
+.age-fill.late { background: var(--hold); }
+.renewal-table th[scope='row'] { white-space: nowrap; }
+@media (max-width: 720px) { .history-grid { grid-template-columns: 1fr; } }
 .decision-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; align-items: flex-start; margin-bottom: .75rem; }
 .decision-verdict { font-size: 2.1rem; font-weight: 600; letter-spacing: -.02em; line-height: 1.1; margin: 0; }
 .decision-sub { color: var(--ink-3); margin: .3rem 0 0; font-size: .9rem; }

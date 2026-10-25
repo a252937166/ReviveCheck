@@ -1,0 +1,43 @@
+{
+  "observedAt": "2026-10-25T12:48:03.027Z",
+  "scope": "Offline synthetic helper inputs, extracted form functions and installed MCP resources; no chain tools or transactions.",
+  "sourceHashes": {
+    "src/receipts.js": "65970d6b749fc46117d30422343b023f884aedc42c1f5117ac6b7efb42053e2d",
+    "src/PlanEditor.jsx": "8b3f6c7f664dcf123f7a5a28f8e752172fa6b9b3a62fd28d1a81b36aa9baa365",
+    "src/Catalog.jsx": "40973bb0624286c44dadeea72b23cd232ae1102d030598b8ff7b381f80bef285",
+    "mcp/server.js": "3d296c411a982318e5561798f9aea2c929a1d7bf235bb7e70d37c6c9043c6ad8",
+    "package.json": "4a09ad1f9f1c70a4520764ce479e8790ab91e82d80d48e1975651f264e27a0be"
+  },
+  "receipt": {
+    "mismatchedReadback": {
+      "kind": "current",
+      "completion": "finalized",
+      "listed": true,
+      "reasons": []
+    },
+    "failedTransaction": {
+      "kind": "current",
+      "completion": "failed",
+      "listed": true,
+      "reasons": []
+    }
+  },
+  "plan": {
+    "formHasListing": true,
+    "serializedHasListing": false
+  },
+  "installedMcpResources": [
+    {
+      "uri": "revivecheck://lifecycle/reference",
+      "readable": false,
+      "code": -32603,
+      "missingFile": true
+    },
+    {
+      "uri": "revivecheck://registry",
+      "readable": false,
+      "code": -32603,
+      "missingFile": true
+    }
+  ]
+}

@@ -1,28 +1,9 @@
 import React from 'react';
 import {Plus,Trash2,Check,LoaderCircle,Code2,ChevronDown,Radio,FlaskConical,Activity,Download} from 'lucide-react';
 import {downloadJson} from '../lib/share.js';
+import {defaults,makeForm,serializePlan} from './plan-form.js';
+export {defaults,makeForm,serializePlan};
 
-const firstAssertion={id:'value',label:'Stored value',signature:'value()',returns:'uint256',args:[],expected:'42'};
-export const defaults={name:'',release:'v0.1.0',profile:'contract',logicalContractId:'',sourceRevision:'',account:'',contractAddress:'',expectedValue:'42',expectedChainId:420420777,transactionHash:'',transactionBlockHash:'',assertions:[firstAssertion],nativeAsset:{assetId:'7777',holder:''}};
-export function makeForm(project={}) {
-  const plan={...defaults,...project,nativeAsset:{...defaults.nativeAsset,...project.nativeAsset}};
-  const assertions=Array.isArray(project.assertions)?project.assertions:plan.profile==='native-asset'?[]:[{...firstAssertion,expected:project.expectedValue??'42'}];
-  return {...plan,assertions:assertions.map(item=>({...item,argsText:JSON.stringify(item.args||[]),expectedText:String(item.expected??'')}))};
-}
-export function serializePlan(form) {
-  const plan=Object.fromEntries(Object.keys(defaults).map(key=>[key,form[key]??defaults[key]]));
-  plan.expectedChainId=Number(plan.expectedChainId);
-  plan.assertions=(form.profile==='native-asset'?[]:form.assertions).map(item=>{
-    let args;try{args=JSON.parse(item.argsText??JSON.stringify(item.args||[]));}catch{throw new Error(`Arguments for “${item.label||item.signature}” must be a JSON array.`);}
-    if(!Array.isArray(args)||args.some(arg=>arg!==null&&!['string','number','boolean'].includes(typeof arg)))throw new Error('Function arguments must be a JSON array of primitive values.');
-    if(args.some(arg=>typeof arg==='number'&&!Number.isSafeInteger(arg)))throw new Error('Put large integer arguments in quotes to preserve precision.');
-    let expected=item.expectedText??String(item.expected??'');
-    if(item.returns==='bool'){if(!['true','false'].includes(expected))throw new Error('Boolean expectations must be true or false.');expected=expected==='true';}
-    return {id:item.id,label:item.label,signature:item.signature,returns:item.returns,args,expected};
-  });
-  plan.nativeAsset=plan.profile==='native-asset'?{assetId:String(form.nativeAsset?.assetId||'').trim(),holder:String(form.nativeAsset?.holder||'').trim()}:null;
-  return plan;
-}
 
 export default function PlanEditor({form,setForm,dirty,busy,archived,onSave,onRun,onError,sample,setSample,scenario,setScenario}) {
   const edit=(key,value)=>setForm(current=>({...current,[key]:value}));

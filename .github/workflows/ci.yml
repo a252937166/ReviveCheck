@@ -25,3 +25,23 @@ jobs:
       - run: npx vite build
       - name: Feed and lifecycle records parse
         run: node -e "for (const f of ['public/api/registry.json','public/lifecycle/registry.json','public/lifecycle/token-list.json','public/lifecycle/token-list-v2.json','public/lifecycle/evidence.json','public/lifecycle/registry-writes.json','public/lifecycle/funding.json','public/release-status.json','public/catalog/testnet-v2/lifecycle.json']) JSON.parse(require('fs').readFileSync(f,'utf8')); console.log('records ok')"
+  artifact:
+    name: The packed artifact works from a clean install
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Packs this checkout, installs the tarball into an empty project outside the source tree (the
+      # npm registry supplies the dependencies), resolves every documented export, runs the CLI help,
+      # starts the MCP server and reads every advertised resource, and checks that nothing private is packed.
+      - run: node scripts/verify-artifact.mjs --out artifacts/local/package-verification.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: package-verification
+          path: artifacts/local/package-verification.json

@@ -17,7 +17,7 @@ No configuration establishes independent review or adoption. The `roles` block o
 
 ## The published entry is the approved entry
 
-The catalog does not copy the configured symbol, name or decimals into its output. It derives the published fields (`chainId`, `address`, `symbol`, `name`, `decimals`, `assetId`) from the approved report's own listing, accepted only when the report passed and its `token.listing` check confirmed every field through both interfaces (`approvedEntry` in `lib/catalog.js`). The configuration states what the maintainer intends to publish; `compareEntry` compares the two in canonical form, so address casing and property order never differ. A mismatch withholds the entry under an otherwise valid evaluation and names the field (`entry-mismatch:decimals`); `bind` refuses such a binding before anything is written; a report that approves no complete entry yields `entry-unverified`. Display-only data (`display`) is passed through and marked unverified.
+The catalog does not copy the configured symbol, name or decimals into its output. It derives the published fields (`chainId`, `address`, `symbol`, `name`, `decimals`, `assetId`) from the approved report's own listing, accepted only when the report passed and its `token.listing` check confirmed every field through both interfaces (`approvedEntry`, now in the library's `lib/entry.js` and re-exported by `lib/catalog.js`). The configuration states what the maintainer intends to publish; `compareEntry` compares the two in canonical form, so address casing and property order never differ. A mismatch withholds the entry under an otherwise valid evaluation and names the field (`entry-mismatch:decimals`); `bind` refuses such a binding before anything is written; a report that approves no complete entry yields `entry-unverified`. Display-only data (`display`) is passed through and marked unverified.
 
 ## Run it
 
@@ -81,7 +81,7 @@ The local demo (`demo --strict`) still runs the 17-step sequence with a stranger
 | Path | What |
 | --- | --- |
 | `catalog.js` | the entry point: `demo`, `bind`, `build`, `acceptance`, `record`, `publish` |
-| `lib/catalog.js` | configuration, the approved-entry derivation and comparison, append-only bindings with superseded-policy history, the catalog document |
+| `lib/catalog.js` | configuration, the approved-entry derivation and comparison (re-exported from the library's `lib/entry.js`, which the separate consumer example shares), append-only bindings with superseded-policy history, the catalog document |
 | `lib/lifecycle.js` | the scripted local lifecycle and `EXPECTED` |
 | `lib/local-chain.js` | the in-memory stand-in chain and fixture reads |
 | `config/local.json`, `config/testnet.json`, `config/testnet-v2.json`, `config/testnet-v2-wrong-entry.json` | the configurations with their policies and role labels |

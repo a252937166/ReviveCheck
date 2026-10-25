@@ -72,6 +72,27 @@ What the broadcast step enforces, in order: the wallet is the manifest deployer;
 
 Activation re-reads the chain rather than trusting the record, then regenerates the module. Activation never deletes v1: the generated module lists both versions, and `TOKEN_LIST_VERSIONS` exposes them.
 
+## Publishing the site
+
+The hosted site is a static build served from a release directory; which build is served is stated by a hosting manifest written beside the files AFTER the build, never by the repository's status record (`public/release-status.json` describes the published evidence at its own commit). The two are separate facts and cannot contradict each other about "the current release".
+
+```sh
+# 1. Build from a clean commit and record the per-file manifest.
+git status --porcelain            # must be empty
+npx vite build --base /
+RELEASE="$(date -u +%Y%m%d)-$(git rev-parse --short HEAD)-public-rN"
+COPYFILE_DISABLE=1 tar --no-mac-metadata --no-xattrs -C dist -czf "revivecheck-public-$RELEASE.tar.gz" .   # no AppleDouble entries
+node scripts/hosting-manifest.mjs --dist dist --release "$RELEASE" --payload "revivecheck-public-$RELEASE.tar.gz" --out hosting.json
+
+# 2. Upload the payload and hosting.json; extract into releases/$RELEASE; verify every file against the manifest
+#    (sha256sum -c) and that no ._* file was extracted; place hosting.json in the release directory.
+# 3. Switch the `current` symlink atomically (ln -s … current.tmp && mv -Tf current.tmp current); Nginx needs no reload.
+# 4. Fetch every file over HTTPS and compare with the manifest; fetch /hosting.json and compare its sourceCommit with the commit built.
+# 5. Keep the previous release directories for rollback; record the receipt in docs/PUBLICATION_<date>.md.
+```
+
+`https://revivecheck.axiqo.xyz/hosting.json` therefore identifies the actual hosted build (source commit, release ID, build time, per-file manifest hash, payload hash). It is not part of the repository.
+
 ## Costs recorded so far
 
 | Transaction | Block | Deposit held (tPOT) | Fee spent (tPOT) |

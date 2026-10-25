@@ -44,9 +44,13 @@ async function check(id, work) {
   try { const detail = await work(); checks.push({ id, status: 'passed', detail: detail ?? '' }); }
   catch (error) { checks.push({ id, status: 'failed', detail: String(error?.message || error).slice(0, 400) }); }
 }
+// Hosting metadata is NOT evidence status. Which build the site serves is stated by the hosting manifest the
+// deployment procedure writes beside the served files (hosting.json, scripts/hosting-manifest.mjs), never here,
+// so this record and the site cannot contradict each other about "the current release".
 const PUBLICATION = Object.freeze({
-  site: 'https://revivecheck.axiqo.xyz/', siteRelease: '20261025-8aee632-public-r1', siteSourceCommit: '8aee632f9eff67211e482605527a043d89aa6b8a', sitePublishedAt: '2026-10-25T11:27:50Z', siteRecord: 'docs/PUBLICATION_2026-10-25.md',
+  site: 'https://revivecheck.axiqo.xyz/', hostingManifest: 'https://revivecheck.axiqo.xyz/hosting.json', hostingProcedure: 'docs/DEPLOYMENT.md', publicationRecords: ['docs/PUBLICATION_2026-10-24.md', 'docs/PUBLICATION_2026-10-25.md'],
   sourceRepository: 'https://github.com/a252937166/ReviveCheck', sourceBranch: 'main', build: 'https://dorahacks.io/build/50176', buildDescribes: 'the 2026-10-24 release; not yet updated',
+  consumerExample: { repository: 'revivecheck-consumer-example (separate repository; published state is recorded in its README)', interface: 'Token eligibility demo (browser) and a command line; author-built, portability not adoption' },
   video: 'https://www.youtube.com/watch?v=CvpzlQfya4U', videoRecordedAgainst: '2026-10-24 release (v0.3): the v2 deployment and the simulated catalog lifecycle; it predates the live v2 lifecycle recorded on 2026-10-25',
   deck: 'docs/FINAL_DECK.md', historicalDeck: 'artifacts/ReviveCheck-Check-in-Deck.pdf', freeze: '2026-11-06T04:00:00Z (November 5, 2026, 23:00 EST)',
 });
@@ -282,7 +286,8 @@ const status = {
     ...(levels.lifecycle?.established ? [] : [{ item: 'live v2 lifecycle', why: levels.lifecycle?.why }]),
     { item: 'Independent adoption', why: 'No external builder has installed or configured ReviveCheck; the second consumer and the benchmark are author-run.' },
     { item: 'Maintainer pilot', why: 'docs/PILOT_PROTOCOL.md describes the study; no participant has run it.' },
-    { item: 'Video and DoraHacks build', why: 'The site was republished from commit 8aee632 on 2026-10-25 (release 20261025-8aee632-public-r1, docs/PUBLICATION_2026-10-25.md); the video, recorded on 2026-10-24, and the DoraHacks build description still describe the 2026-10-24 release.' },
+    { item: 'Video and DoraHacks build', why: 'The video, recorded on 2026-10-24, and the DoraHacks build description still describe the 2026-10-24 release; the hosted build is identified by hosting.json on the site, not by this record.' },
+    { item: 'Evidence renewal', why: `The bound report ${v2.binding?.reportHash ? `${v2.binding.reportHash.slice(0, 12)}…` : ''} is acceptable under the seven-day policy until ${v2.binding ? new Date(Date.parse((await json(`public/reports/${v2.binding.reportHash}.json`)).completedAt) + v2.config.policy.evidence.maxAgeSeconds * 1000).toISOString() : 'unknown'}; docs/RENEWAL.md is the runbook. No renewal transaction has been sent.` },
   ],
 };
 if (outIndex >= 0) await writeFile(path.resolve(root, args[outIndex + 1]), `${JSON.stringify(status, null, 2)}\n`);

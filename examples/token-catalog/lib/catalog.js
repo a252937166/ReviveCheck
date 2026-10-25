@@ -11,57 +11,19 @@
 // named. Display-only data (`display`) is passed through and labelled unverified.
 import { normalizePolicy, policyHash, verifyBinding } from '../../../lib/policy.js';
 import { fingerprint, verifyRun } from '../../../lib/report.js';
+import { ENTRY_FIELDS, canonicalEntry, entryIdentity, approvedEntry, compareEntry } from '../../../lib/entry.js';
 
 export const CONFIG_SCHEMA = 'revivecheck.token-catalog-config.v1';
 export const CATALOG_SCHEMA = 'revivecheck.token-catalog.v2';
 export const INPUTS_SCHEMA = 'revivecheck.token-catalog-inputs.v1';
 export const BINDINGS_SCHEMA = 'revivecheck.token-catalog-bindings.v1';
 /** The fields acceptance covers. A catalog entry is published only when every one of them equals the approved report. */
-export const ENTRY_FIELDS = Object.freeze(['chainId', 'address', 'symbol', 'name', 'decimals', 'assetId']);
+// The published-entry invariant lives in the library (lib/entry.js) so that every
+// consumer shares one implementation; the catalog re-exports it for its own callers.
+export { ENTRY_FIELDS, canonicalEntry, entryIdentity, approvedEntry, compareEntry } from '../../../lib/entry.js';
 const H160 = /^0x[0-9a-fA-F]{40}$/;
 const lower = (value) => String(value ?? '').toLowerCase();
 
-/** One canonical shape for an entry: lower-case address, numeric chainId and decimals, assetId as a decimal string. Property order never matters. */
-export function canonicalEntry(entry) {
-  if (!entry || typeof entry !== 'object') return null;
-  return {
-    chainId: Number(entry.chainId), address: lower(entry.address), symbol: String(entry.symbol ?? ''), name: String(entry.name ?? ''),
-    decimals: Number(entry.decimals), assetId: entry.assetId === undefined || entry.assetId === null ? null : String(entry.assetId),
-  };
-}
-/** The identity of an entry: a SHA-256 over its canonical fields, so two spellings of the same entry share one identity. */
-export const entryIdentity = (entry) => { const canonical = canonicalEntry(entry); return canonical ? fingerprint(canonical) : null; };
-
-/**
- * The entry an approved report verified: its own listing claim, accepted only when
- * the report passed and its `token.listing` check confirmed every field through
- * both interfaces. Anything else yields no approved entry, with the reason.
- */
-export function approvedEntry(report) {
-  if (!verifyRun(report)) return { entry: null, reason: 'the report fails its integrity check' };
-  if (report.status !== 'passed') return { entry: null, reason: `the report did not pass (${report.status})` };
-  const input = report.input || {};
-  if (input.profile !== 'native-asset' || !input.listing || typeof input.listing !== 'object') return { entry: null, reason: 'the report carries no token-list entry; only a native-asset report with a listing can approve one' };
-  const check = (report.checks || []).find((item) => item.id === 'token.listing');
-  if (!check || check.status !== 'passed') return { entry: null, reason: 'the report has no passed token.listing check' };
-  const fields = Array.isArray(check.evidence?.fields) ? check.evidence.fields : null;
-  const confirmed = fields ? fields.filter((field) => field.status === 'passed').map((field) => field.field) : [];
-  for (const field of ['chainId', 'address', 'symbol', 'name', 'decimals']) if (fields && !confirmed.includes(field)) return { entry: null, reason: `the token.listing check did not confirm ${field}` };
-  const entry = canonicalEntry({ ...input.listing, assetId: input.nativeAsset?.assetId ?? null });
-  if (!H160.test(entry.address) || !Number.isSafeInteger(entry.chainId) || !Number.isInteger(entry.decimals) || !entry.symbol || !entry.name || entry.assetId === null) return { entry: null, reason: 'the report listing is incomplete' };
-  return { entry, reason: null, checkpoint: report.binding?.checkpoint ?? null, reportHash: report.evidenceHash };
-}
-
-/** Field-by-field comparison of what the maintainer configured with what was approved. Canonical forms only, so casing and key order never differ. */
-export function compareEntry(configured, approved) {
-  const want = canonicalEntry(configured), have = canonicalEntry(approved);
-  if (!want) return { match: false, mismatches: [], reason: 'no configured entry' };
-  if (!have) return { match: false, mismatches: [], reason: 'no approved entry' };
-  const mismatches = ENTRY_FIELDS.filter((field) => want[field] !== have[field]).map((field) => ({ field, configured: want[field], approved: have[field] }));
-  return { match: mismatches.length === 0, mismatches, reason: mismatches.length ? `the configured entry differs from the approved report in ${mismatches.map((item) => item.field).join(', ')}` : null };
-}
-
-/** Throw unless the configured token is exactly the entry the report approved. Used before a binding is created. */
 export function assertEntryApproved(token, report) {
   const approved = approvedEntry(report);
   if (!approved.entry) throw new Error(`Report ${report?.evidenceHash ?? '?'} approves no catalog entry: ${approved.reason}.`);

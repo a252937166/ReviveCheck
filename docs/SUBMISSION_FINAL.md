@@ -22,12 +22,13 @@ Portaldot is part of the mechanism: Revive runs the contracts; ReviveApi maps na
 - Sealed reports stored through `remark.store` at blocks 164266, 164335, 187058 and 187145, with retrieval and fingerprint verification.
 - A Catalog decision page in the application: the published entry against the approved report, the on-chain approval, the listing, the policy verdict and reasons, evidence age, checkpoints, next action and binding history, with a live evaluation in the browser and no wallet.
 - A standalone Token Catalog with a reproducible local lifecycle, the live v2 lifecycle, refusal cases (wrong entry, superseded revision, revoked approval, unreachable node) and downstream acceptance CI.
-- A second consumer, a DEX allow-list, installed from the packed artifact in a separate repository with its own policy and CI.
+- A second consumer, a DEX allow-list, installed from the packed artifact (version 0.4.0, verified from a clean install) in a separate repository with its own policy and CI, and its public Token eligibility demo: anyone checks the configured entry without login or wallet, sees why a wrong entry is withheld, opens the exact report in the App, corrects the entry, refreshes under the consumer's own policy and watches the token selector obey the result; a decision-evidence document is downloadable and reconstructed offline by a second command.
+- The library documented function by function (`docs/LIBRARY.md`) and shipped in the artifact: `retrieveEvidence`, `createBinding`, `collectPolicyInputs`, `evaluateBinding`, the published-entry invariant, the current-decision reducer and the portable decision document.
 - VerifiedTokenList v1: `0xd0bd833b4b8658b1230a0e9a99640935b3c65819`, block 164220, pUSD listing at 164313: preserved as history; new writes to it are refused.
 
 ### Current boundaries
 
-The owner and reviewer accounts of the recorded lifecycle are both controlled by the project: role separation on-chain, not independent review. Policy freshness is evaluated by the application when invoked, not discovered continuously by a Solidity contract; expiry, a runtime change and a node outage are demonstrated locally and labelled simulated. The second consumer and the value experiment were run by the author; no builder outside the project has installed or configured ReviveCheck, and the maintainer pilot described in `docs/PILOT_PROTOCOL.md` has not run. The value experiment compares equivalent checks at identical captured checkpoints and reports what was measured, not human time savings or demand. Unsupported historical replay observations are reported as partial.
+The owner and reviewer accounts of the recorded lifecycle are both controlled by the project: role separation on-chain, not independent review. The bound report is acceptable under the seven-day policy until 2026-11-01T09:29:17.646Z; the renewal runbook (`docs/RENEWAL.md`) names the steps by role, and no renewal transaction has been sent yet. Policy freshness is evaluated by the application when invoked, not discovered continuously by a Solidity contract; expiry, a runtime change and a node outage are demonstrated locally and labelled simulated. The second consumer and the value experiment were run by the author; no builder outside the project has installed or configured ReviveCheck, and the maintainer pilot described in `docs/PILOT_PROTOCOL.md` has not run. The value experiment compares equivalent checks at identical captured checkpoints and reports what was measured, not human time savings or demand. Unsupported historical replay observations are reported as partial.
 
 ### Try and verify
 
@@ -35,6 +36,7 @@ The owner and reviewer accounts of the recorded lifecycle are both controlled by
 - Video: https://www.youtube.com/watch?v=CvpzlQfya4U (recorded 2026-10-24; predates the live lifecycle)
 - Source and setup: https://github.com/a252937166/ReviveCheck
 - Token Catalog: https://github.com/a252937166/ReviveCheck/tree/main/examples/token-catalog
+- Token eligibility demo (the second consumer): to be published from the separate repository; no public URL yet
 - Status record: `public/release-status.json` in the repository
 - Explorer: https://scanner-testnet-v3.portaldot.dev/
 

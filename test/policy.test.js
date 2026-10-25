@@ -125,6 +125,8 @@ test('reviewer trust is explicit: only trusted reviewers count, revocation block
 test('evidence age is a policy clock, not a chain event: the same inputs expire when the clock passes the limit', () => {
   const fresh = evaluate(assetReport, { now: after(assetReport, 7 * 86400 - 1) });
   assert.equal(fresh.status, 'valid');
+  const atLimit = evaluate(assetReport, { now: after(assetReport, 7 * 86400) });
+  assert.equal(atLimit.status, 'valid', 'acceptable at exactly the limit');
   const expired = evaluate(assetReport, { now: after(assetReport, 7 * 86400 + 1) });
   assert.equal(expired.status, 'expired');
   assert.deepEqual(codes(expired), ['evidence-expired']);

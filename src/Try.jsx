@@ -581,11 +581,11 @@ function ConsumeStep({ session, patch }) {
       {tx.stage === 'error' && <p className="form-error block" role="alert"><CircleAlert size={15}/>{tx.error}</p>}
     </>}
     {done && <div className="result-card passed">
-      <div className="result-head"><Badge status={receipt.listed ? 'listed' : receipt.listed === false ? 'pending' : 'finalized'}>{receipt.listed ? 'Listed' : receipt.listed === false ? 'Finalized · not listed' : 'Finalized'}</Badge><strong>{short(done.token, 14)} in the VerifiedTokenList v{done.consumer.version}</strong></div>
+      <div className="result-head"><Badge status={receipt.completion === 'failed' ? 'failed' : receipt.listed ? 'listed' : receipt.listed === false ? 'pending' : 'finalized'}>{receipt.completion === 'failed' ? 'Failed' : receipt.listed ? 'Listed' : receipt.listed === false ? (receipt.readback?.matched ? 'Finalized · not listed' : 'Finalized · readback unmatched') : 'Finalized'}</Badge><strong>{short(done.token, 14)} in the VerifiedTokenList v{done.consumer.version}</strong></div>
       <TxResult result={done.tx} title="Extrinsic"/>
       <dl className="kv-list compact">
         <div className="kv"><dt>Bound to</dt><dd>chain {done.network.chainId} · consumer v{done.consumer.version} <span className="mono">{short(done.consumer.address, 12)}</span> · revision {done.revision} · report <span className="mono">{short(done.reportHash, 14)}</span> · reviewer <span className="mono">{short(done.reviewer, 12)}</span></dd></div>
-        {done.readback ? <div className="kv"><dt>Read back</dt><dd>isListed → {String(done.readback.listed)} · {done.readback.interfacesAgree ? 'both interfaces agree' : 'interfaces disagree'} at <ChainLink hash={done.readback.block.nativeHash}>#{fmt(done.readback.block.number)}</ChainLink></dd></div> : <div className="kv"><dt>Read back</dt><dd>No matching readback yet. Inclusion in a block alone never shows Listed.</dd></div>}
+        {done.readback ? <div className="kv"><dt>Read back</dt><dd>isListed → {String(done.readback.listed)} · {done.readback.interfacesAgree ? 'both interfaces agree' : 'interfaces disagree'}{done.readback.block ? <> at <ChainLink hash={done.readback.block.nativeHash}>#{fmt(done.readback.block.number)}</ChainLink></> : null}{receipt.readback && !receipt.readback.matched && <small className="block">This readback does not vouch for the listing: {receipt.readback.reasons.join('; ')}.</small>}</dd></div> : <div className="kv"><dt>Read back</dt><dd>No matching readback yet. Inclusion in a block alone never shows Listed.</dd></div>}
         <div className="kv"><dt>Eligibility</dt><dd>A finalized listing is a transaction fact. Whether the entry may be enabled now is a policy decision at a fresh checkpoint; a new revision or a revoked approval changes it without touching this receipt. <a className="text-link" href="#/app/catalog">Catalog decision<ArrowRight size={13} aria-hidden="true"/></a></dd></div>
       </dl>
     </div>}
@@ -640,7 +640,7 @@ function stepStatus(id, session) {
     case 'store': return passed && session.store?.reportHash === passed.evidenceHash ? ['passed', session.store.retrieved?.verified ? 'On-chain' : 'Finalized'] : passed && session.replay?.reportHash === passed.evidenceHash ? [session.replay.status, 'Replayed'] : passed ? ['idle', 'Wallet'] : ['locked', 'Needs a pass'];
     case 'consume': {
       const receipt = describeListReceipt(session.consume, { network: TESTNET, consumer: TOKEN_LIST, token: session.consume?.token, releaseId: session.submit?.releaseId, reviewer: session.consume?.reviewer });
-      if (receipt.kind === 'current') return receipt.listed ? ['approved', 'Listed'] : ['finalized', 'Finalized'];
+      if (receipt.kind === 'current') return receipt.completion === 'failed' ? ['failed', 'Failed'] : receipt.listed ? ['approved', 'Listed'] : ['finalized', 'Finalized'];
       if (receipt.kind === 'historical') return ['idle', 'Historical'];
       return session.approve?.tx ? ['idle', 'Wallet'] : ['locked', 'After Approve'];
     }
@@ -663,7 +663,7 @@ function Ledger({ session, reset }) {
     session.submit?.tx && ['Submit', session.submit.label, 'finalized', session.submit.tx.extrinsicHash || session.submit.tx.blockHash, session.submit.tx.blockNumber, session.submit.tx.extrinsicHash ? 'extrinsic' : 'block', TESTNET],
     session.approve?.tx && ['Approve', session.approve.approved ? 'Approved' : 'Changes', session.approve.approved ? 'approved' : 'changes-requested', session.approve.tx.extrinsicHash || session.approve.tx.blockHash, session.approve.tx.blockNumber, session.approve.tx.extrinsicHash ? 'extrinsic' : 'block', TESTNET],
     session.remark?.tx && ['Remark', session.remark.decision === 'accepted' ? 'Accepted' : 'Changes', session.remark.verification?.verified ? 'passed' : 'pending', session.remark.tx.extrinsicHash, session.remark.tx.blockNumber, 'extrinsic', TESTNET],
-    session.consume?.tx && ['Consume', listing.kind === 'historical' ? 'Historical' : listing.listed ? 'Listed' : 'Finalized', listing.kind === 'historical' ? 'idle' : listing.listed ? 'approved' : 'finalized', session.consume.tx.extrinsicHash, session.consume.tx.blockNumber, 'extrinsic', TESTNET],
+    session.consume?.tx && ['Consume', listing.kind === 'historical' ? 'Historical' : listing.completion === 'failed' ? 'Failed' : listing.listed ? 'Listed' : 'Finalized', listing.kind === 'historical' ? 'idle' : listing.completion === 'failed' ? 'failed' : listing.listed ? 'approved' : 'finalized', session.consume.tx.extrinsicHash, session.consume.tx.blockNumber, 'extrinsic', TESTNET],
     session.promote?.report && ['Promote', session.promote.report.status === 'passed' ? 'Can stand' : 'Refused', session.promote.report.status === 'passed' ? 'passed' : 'refused', session.promote.report.network?.finalizedNativeBlockHash, session.promote.report.network?.finalizedBlockNumber, 'block', LIVE],
     session.watch?.report && ['Watch', 'Rechecked', session.watch.report.status, session.watch.report.network?.finalizedNativeBlockHash, session.watch.report.network?.finalizedBlockNumber, 'block', TESTNET],
   ].filter(Boolean);
