@@ -2,6 +2,20 @@
 
 Validation date: 2026-10-23, America/New_York. Scope: the local prototype at implementation revision `a07a912` and its local Check-in materials. The interactive app remains local. Public video and source are available; formal Check-in was submitted and is Under Review; see [SUBMISSION.md](SUBMISSION.md).
 
+
+## Manual checks of 2026-10-25
+
+The sections below this one are the manual acceptance record of the first release (2026-10-22 and 2026-10-23) and are kept as history; their balance, deployment and support-ticket statements describe that time. The current status record is `public/release-status.json` (mirrored by [RELEASE_STATUS.md](RELEASE_STATUS.md)).
+
+Performed by the author on the production build served locally, in headless Chromium at 1360 by 900, without a wallet:
+
+- Catalog decision page, v2 catalog (`#/app/catalog/testnet-v2`): renders **Available**, "Policy: Valid", "Entry equals the approved report", the reasons, the next action, the recorded evaluation (35 checks), the three fact cards, the published-entry table, the recorded checks, the 12-step recorded execution with explorer links and the binding history including the superseded-policy binding. Screenshot: `artifacts/assessment-2026-10-25/catalog-decision-v2.png`. No console errors.
+- Evaluate now on that page: the in-browser evaluator read the registry, the token list, the stored report and the finalized head and returned **Available now**, `valid`, checkpoints #187,343 on portaldot-v3/3002, with an evaluation hash. Screenshot: `artifacts/assessment-2026-10-25/catalog-decision-v2-evaluate-now.png`.
+- Wrong-entry catalog (`#/app/catalog/testnet-v2-wrong-entry`): renders **Withheld**, "Policy: Valid", "Entry differs: decimals", the `entry-mismatch:decimals` reason with its text, and the next action telling the maintainer not to publish. Screenshot: `artifacts/assessment-2026-10-25/catalog-decision-wrong-entry.png`.
+- Offline: `npm test` 168 passing; `npx vite build` passes; `node scripts/release-status.js` reports `ok` with all 13 integrity checks passed and five of six levels established (independent adoption not established).
+
+No independent user, saved human time, revenue, security audit or organizer decision is established by these checks.
+
 ## Commands run for this record
 
 Environment: Node.js `v22.23.1`, npm `10.9.8`.
