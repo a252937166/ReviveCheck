@@ -3,28 +3,31 @@
   "name": "pUSD token catalog (Portaldot V3 testnet, consumer v2)",
   "mode": "testnet",
   "roles": {
-    "owner": { "address": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b", "control": "the project's isolated test account (5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt); it owns the unchanged pusd-token-list release" },
-    "reviewer": { "address": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b", "control": "the same project test account; the existing exact-report approval is reused, not independent review" },
-    "operator": { "control": "the project author, explicitly binding the existing approved report to the v2 consumer; no independent adoption is claimed" }
+    "owner": { "address": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b", "control": "the project's development test account (5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt); it owns the pusd-catalog-v2 release and signs the listings" },
+    "reviewer": { "address": "0x95db300103ec8b45884b13ed85230fbf02114065", "control": "the project's separate reviewer test account (5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ), funded from the development account on 2026-10-25; a distinct signer controlled by the same project, so this shows role separation, not independent review" },
+    "operator": { "control": "the project author, binding approved reports explicitly from a terminal and recording each live step; no independent adoption is claimed" }
   },
   "policy": {
     "schema": "revivecheck.policy.v1",
-    "name": "pUSD catalog policy (testnet, consumer v2)",
+    "name": "pUSD catalog policy (testnet, consumer v2, separate reviewer)",
     "network": { "key": "testnet", "chainId": 420420777, "genesisHash": "0xd4f9acbcf7f52388d8b095abe3c198d19fc510e0343e643e87cfbccb155283bd" },
     "runtime": { "specName": "portaldot-v3", "specVersions": ["3002"] },
     "subject": { "kind": "native-asset", "assetId": "7777", "address": "0x00001e6100000000000000000000000000010000" },
     "planHash": "ce76c98f90e2851aff534febe6c39a4802fbef32e478a665d3e4109352222191",
     "evidence": { "scope": "portaldot-testnet-readonly", "maxAgeSeconds": 604800, "maxObservationAgeSeconds": 900, "requireInterfacesAgree": true, "requireStoredOnChain": true },
     "reviewers": {
-      "trusted": ["0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b"],
+      "trusted": ["0x95db300103ec8b45884b13ed85230fbf02114065"],
       "threshold": 1,
-      "basis": "The project's isolated test account, which is also the release owner. Its existing approval of the unchanged report demonstrates the mechanism, not independent review. A production catalog would name reviewers it does not control."
+      "basis": "The project's separate reviewer test account. The release owner's own approval does not count under this policy. Both accounts are controlled by the project, so this demonstrates role separation on-chain, not independent review; a production catalog would name reviewers it does not control."
     },
-    "registry": { "address": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339", "owner": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b", "label": "pusd-token-list" },
+    "registry": { "address": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339", "owner": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b", "label": "pusd-catalog-v2" },
     "consumer": { "address": "0xedaf8a25bb583ad164a94191b762414277198df9", "requireListed": true, "version": 2 }
   },
   "tokens": [
     { "address": "0x00001e6100000000000000000000000000010000", "symbol": "pUSD", "name": "Portaldot USD (test)", "decimals": 6, "assetId": "7777" }
+  ],
+  "supersededPolicies": [
+    { "policyHash": "2314f14b1a9b1a6763c0968db846a5c07021ed15804f276a2e1a5e911e704142", "note": "The first v2 policy (2026-10-24) trusted the owner account as its reviewer and named the pusd-token-list release; its binding of the v1 report was never listed on v2. Superseded on 2026-10-25 by this role-separated policy on the pusd-catalog-v2 release. The binding is kept as history." }
   ],
   "data": "examples/token-catalog/data/testnet-v2",
   "reports": "public/reports"

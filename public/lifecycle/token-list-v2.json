@@ -407,5 +407,50 @@
       "stateMutability": "pure",
       "type": "function"
     }
+  ],
+  "listings": [
+    {
+      "token": "0x00001e6100000000000000000000000000010000",
+      "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+      "reportHash": "0xeb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+      "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+      "decimals": 6,
+      "extrinsicHash": "0xc1af7571d02e3e2ed95e300ee019bcc37287bbf72b3b9b81ee6a2d807134c3d1",
+      "blockHash": "0x0beeb6bcfa8d7661fda4b79d73cb9b1cbe118c20de42c1a80fc32ea1854b0eb9",
+      "blockNumber": "187124",
+      "finalizedAt": "2026-10-25T09:27:54.351Z",
+      "feeTpot": "0.03132116223243",
+      "readback": {
+        "block": {
+          "number": "187132",
+          "nativeHash": "0x775d8a8d3d63e0de2988d6d9a9d19881d44180979c56accab1d1eb3db7ca5573",
+          "evmHash": "0x1240a1027aa1f2f716afdd90ac7bc337b4c0a5fdbd8f728dd696a6f03e1f8296"
+        },
+        "listed": true,
+        "interfacesAgree": true,
+        "source": "catalog capture 05-list-r1 (the readback right after the listing; the script output at #187124 showed listed=true, interfacesAgree=true)"
+      }
+    },
+    {
+      "token": "0x00001e6100000000000000000000000000010000",
+      "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+      "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+      "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+      "decimals": 6,
+      "extrinsicHash": "0x435979c0ff353ecd887e031490752671f9739f249d2344b9967d7292cb0f7eb3",
+      "blockHash": "0x7dc874cd19f9d1e8311cac5027090c0e54aac20cc0f165b964a06b5f3ad61eea",
+      "blockNumber": "187205",
+      "finalizedAt": "2026-10-25T09:36:00.311Z",
+      "feeTpot": "0.03062334276985",
+      "readback": {
+        "block": {
+          "number": "187205",
+          "nativeHash": "0x7dc874cd19f9d1e8311cac5027090c0e54aac20cc0f165b964a06b5f3ad61eea",
+          "evmHash": "0x22dc18b006f13fbf845b2ebb612886b138d5436a72ab809d14921410b01512a4"
+        },
+        "listed": true,
+        "interfacesAgree": true
+      }
+    }
   ]
 }

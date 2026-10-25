@@ -2,8 +2,8 @@
   "schema": "revivecheck.feed.v1",
   "network": "testnet",
   "chainId": 420420777,
-  "generatedAt": "2026-10-24T17:25:03.054Z",
-  "indexedTo": 177549,
+  "generatedAt": "2026-10-25T09:44:02.610Z",
+  "indexedTo": 187283,
   "source": {
     "explorerApi": "https://scanner-testnet-v3-api.portaldot.dev",
     "from": 162962,
@@ -60,6 +60,101 @@
   ],
   "releases": [
     {
+      "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+      "owner": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+      "label": "pusd-catalog-v2",
+      "revision": "2",
+      "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+      "decisions": {
+        "0x95db300103ec8b45884b13ed85230fbf02114065": {
+          "revision": "2",
+          "approved": true,
+          "blockNumber": "187271",
+          "extrinsicHash": "0x6cee3f89def64b4e669242a518c14c6e1b1629cc012ddb522e90d1e29580b71a"
+        }
+      },
+      "history": [
+        {
+          "type": "submitted",
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "owner": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+          "label": "pusd-catalog-v2",
+          "revision": "1",
+          "reportHash": "0xeb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+          "blockNumber": "187069",
+          "blockHash": "0xf7fe072370ba8e5b229f3d26d900726bf543c825923933da5aded1c1eb9795e5",
+          "extrinsicHash": "0x4d09c15021e03f1123819bac1715ee880b64a262aadecc1453af182b3358e505",
+          "signer": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+          "time": "2026-10-25T09:22:18.000Z"
+        },
+        {
+          "type": "reviewed",
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+          "revision": "1",
+          "reportHash": "0xeb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+          "approved": true,
+          "blockNumber": "187095",
+          "blockHash": "0x9e4c67cb64dd330dc38b8dbeda75d45636dc2a110064d1992578c50793a754d6",
+          "extrinsicHash": "0xf90702ef780e0a832c7ec07ec1001e48200d3107fa7b598cc46e681736fd4ceb",
+          "signer": "5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ",
+          "time": "2026-10-25T09:24:54.000Z"
+        },
+        {
+          "type": "submitted",
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "owner": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+          "label": "pusd-catalog-v2",
+          "revision": "2",
+          "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+          "blockNumber": "187165",
+          "blockHash": "0x75bd2b5a20b9a398dad45826e724697c1b4252e446547d0afb6bdab6b241d112",
+          "extrinsicHash": "0xd4818dec55ef294fa4d643bf5897f64044923f9493aab560e2bc2cb160740eab",
+          "signer": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+          "time": "2026-10-25T09:31:54.000Z"
+        },
+        {
+          "type": "reviewed",
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+          "revision": "2",
+          "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+          "approved": true,
+          "blockNumber": "187181",
+          "blockHash": "0x839bfec62df3fd627a28b002a55a1baa32969619f7625a18814594641be0cfed",
+          "extrinsicHash": "0x5af1743333c313c4109005318f22343404d0ee7780df4f9557af12816a8b521a",
+          "signer": "5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ",
+          "time": "2026-10-25T09:33:30.000Z"
+        },
+        {
+          "type": "reviewed",
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+          "revision": "2",
+          "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+          "approved": false,
+          "blockNumber": "187230",
+          "blockHash": "0x36b7e0c915ae3e600b80a0dd94e0bde3db35ef47ed9dd065333f8f1d5fc9e727",
+          "extrinsicHash": "0xa1b8688bfbcf775aecef7289866eab710444eb9fed04d7c12f2034373cf56766",
+          "signer": "5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ",
+          "time": "2026-10-25T09:38:24.000Z"
+        },
+        {
+          "type": "reviewed",
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+          "revision": "2",
+          "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+          "approved": true,
+          "blockNumber": "187271",
+          "blockHash": "0x520a38d8fdd4e2bf9a7f32e60681c08e0ef37a15e83d6986bf40f219760a5d47",
+          "extrinsicHash": "0x6cee3f89def64b4e669242a518c14c6e1b1629cc012ddb522e90d1e29580b71a",
+          "signer": "5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ",
+          "time": "2026-10-25T09:42:30.000Z"
+        }
+      ]
+    },
+    {
       "releaseId": "0xe3f6ab7784cbaa8f60171e5201fea4e27fa5cec3d6682e06d8fcb7d89181f808",
       "owner": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
       "label": "pusd-token-list",
@@ -106,6 +201,34 @@
   "listings": [
     {
       "token": "0x00001e6100000000000000000000000000010000",
+      "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+      "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+      "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+      "decimals": 6,
+      "list": "0xedaf8a25bb583ad164a94191b762414277198df9",
+      "version": 2,
+      "blockNumber": "187205",
+      "blockHash": "0x7dc874cd19f9d1e8311cac5027090c0e54aac20cc0f165b964a06b5f3ad61eea",
+      "extrinsicHash": "0x435979c0ff353ecd887e031490752671f9739f249d2344b9967d7292cb0f7eb3",
+      "signer": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+      "time": "2026-10-25T09:35:54.000Z"
+    },
+    {
+      "token": "0x00001e6100000000000000000000000000010000",
+      "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+      "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+      "reportHash": "0xeb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+      "decimals": 6,
+      "list": "0xedaf8a25bb583ad164a94191b762414277198df9",
+      "version": 2,
+      "blockNumber": "187124",
+      "blockHash": "0x0beeb6bcfa8d7661fda4b79d73cb9b1cbe118c20de42c1a80fc32ea1854b0eb9",
+      "extrinsicHash": "0xc1af7571d02e3e2ed95e300ee019bcc37287bbf72b3b9b81ee6a2d807134c3d1",
+      "signer": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+      "time": "2026-10-25T09:27:48.001Z"
+    },
+    {
+      "token": "0x00001e6100000000000000000000000000010000",
       "releaseId": "0xe3f6ab7784cbaa8f60171e5201fea4e27fa5cec3d6682e06d8fcb7d89181f808",
       "reviewer": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
       "reportHash": "0xcbd78faa85f8759860d88366794e0c70052b74f9ed775be5bb37ad20118ed427",
@@ -121,6 +244,30 @@
   ],
   "delistings": [],
   "evidence": [
+    {
+      "publisher": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+      "contentHash": "0xcae9e2a7bd13559a6c3c5536dd63c2dedcbb4dfc2d10847fb21138b8b6050f05",
+      "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+      "release": "v1.0.1",
+      "bytes": 7404,
+      "blockNumber": "187145",
+      "blockHash": "0x18a28f38f2a66093eab90d11f438664428141cfade5df5ce031ff3f4519ce868",
+      "extrinsicHash": "0x80d46a8611bb486f3b71bdd6e9e15c96e522c536e2671c9f35d0a4496792feb3",
+      "time": "2026-10-25T09:29:54.000Z",
+      "project": "pUSD token list"
+    },
+    {
+      "publisher": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+      "contentHash": "0x298e6c62b0bc0ef444ec723e25b483b666887b8d110fda1fe3c2e810d0434259",
+      "reportHash": "eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+      "release": "v1.0.1",
+      "bytes": 7369,
+      "blockNumber": "187058",
+      "blockHash": "0x76eac2817fcff3ce08bec3ce1d3eab8da323cbf04263535223792ad7f5491083",
+      "extrinsicHash": "0x2489bd65a330e17e422ef6ff0ce87132a6ecdb0d20554bbbc04560654fa15b44",
+      "time": "2026-10-25T09:21:12.000Z",
+      "project": "pUSD token list"
+    },
     {
       "publisher": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
       "contentHash": "0x18f027671fe773e93871e2ca8d6531ee291330ac3b569de738808a50efefe237",

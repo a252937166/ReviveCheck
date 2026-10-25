@@ -71,9 +71,10 @@ try {
     await save();
     const readback = await readTokenListWithClients(clients, { token });
     if (!readback.listed || !readback.interfacesAgree) throw new Error('Listed, but the readback does not show it through both interfaces.');
-    // Listings are appended to the active deployment's own record; a v1 record never receives v2 listings.
+    // Listings are appended to the active deployment's own record, never replaced: an earlier listing of the same
+    // token stays as history, and the last entry for a token is the current one. A v1 record never receives v2 listings.
     const record = JSON.parse(await readFile(TOKEN_LIST.record, 'utf8'));
-    record.listings = (record.listings || []).filter((item) => item.token !== token.toLowerCase());
+    record.listings = record.listings || [];
     record.listings.push({ token: token.toLowerCase(), releaseId, reportHash, reviewer, decimals, ...journal.listed, feeTpot: formatNative(BigInt(journal.actualNativeFeesRaw || '0'), chainDecimals), readback: { block: readback.block, listed: readback.listed, interfacesAgree: readback.interfacesAgree } });
     await writeFile(TOKEN_LIST.record, `${JSON.stringify(record, null, 2)}\n`);
     console.log(JSON.stringify({ status: 'listed', ...journal.listed, readback: { block: readback.block.number, listed: readback.listed, interfacesAgree: readback.interfacesAgree }, feeTpot: formatNative(BigInt(journal.actualNativeFeesRaw || '0'), chainDecimals) }, null, 2));

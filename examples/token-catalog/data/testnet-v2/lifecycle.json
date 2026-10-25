@@ -1,0 +1,853 @@
+{
+  "schema": "revivecheck.token-catalog-lifecycle.v1",
+  "config": "examples/token-catalog/config/testnet-v2.json",
+  "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
+  "scope": "Live Portaldot V3 testnet steps recorded as they happened, each with its finalized receipts, the checkpoint read afterwards and the policy decision at that moment. Roles are labelled in the configuration; nothing here is independent review.",
+  "steps": [
+    {
+      "index": 1,
+      "step": "check-r1",
+      "at": "2026-10-25T09:21:51.696Z",
+      "actor": "A (owner), operator",
+      "action": "check pUSD release v1.0.1 live (report eb960cc7… passed at #187037), publish it and store it on-chain through remark.store",
+      "note": "Nothing is bound yet; the catalog has no entry to publish.",
+      "receipts": [
+        {
+          "kind": "store",
+          "extrinsicHash": "0x2489bd65a330e17e422ef6ff0ce87132a6ecdb0d20554bbbc04560654fa15b44",
+          "blockNumber": "187058",
+          "blockHash": "0x76eac2817fcff3ce08bec3ce1d3eab8da323cbf04263535223792ad7f5491083",
+          "signer": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+          "reportHash": "eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8"
+        }
+      ],
+      "registry": {
+        "error": "not read"
+      },
+      "listing": {
+        "error": "not read"
+      },
+      "observation": {
+        "error": "not read"
+      },
+      "binding": null,
+      "status": "unbound",
+      "available": false,
+      "reasons": [
+        "no-binding"
+      ],
+      "entryMatch": false,
+      "evaluationHash": null,
+      "capture": "examples/token-catalog/data/testnet-v2/captures/01-check-r1.inputs.json"
+    },
+    {
+      "index": 2,
+      "step": "submit-r1",
+      "at": "2026-10-25T09:23:51.648Z",
+      "actor": "A (owner), operator",
+      "action": "submit report eb960cc7… as revision 1 of pusd-catalog-v2; the operator binds it explicitly (binding 4896a5a5…). No trusted approval yet, nothing listed.",
+      "note": "",
+      "receipts": [
+        {
+          "kind": "submit",
+          "extrinsicHash": "0x4d09c15021e03f1123819bac1715ee880b64a262aadecc1453af182b3358e505",
+          "blockNumber": "187069",
+          "blockHash": "0xf7fe072370ba8e5b229f3d26d900726bf543c825923933da5aded1c1eb9795e5",
+          "signer": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "revision": "1",
+          "reportHash": "eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8"
+        }
+      ],
+      "registry": {
+        "block": {
+          "number": "187084",
+          "nativeHash": "0xac9d79fb296fd6204ff30090b562fb37559fe54a4a90d98221c09f0004eb115d",
+          "evmHash": "0x61fd1027e9a37e431d55829d4b2a62bc60daaf4b99c8e2181b6292dee3dd522c"
+        },
+        "revision": "1",
+        "reportHash": "0xeb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+        "exists": true,
+        "decisions": {
+          "0x95db300103ec8b45884b13ed85230fbf02114065": {
+            "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+            "reviewed": false,
+            "approved": false
+          }
+        },
+        "interfacesAgree": true
+      },
+      "listing": {
+        "block": {
+          "number": "187084",
+          "nativeHash": "0xac9d79fb296fd6204ff30090b562fb37559fe54a4a90d98221c09f0004eb115d",
+          "evmHash": "0x61fd1027e9a37e431d55829d4b2a62bc60daaf4b99c8e2181b6292dee3dd522c"
+        },
+        "listed": false,
+        "entry": null,
+        "interfacesAgree": true,
+        "consumer": "0xedaf8a25bb583ad164a94191b762414277198df9",
+        "version": 2
+      },
+      "observation": {
+        "finalized": {
+          "number": "187084",
+          "nativeHash": "0xac9d79fb296fd6204ff30090b562fb37559fe54a4a90d98221c09f0004eb115d",
+          "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0xac9d79fb296fd6204ff30090b562fb37559fe54a4a90d98221c09f0004eb115d"
+        },
+        "runtime": "portaldot-v3/3002",
+        "observedAt": "2026-10-25T09:24:01.465Z"
+      },
+      "binding": {
+        "id": "4896a5a5-1fc6-4160-9049-7a01b11a8591",
+        "reportHash": "eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+        "revision": "1"
+      },
+      "status": "recheck-required",
+      "available": false,
+      "reasons": [
+        "approval-missing",
+        "consumer-not-listed"
+      ],
+      "entryMatch": true,
+      "evaluationHash": "de077fd5d52908eb26e49ee35ff8fe5e06651e54f6dd2bf56874c1347a81ce5d",
+      "capture": "examples/token-catalog/data/testnet-v2/captures/02-submit-r1.inputs.json"
+    },
+    {
+      "index": 3,
+      "step": "approve-r1",
+      "at": "2026-10-25T09:25:35.146Z",
+      "actor": "B (reviewer)",
+      "action": "approve revision 1 by naming its exact report hash; the v2 token list does not list pUSD yet",
+      "note": "",
+      "receipts": [
+        {
+          "kind": "review",
+          "approved": true,
+          "extrinsicHash": "0xf90702ef780e0a832c7ec07ec1001e48200d3107fa7b598cc46e681736fd4ceb",
+          "blockNumber": "187095",
+          "blockHash": "0x9e4c67cb64dd330dc38b8dbeda75d45636dc2a110064d1992578c50793a754d6",
+          "signer": "5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ",
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "revision": "1",
+          "reportHash": "eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8"
+        }
+      ],
+      "registry": {
+        "block": {
+          "number": "187102",
+          "nativeHash": "0xec46f7afd473b3701251082de9cc1b1f73bfc7d7bbb3b0a34e32af1919208ba7",
+          "evmHash": "0x9244974e012513e8d3db783ff3b3bde50a70a8d2b9cb69c6a2e3cf73424a2871"
+        },
+        "revision": "1",
+        "reportHash": "0xeb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+        "exists": true,
+        "decisions": {
+          "0x95db300103ec8b45884b13ed85230fbf02114065": {
+            "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+            "reviewed": true,
+            "approved": true
+          }
+        },
+        "interfacesAgree": true
+      },
+      "listing": {
+        "block": {
+          "number": "187102",
+          "nativeHash": "0xec46f7afd473b3701251082de9cc1b1f73bfc7d7bbb3b0a34e32af1919208ba7",
+          "evmHash": "0x9244974e012513e8d3db783ff3b3bde50a70a8d2b9cb69c6a2e3cf73424a2871"
+        },
+        "listed": false,
+        "entry": null,
+        "interfacesAgree": true,
+        "consumer": "0xedaf8a25bb583ad164a94191b762414277198df9",
+        "version": 2
+      },
+      "observation": {
+        "finalized": {
+          "number": "187102",
+          "nativeHash": "0xec46f7afd473b3701251082de9cc1b1f73bfc7d7bbb3b0a34e32af1919208ba7",
+          "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0xec46f7afd473b3701251082de9cc1b1f73bfc7d7bbb3b0a34e32af1919208ba7"
+        },
+        "runtime": "portaldot-v3/3002",
+        "observedAt": "2026-10-25T09:25:46.634Z"
+      },
+      "binding": {
+        "id": "4896a5a5-1fc6-4160-9049-7a01b11a8591",
+        "reportHash": "eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+        "revision": "1"
+      },
+      "status": "recheck-required",
+      "available": false,
+      "reasons": [
+        "consumer-not-listed"
+      ],
+      "entryMatch": true,
+      "evaluationHash": "157c9cf2d276857f132918308dc54673ffe3a069a263ac214369b60cdf5ec176",
+      "capture": "examples/token-catalog/data/testnet-v2/captures/03-approve-r1.inputs.json"
+    },
+    {
+      "index": 4,
+      "step": "wrong-decimals-refused",
+      "at": "2026-10-25T09:26:43.627Z",
+      "actor": "A (owner)",
+      "action": "dry-run list(pUSD, pusd-catalog-v2, eb960cc7…, B, 18 decimals) on the v2 token list; the contract reads decimals() = 6 from the token and reverts with DecimalsMismatch, so nothing was signed",
+      "note": "Contract-level refusal of a wrong entry (ReviveApi.call dry-run, no transaction). The catalog state is unchanged: approved, not listed.",
+      "receipts": [],
+      "registry": {
+        "block": {
+          "number": "187113",
+          "nativeHash": "0x814043cd00cc96be725cdc22538215cfa6c655b6aefa7a758c00b3f9c3515659",
+          "evmHash": "0x533322b9f207358f9014e77884a07e8d0d206df4ff9b70f349e4c700ecadda60"
+        },
+        "revision": "1",
+        "reportHash": "0xeb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+        "exists": true,
+        "decisions": {
+          "0x95db300103ec8b45884b13ed85230fbf02114065": {
+            "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+            "reviewed": true,
+            "approved": true
+          }
+        },
+        "interfacesAgree": true
+      },
+      "listing": {
+        "block": {
+          "number": "187113",
+          "nativeHash": "0x814043cd00cc96be725cdc22538215cfa6c655b6aefa7a758c00b3f9c3515659",
+          "evmHash": "0x533322b9f207358f9014e77884a07e8d0d206df4ff9b70f349e4c700ecadda60"
+        },
+        "listed": false,
+        "entry": null,
+        "interfacesAgree": true,
+        "consumer": "0xedaf8a25bb583ad164a94191b762414277198df9",
+        "version": 2
+      },
+      "observation": {
+        "finalized": {
+          "number": "187113",
+          "nativeHash": "0x814043cd00cc96be725cdc22538215cfa6c655b6aefa7a758c00b3f9c3515659",
+          "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0x814043cd00cc96be725cdc22538215cfa6c655b6aefa7a758c00b3f9c3515659"
+        },
+        "runtime": "portaldot-v3/3002",
+        "observedAt": "2026-10-25T09:26:52.968Z"
+      },
+      "binding": {
+        "id": "4896a5a5-1fc6-4160-9049-7a01b11a8591",
+        "reportHash": "eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+        "revision": "1"
+      },
+      "status": "recheck-required",
+      "available": false,
+      "reasons": [
+        "consumer-not-listed"
+      ],
+      "entryMatch": true,
+      "evaluationHash": "eeb17769eb6b7d3085cb4f95e2756ce604960de106f2cd5f1569e22c2baf3032",
+      "capture": "examples/token-catalog/data/testnet-v2/captures/04-wrong-decimals-refused.inputs.json"
+    },
+    {
+      "index": 5,
+      "step": "list-r1",
+      "at": "2026-10-25T09:28:39.258Z",
+      "actor": "A (owner)",
+      "action": "list pUSD in VerifiedTokenList v2 on B's approval of revision 1 (6 decimals); read back through both interfaces",
+      "note": "",
+      "receipts": [
+        {
+          "kind": "list",
+          "extrinsicHash": "0xc1af7571d02e3e2ed95e300ee019bcc37287bbf72b3b9b81ee6a2d807134c3d1",
+          "blockNumber": "187124",
+          "blockHash": "0x0beeb6bcfa8d7661fda4b79d73cb9b1cbe118c20de42c1a80fc32ea1854b0eb9",
+          "signer": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+          "token": "0x00001e6100000000000000000000000000010000",
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "reportHash": "eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+          "decimals": 6
+        }
+      ],
+      "registry": {
+        "block": {
+          "number": "187132",
+          "nativeHash": "0x775d8a8d3d63e0de2988d6d9a9d19881d44180979c56accab1d1eb3db7ca5573",
+          "evmHash": "0x1240a1027aa1f2f716afdd90ac7bc337b4c0a5fdbd8f728dd696a6f03e1f8296"
+        },
+        "revision": "1",
+        "reportHash": "0xeb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+        "exists": true,
+        "decisions": {
+          "0x95db300103ec8b45884b13ed85230fbf02114065": {
+            "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+            "reviewed": true,
+            "approved": true
+          }
+        },
+        "interfacesAgree": true
+      },
+      "listing": {
+        "block": {
+          "number": "187132",
+          "nativeHash": "0x775d8a8d3d63e0de2988d6d9a9d19881d44180979c56accab1d1eb3db7ca5573",
+          "evmHash": "0x1240a1027aa1f2f716afdd90ac7bc337b4c0a5fdbd8f728dd696a6f03e1f8296"
+        },
+        "listed": true,
+        "entry": {
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "reportHash": "0xeb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065"
+        },
+        "interfacesAgree": true,
+        "consumer": "0xedaf8a25bb583ad164a94191b762414277198df9",
+        "version": 2
+      },
+      "observation": {
+        "finalized": {
+          "number": "187132",
+          "nativeHash": "0x775d8a8d3d63e0de2988d6d9a9d19881d44180979c56accab1d1eb3db7ca5573",
+          "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0x775d8a8d3d63e0de2988d6d9a9d19881d44180979c56accab1d1eb3db7ca5573"
+        },
+        "runtime": "portaldot-v3/3002",
+        "observedAt": "2026-10-25T09:28:50.856Z"
+      },
+      "binding": {
+        "id": "4896a5a5-1fc6-4160-9049-7a01b11a8591",
+        "reportHash": "eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+        "revision": "1"
+      },
+      "status": "valid",
+      "available": true,
+      "reasons": [],
+      "entryMatch": true,
+      "evaluationHash": "fb6c74108a5309fa8fcf05c80242b72041bb56523457b1b720379fb29d28e8fb",
+      "capture": "examples/token-catalog/data/testnet-v2/captures/05-list-r1.inputs.json"
+    },
+    {
+      "index": 6,
+      "step": "recheck-r2",
+      "at": "2026-10-25T09:30:40.269Z",
+      "actor": "A (owner), operator",
+      "action": "recheck pUSD release v1.0.1 live (report 1faef921… passed at #187136, a recheck of eb960cc7…), publish it and store it on-chain; the revision-1 binding still stands",
+      "note": "",
+      "receipts": [
+        {
+          "kind": "store",
+          "extrinsicHash": "0x80d46a8611bb486f3b71bdd6e9e15c96e522c536e2671c9f35d0a4496792feb3",
+          "blockNumber": "187145",
+          "blockHash": "0x18a28f38f2a66093eab90d11f438664428141cfade5df5ce031ff3f4519ce868",
+          "signer": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+          "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51"
+        }
+      ],
+      "registry": {
+        "block": {
+          "number": "187152",
+          "nativeHash": "0x86e1c12b7e827769a969dd329300afd2b7a9d3930c6386e5758ac903efe049f6",
+          "evmHash": "0x99a074b7de9c8b2a650b45aa1a614d529e611634b7c99db5285d1407cd4946bd"
+        },
+        "revision": "1",
+        "reportHash": "0xeb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+        "exists": true,
+        "decisions": {
+          "0x95db300103ec8b45884b13ed85230fbf02114065": {
+            "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+            "reviewed": true,
+            "approved": true
+          }
+        },
+        "interfacesAgree": true
+      },
+      "listing": {
+        "block": {
+          "number": "187152",
+          "nativeHash": "0x86e1c12b7e827769a969dd329300afd2b7a9d3930c6386e5758ac903efe049f6",
+          "evmHash": "0x99a074b7de9c8b2a650b45aa1a614d529e611634b7c99db5285d1407cd4946bd"
+        },
+        "listed": true,
+        "entry": {
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "reportHash": "0xeb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065"
+        },
+        "interfacesAgree": true,
+        "consumer": "0xedaf8a25bb583ad164a94191b762414277198df9",
+        "version": 2
+      },
+      "observation": {
+        "finalized": {
+          "number": "187152",
+          "nativeHash": "0x86e1c12b7e827769a969dd329300afd2b7a9d3930c6386e5758ac903efe049f6",
+          "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0x86e1c12b7e827769a969dd329300afd2b7a9d3930c6386e5758ac903efe049f6"
+        },
+        "runtime": "portaldot-v3/3002",
+        "observedAt": "2026-10-25T09:30:50.421Z"
+      },
+      "binding": {
+        "id": "4896a5a5-1fc6-4160-9049-7a01b11a8591",
+        "reportHash": "eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+        "revision": "1"
+      },
+      "status": "valid",
+      "available": true,
+      "reasons": [],
+      "entryMatch": true,
+      "evaluationHash": "6ba3b06d878f518e77a2919bc86e577e609087f783c0e004a7387ce734e44091",
+      "capture": "examples/token-catalog/data/testnet-v2/captures/06-recheck-r2.inputs.json"
+    },
+    {
+      "index": 7,
+      "step": "submit-r2",
+      "at": "2026-10-25T09:32:32.374Z",
+      "actor": "A (owner)",
+      "action": "submit report 1faef921… as revision 2 of pusd-catalog-v2; the registry clears the approval and the v2 token list stops listing pUSD, while the catalog still holds the revision-1 binding",
+      "note": "",
+      "receipts": [
+        {
+          "kind": "submit",
+          "extrinsicHash": "0xd4818dec55ef294fa4d643bf5897f64044923f9493aab560e2bc2cb160740eab",
+          "blockNumber": "187165",
+          "blockHash": "0x75bd2b5a20b9a398dad45826e724697c1b4252e446547d0afb6bdab6b241d112",
+          "signer": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "revision": "2",
+          "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51"
+        }
+      ],
+      "registry": {
+        "block": {
+          "number": "187171",
+          "nativeHash": "0x23fcd00231e79f6cf858c84d38b1fdcfa74cedbbab461c8a77a942c6294c2f28",
+          "evmHash": "0x731258f542c9ce4de74997ffb81ba3185855d025fbe98adb7a15d67033833f6c"
+        },
+        "revision": "2",
+        "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+        "exists": true,
+        "decisions": {
+          "0x95db300103ec8b45884b13ed85230fbf02114065": {
+            "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+            "reviewed": false,
+            "approved": false
+          }
+        },
+        "interfacesAgree": true
+      },
+      "listing": {
+        "block": {
+          "number": "187171",
+          "nativeHash": "0x23fcd00231e79f6cf858c84d38b1fdcfa74cedbbab461c8a77a942c6294c2f28",
+          "evmHash": "0x731258f542c9ce4de74997ffb81ba3185855d025fbe98adb7a15d67033833f6c"
+        },
+        "listed": false,
+        "entry": {
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "reportHash": "0xeb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065"
+        },
+        "interfacesAgree": true,
+        "consumer": "0xedaf8a25bb583ad164a94191b762414277198df9",
+        "version": 2
+      },
+      "observation": {
+        "finalized": {
+          "number": "187171",
+          "nativeHash": "0x23fcd00231e79f6cf858c84d38b1fdcfa74cedbbab461c8a77a942c6294c2f28",
+          "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0x23fcd00231e79f6cf858c84d38b1fdcfa74cedbbab461c8a77a942c6294c2f28"
+        },
+        "runtime": "portaldot-v3/3002",
+        "observedAt": "2026-10-25T09:32:42.087Z"
+      },
+      "binding": {
+        "id": "4896a5a5-1fc6-4160-9049-7a01b11a8591",
+        "reportHash": "eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+        "revision": "1"
+      },
+      "status": "recheck-required",
+      "available": false,
+      "reasons": [
+        "revision-superseded",
+        "approval-missing",
+        "consumer-not-listed"
+      ],
+      "entryMatch": true,
+      "evaluationHash": "534d4cf79808fc056d19d2ae20990acc2bb11746099e0df5c25d196151829902",
+      "capture": "examples/token-catalog/data/testnet-v2/captures/07-submit-r2.inputs.json"
+    },
+    {
+      "index": 8,
+      "step": "approve-r2",
+      "at": "2026-10-25T09:34:05.111Z",
+      "actor": "B (reviewer)",
+      "action": "approve revision 2 by naming report 1faef921…; the catalog still holds the revision-1 binding, so approval alone changes nothing for the entry",
+      "note": "",
+      "receipts": [
+        {
+          "kind": "review",
+          "approved": true,
+          "extrinsicHash": "0x5af1743333c313c4109005318f22343404d0ee7780df4f9557af12816a8b521a",
+          "blockNumber": "187181",
+          "blockHash": "0x839bfec62df3fd627a28b002a55a1baa32969619f7625a18814594641be0cfed",
+          "signer": "5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ",
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "revision": "2",
+          "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51"
+        }
+      ],
+      "registry": {
+        "block": {
+          "number": "187187",
+          "nativeHash": "0xf20e2d3648e36c5f022c50d987fa9b8399251f498ab03aa2009954e2efd85788",
+          "evmHash": "0xb91b947cbb3fd3c817881de7cdd19b709b5c2c223b67bd8256370adffbe0228b"
+        },
+        "revision": "2",
+        "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+        "exists": true,
+        "decisions": {
+          "0x95db300103ec8b45884b13ed85230fbf02114065": {
+            "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+            "reviewed": true,
+            "approved": true
+          }
+        },
+        "interfacesAgree": true
+      },
+      "listing": {
+        "block": {
+          "number": "187187",
+          "nativeHash": "0xf20e2d3648e36c5f022c50d987fa9b8399251f498ab03aa2009954e2efd85788",
+          "evmHash": "0xb91b947cbb3fd3c817881de7cdd19b709b5c2c223b67bd8256370adffbe0228b"
+        },
+        "listed": false,
+        "entry": {
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "reportHash": "0xeb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065"
+        },
+        "interfacesAgree": true,
+        "consumer": "0xedaf8a25bb583ad164a94191b762414277198df9",
+        "version": 2
+      },
+      "observation": {
+        "finalized": {
+          "number": "187187",
+          "nativeHash": "0xf20e2d3648e36c5f022c50d987fa9b8399251f498ab03aa2009954e2efd85788",
+          "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0xf20e2d3648e36c5f022c50d987fa9b8399251f498ab03aa2009954e2efd85788"
+        },
+        "runtime": "portaldot-v3/3002",
+        "observedAt": "2026-10-25T09:34:15.512Z"
+      },
+      "binding": {
+        "id": "4896a5a5-1fc6-4160-9049-7a01b11a8591",
+        "reportHash": "eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+        "revision": "1"
+      },
+      "status": "recheck-required",
+      "available": false,
+      "reasons": [
+        "revision-superseded",
+        "consumer-not-listed"
+      ],
+      "entryMatch": true,
+      "evaluationHash": "fa17d9c7226cccda8b165dd6a99db5fd26b63ee0bb3a1cc9203dec47f81a60d4",
+      "capture": "examples/token-catalog/data/testnet-v2/captures/08-approve-r2.inputs.json"
+    },
+    {
+      "index": 9,
+      "step": "rebind-r2",
+      "at": "2026-10-25T09:34:50.536Z",
+      "actor": "operator",
+      "action": "bind the revision-2 report explicitly; the v2 token list still carries no pUSD entry, so the entry stays unavailable until the owner relists",
+      "note": "",
+      "receipts": [],
+      "registry": {
+        "block": {
+          "number": "187194",
+          "nativeHash": "0x52d43f6b90a9debc5437faf412bcca1b7be5c4ffff6db90b34246f19be24d1f5",
+          "evmHash": "0x5490f6f876b3a7f45db9c7404e22bfb622bed6ab5a1d60c2d4e5a7a5afae341c"
+        },
+        "revision": "2",
+        "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+        "exists": true,
+        "decisions": {
+          "0x95db300103ec8b45884b13ed85230fbf02114065": {
+            "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+            "reviewed": true,
+            "approved": true
+          }
+        },
+        "interfacesAgree": true
+      },
+      "listing": {
+        "block": {
+          "number": "187194",
+          "nativeHash": "0x52d43f6b90a9debc5437faf412bcca1b7be5c4ffff6db90b34246f19be24d1f5",
+          "evmHash": "0x5490f6f876b3a7f45db9c7404e22bfb622bed6ab5a1d60c2d4e5a7a5afae341c"
+        },
+        "listed": false,
+        "entry": {
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "reportHash": "0xeb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065"
+        },
+        "interfacesAgree": true,
+        "consumer": "0xedaf8a25bb583ad164a94191b762414277198df9",
+        "version": 2
+      },
+      "observation": {
+        "finalized": {
+          "number": "187194",
+          "nativeHash": "0x52d43f6b90a9debc5437faf412bcca1b7be5c4ffff6db90b34246f19be24d1f5",
+          "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0x52d43f6b90a9debc5437faf412bcca1b7be5c4ffff6db90b34246f19be24d1f5"
+        },
+        "runtime": "portaldot-v3/3002",
+        "observedAt": "2026-10-25T09:34:59.747Z"
+      },
+      "binding": {
+        "id": "cfff0845-b6a1-4f77-a5c9-1245ae3df3f0",
+        "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+        "revision": "2"
+      },
+      "status": "recheck-required",
+      "available": false,
+      "reasons": [
+        "consumer-not-listed"
+      ],
+      "entryMatch": true,
+      "evaluationHash": "f11f545989666023a88b3033d1d5f34538971a4761dbd9561baf958477a58494",
+      "capture": "examples/token-catalog/data/testnet-v2/captures/09-rebind-r2.inputs.json"
+    },
+    {
+      "index": 10,
+      "step": "relist-r2",
+      "at": "2026-10-25T09:36:36.681Z",
+      "actor": "A (owner)",
+      "action": "list pUSD again on revision 2 (report 1faef921…, reviewer B, 6 decimals); read back through both interfaces",
+      "note": "",
+      "receipts": [
+        {
+          "kind": "list",
+          "extrinsicHash": "0x435979c0ff353ecd887e031490752671f9739f249d2344b9967d7292cb0f7eb3",
+          "blockNumber": "187205",
+          "blockHash": "0x7dc874cd19f9d1e8311cac5027090c0e54aac20cc0f165b964a06b5f3ad61eea",
+          "signer": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+          "token": "0x00001e6100000000000000000000000000010000",
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+          "decimals": 6
+        }
+      ],
+      "registry": {
+        "block": {
+          "number": "187211",
+          "nativeHash": "0xd5c9f2bb2788042728cac360535ed4bfdd760d0df9f52fce0df4498e81649780",
+          "evmHash": "0x572e79fcd516673a4eda62ba8c0b7c2ca7f5c1324dd70b9b6031ab2c975876b2"
+        },
+        "revision": "2",
+        "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+        "exists": true,
+        "decisions": {
+          "0x95db300103ec8b45884b13ed85230fbf02114065": {
+            "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+            "reviewed": true,
+            "approved": true
+          }
+        },
+        "interfacesAgree": true
+      },
+      "listing": {
+        "block": {
+          "number": "187211",
+          "nativeHash": "0xd5c9f2bb2788042728cac360535ed4bfdd760d0df9f52fce0df4498e81649780",
+          "evmHash": "0x572e79fcd516673a4eda62ba8c0b7c2ca7f5c1324dd70b9b6031ab2c975876b2"
+        },
+        "listed": true,
+        "entry": {
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065"
+        },
+        "interfacesAgree": true,
+        "consumer": "0xedaf8a25bb583ad164a94191b762414277198df9",
+        "version": 2
+      },
+      "observation": {
+        "finalized": {
+          "number": "187211",
+          "nativeHash": "0xd5c9f2bb2788042728cac360535ed4bfdd760d0df9f52fce0df4498e81649780",
+          "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0xd5c9f2bb2788042728cac360535ed4bfdd760d0df9f52fce0df4498e81649780"
+        },
+        "runtime": "portaldot-v3/3002",
+        "observedAt": "2026-10-25T09:36:45.488Z"
+      },
+      "binding": {
+        "id": "cfff0845-b6a1-4f77-a5c9-1245ae3df3f0",
+        "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+        "revision": "2"
+      },
+      "status": "valid",
+      "available": true,
+      "reasons": [],
+      "entryMatch": true,
+      "evaluationHash": "8ba17c50e005f25c7b585d4c19f2c20a183a15dd8ad29b5598cdbc1f4dcd6507",
+      "capture": "examples/token-catalog/data/testnet-v2/captures/10-relist-r2.inputs.json"
+    },
+    {
+      "index": 11,
+      "step": "revoke-r2",
+      "at": "2026-10-25T09:40:16.441Z",
+      "actor": "B (reviewer)",
+      "action": "request changes on revision 2 (approved = false); the registry decision alone un-lists pUSD on the v2 token list and the catalog withholds the entry",
+      "note": "",
+      "receipts": [
+        {
+          "kind": "review",
+          "approved": false,
+          "extrinsicHash": "0xa1b8688bfbcf775aecef7289866eab710444eb9fed04d7c12f2034373cf56766",
+          "blockNumber": "187230",
+          "blockHash": "0x36b7e0c915ae3e600b80a0dd94e0bde3db35ef47ed9dd065333f8f1d5fc9e727",
+          "signer": "5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ",
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "revision": "2",
+          "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51"
+        }
+      ],
+      "registry": {
+        "block": {
+          "number": "187248",
+          "nativeHash": "0x805c4748c4b246aa1de7b8cf261f9b8839bca3c03d994d7e264938301cce4d3d",
+          "evmHash": "0xa9df605b5a996912f3ea3fbba810c424809b7682ce03dad4c194c1786b19a189"
+        },
+        "revision": "2",
+        "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+        "exists": true,
+        "decisions": {
+          "0x95db300103ec8b45884b13ed85230fbf02114065": {
+            "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+            "reviewed": true,
+            "approved": false
+          }
+        },
+        "interfacesAgree": true
+      },
+      "listing": {
+        "block": {
+          "number": "187248",
+          "nativeHash": "0x805c4748c4b246aa1de7b8cf261f9b8839bca3c03d994d7e264938301cce4d3d",
+          "evmHash": "0xa9df605b5a996912f3ea3fbba810c424809b7682ce03dad4c194c1786b19a189"
+        },
+        "listed": false,
+        "entry": {
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065"
+        },
+        "interfacesAgree": true,
+        "consumer": "0xedaf8a25bb583ad164a94191b762414277198df9",
+        "version": 2
+      },
+      "observation": {
+        "finalized": {
+          "number": "187248",
+          "nativeHash": "0x805c4748c4b246aa1de7b8cf261f9b8839bca3c03d994d7e264938301cce4d3d",
+          "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0x805c4748c4b246aa1de7b8cf261f9b8839bca3c03d994d7e264938301cce4d3d"
+        },
+        "runtime": "portaldot-v3/3002",
+        "observedAt": "2026-10-25T09:40:25.866Z"
+      },
+      "binding": {
+        "id": "cfff0845-b6a1-4f77-a5c9-1245ae3df3f0",
+        "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+        "revision": "2"
+      },
+      "status": "recheck-required",
+      "available": false,
+      "reasons": [
+        "approval-revoked",
+        "consumer-not-listed"
+      ],
+      "entryMatch": true,
+      "evaluationHash": "cc8a8eee51dcb04c09a1c2c900df54d2a8183c619306c6dc6ef2acd800b732bf",
+      "capture": "examples/token-catalog/data/testnet-v2/captures/11-revoke-r2.inputs.json"
+    },
+    {
+      "index": 12,
+      "step": "reapprove-r2",
+      "at": "2026-10-25T09:43:18.329Z",
+      "actor": "B (reviewer)",
+      "action": "approve revision 2 again; the standing entry on the v2 token list counts again and the catalog publishes the approved entry",
+      "note": "",
+      "receipts": [
+        {
+          "kind": "review",
+          "approved": true,
+          "extrinsicHash": "0x6cee3f89def64b4e669242a518c14c6e1b1629cc012ddb522e90d1e29580b71a",
+          "blockNumber": "187271",
+          "blockHash": "0x520a38d8fdd4e2bf9a7f32e60681c08e0ef37a15e83d6986bf40f219760a5d47",
+          "signer": "5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ",
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "revision": "2",
+          "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51"
+        }
+      ],
+      "registry": {
+        "block": {
+          "number": "187279",
+          "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+          "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba"
+        },
+        "revision": "2",
+        "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+        "exists": true,
+        "decisions": {
+          "0x95db300103ec8b45884b13ed85230fbf02114065": {
+            "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+            "reviewed": true,
+            "approved": true
+          }
+        },
+        "interfacesAgree": true
+      },
+      "listing": {
+        "block": {
+          "number": "187279",
+          "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+          "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba"
+        },
+        "listed": true,
+        "entry": {
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065"
+        },
+        "interfacesAgree": true,
+        "consumer": "0xedaf8a25bb583ad164a94191b762414277198df9",
+        "version": 2
+      },
+      "observation": {
+        "finalized": {
+          "number": "187279",
+          "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+          "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39"
+        },
+        "runtime": "portaldot-v3/3002",
+        "observedAt": "2026-10-25T09:43:29.145Z"
+      },
+      "binding": {
+        "id": "cfff0845-b6a1-4f77-a5c9-1245ae3df3f0",
+        "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+        "revision": "2"
+      },
+      "status": "valid",
+      "available": true,
+      "reasons": [],
+      "entryMatch": true,
+      "evaluationHash": "9dfc49fad1a14aecd56f1b4c36ae23133055a4d84922a5bb74a22cf834d2fec4",
+      "capture": "examples/token-catalog/data/testnet-v2/captures/12-reapprove-r2.inputs.json"
+    }
+  ]
+}

@@ -95,6 +95,24 @@
       "role": "studio-watch",
       "studio": true,
       "network": "testnet"
+    },
+    {
+      "evidenceHash": "eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+      "projectName": "pUSD token list",
+      "release": "v1.0.1",
+      "profile": "native-asset",
+      "completedAt": "2026-10-25T09:19:23.187Z",
+      "role": "catalog-v2-check",
+      "network": "testnet"
+    },
+    {
+      "evidenceHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+      "projectName": "pUSD token list",
+      "release": "v1.0.1",
+      "profile": "native-asset",
+      "completedAt": "2026-10-25T09:29:17.646Z",
+      "role": "catalog-v2-recheck",
+      "network": "testnet"
     }
   ],
   "currentBaselineReportHash": "0272674216c3687911b6e97349414d39a31eb49c8173c02919262dfafc9dc0d5"

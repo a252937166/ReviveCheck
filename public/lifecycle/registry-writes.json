@@ -1,0 +1,266 @@
+{
+  "schema": "revivecheck.registry-writes.v1",
+  "network": "testnet",
+  "registry": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339",
+  "scope": "Writes driven from a terminal with project-controlled test wallets: the development wallet (docs/WALLET_PUBLIC.json) owns releases, the reviewer wallet (docs/REVIEWER_WALLET_PUBLIC.json) signs decisions. Distinct signers show role separation; both are controlled by the project, so this is not independent review.",
+  "items": [
+    {
+      "action": "submit",
+      "label": "pusd-catalog-v2",
+      "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+      "revision": "1",
+      "reportHash": "0xeb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+      "approved": null,
+      "sender": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+      "signer": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+      "extrinsicHash": "0x4d09c15021e03f1123819bac1715ee880b64a262aadecc1453af182b3358e505",
+      "blockHash": "0xf7fe072370ba8e5b229f3d26d900726bf543c825923933da5aded1c1eb9795e5",
+      "blockNumber": "187069",
+      "finalizedAt": "2026-10-25T09:22:24.603Z",
+      "feeTpot": "0.02160988363641",
+      "maxStorageDepositTpot": "7.683",
+      "events": [
+        {
+          "name": "ReportSubmitted",
+          "args": {
+            "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+            "owner": "0x48B9e37a2A2C9621172745dC377b9FC6B9a6a71b",
+            "revision": "1",
+            "reportHash": "0xeb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+            "name": "0x707573642d636174616c6f672d76320000000000000000000000000000000000"
+          }
+        }
+      ],
+      "readback": {
+        "block": {
+          "number": "187069",
+          "nativeHash": "0xf7fe072370ba8e5b229f3d26d900726bf543c825923933da5aded1c1eb9795e5",
+          "evmHash": "0x39f1f62668a27479fb8ce1426c29c55c787d3463ba1b1825096de554da7b7c6d"
+        },
+        "revision": "1",
+        "reportHash": "0xeb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+        "decision": {
+          "reviewer": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+          "reviewed": false,
+          "approved": false
+        },
+        "interfacesAgree": true
+      }
+    },
+    {
+      "action": "review",
+      "label": null,
+      "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+      "revision": "1",
+      "reportHash": "0xeb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+      "approved": true,
+      "sender": "0x95db300103ec8b45884b13ed85230fbf02114065",
+      "signer": "5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ",
+      "extrinsicHash": "0xf90702ef780e0a832c7ec07ec1001e48200d3107fa7b598cc46e681736fd4ceb",
+      "blockHash": "0x9e4c67cb64dd330dc38b8dbeda75d45636dc2a110064d1992578c50793a754d6",
+      "blockNumber": "187095",
+      "finalizedAt": "2026-10-25T09:25:00.794Z",
+      "feeTpot": "0.02480986004597",
+      "maxStorageDepositTpot": "3.8415",
+      "events": [
+        {
+          "name": "ReportReviewed",
+          "args": {
+            "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+            "reviewer": "0x95dB300103EC8B45884b13ed85230FbF02114065",
+            "revision": "1",
+            "reportHash": "0xeb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+            "approved": true
+          }
+        }
+      ],
+      "readback": {
+        "block": {
+          "number": "187095",
+          "nativeHash": "0x9e4c67cb64dd330dc38b8dbeda75d45636dc2a110064d1992578c50793a754d6",
+          "evmHash": "0x1638764b4404cf24ad0b96be5b1c53198827f2b09d02ebaf4736332b735dee7a"
+        },
+        "revision": "1",
+        "reportHash": "0xeb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+        "decision": {
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+          "reviewed": true,
+          "approved": true
+        },
+        "interfacesAgree": true
+      }
+    },
+    {
+      "action": "submit",
+      "label": "pusd-catalog-v2",
+      "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+      "revision": "2",
+      "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+      "approved": null,
+      "sender": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+      "signer": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+      "extrinsicHash": "0xd4818dec55ef294fa4d643bf5897f64044923f9493aab560e2bc2cb160740eab",
+      "blockHash": "0x75bd2b5a20b9a398dad45826e724697c1b4252e446547d0afb6bdab6b241d112",
+      "blockNumber": "187165",
+      "finalizedAt": "2026-10-25T09:31:59.964Z",
+      "feeTpot": "0.0209098819093",
+      "maxStorageDepositTpot": "0",
+      "events": [
+        {
+          "name": "ReportSubmitted",
+          "args": {
+            "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+            "owner": "0x48B9e37a2A2C9621172745dC377b9FC6B9a6a71b",
+            "revision": "2",
+            "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+            "name": "0x707573642d636174616c6f672d76320000000000000000000000000000000000"
+          }
+        }
+      ],
+      "readback": {
+        "block": {
+          "number": "187165",
+          "nativeHash": "0x75bd2b5a20b9a398dad45826e724697c1b4252e446547d0afb6bdab6b241d112",
+          "evmHash": "0xf3f713988c5a2c56703e9907dc22bc2ea40a79537082f8419d01e206b4d616e0"
+        },
+        "revision": "2",
+        "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+        "decision": {
+          "reviewer": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+          "reviewed": false,
+          "approved": false
+        },
+        "interfacesAgree": true
+      }
+    },
+    {
+      "action": "review",
+      "label": null,
+      "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+      "revision": "2",
+      "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+      "approved": true,
+      "sender": "0x95db300103ec8b45884b13ed85230fbf02114065",
+      "signer": "5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ",
+      "extrinsicHash": "0x5af1743333c313c4109005318f22343404d0ee7780df4f9557af12816a8b521a",
+      "blockHash": "0x839bfec62df3fd627a28b002a55a1baa32969619f7625a18814594641be0cfed",
+      "blockNumber": "187181",
+      "finalizedAt": "2026-10-25T09:33:36.090Z",
+      "feeTpot": "0.02410985826875",
+      "maxStorageDepositTpot": "0",
+      "events": [
+        {
+          "name": "ReportReviewed",
+          "args": {
+            "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+            "reviewer": "0x95dB300103EC8B45884b13ed85230FbF02114065",
+            "revision": "2",
+            "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+            "approved": true
+          }
+        }
+      ],
+      "readback": {
+        "block": {
+          "number": "187181",
+          "nativeHash": "0x839bfec62df3fd627a28b002a55a1baa32969619f7625a18814594641be0cfed",
+          "evmHash": "0xb6ea481e1582e61b561457c53f9d81194a899b4586aa9de64a719d3eea2b27be"
+        },
+        "revision": "2",
+        "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+        "decision": {
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+          "reviewed": true,
+          "approved": true
+        },
+        "interfacesAgree": true
+      }
+    },
+    {
+      "action": "review",
+      "label": null,
+      "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+      "revision": "2",
+      "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+      "approved": false,
+      "sender": "0x95db300103ec8b45884b13ed85230fbf02114065",
+      "signer": "5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ",
+      "extrinsicHash": "0xa1b8688bfbcf775aecef7289866eab710444eb9fed04d7c12f2034373cf56766",
+      "blockHash": "0x36b7e0c915ae3e600b80a0dd94e0bde3db35ef47ed9dd065333f8f1d5fc9e727",
+      "blockNumber": "187230",
+      "finalizedAt": "2026-10-25T09:38:31.127Z",
+      "feeTpot": "0.02410985767905",
+      "maxStorageDepositTpot": "0",
+      "events": [
+        {
+          "name": "ReportReviewed",
+          "args": {
+            "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+            "reviewer": "0x95dB300103EC8B45884b13ed85230FbF02114065",
+            "revision": "2",
+            "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+            "approved": false
+          }
+        }
+      ],
+      "readback": {
+        "block": {
+          "number": "187230",
+          "nativeHash": "0x36b7e0c915ae3e600b80a0dd94e0bde3db35ef47ed9dd065333f8f1d5fc9e727",
+          "evmHash": "0x5c5b559a34f12bf7c8a9c94d810adc2703fae56f65940c9bb275a43597631c22"
+        },
+        "revision": "2",
+        "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+        "decision": {
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+          "reviewed": true,
+          "approved": false
+        },
+        "interfacesAgree": true
+      }
+    },
+    {
+      "action": "review",
+      "label": null,
+      "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+      "revision": "2",
+      "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+      "approved": true,
+      "sender": "0x95db300103ec8b45884b13ed85230fbf02114065",
+      "signer": "5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ",
+      "extrinsicHash": "0x6cee3f89def64b4e669242a518c14c6e1b1629cc012ddb522e90d1e29580b71a",
+      "blockHash": "0x520a38d8fdd4e2bf9a7f32e60681c08e0ef37a15e83d6986bf40f219760a5d47",
+      "blockNumber": "187271",
+      "finalizedAt": "2026-10-25T09:42:36.774Z",
+      "feeTpot": "0.02410985629463",
+      "maxStorageDepositTpot": "0",
+      "events": [
+        {
+          "name": "ReportReviewed",
+          "args": {
+            "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+            "reviewer": "0x95dB300103EC8B45884b13ed85230FbF02114065",
+            "revision": "2",
+            "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+            "approved": true
+          }
+        }
+      ],
+      "readback": {
+        "block": {
+          "number": "187271",
+          "nativeHash": "0x520a38d8fdd4e2bf9a7f32e60681c08e0ef37a15e83d6986bf40f219760a5d47",
+          "evmHash": "0xcb0f4ef3e33025236aa99d16c82df66d45b10ebbb2bb9790ff35439ad41539ef"
+        },
+        "revision": "2",
+        "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+        "decision": {
+          "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+          "reviewed": true,
+          "approved": true
+        },
+        "interfacesAgree": true
+      }
+    }
+  ]
+}

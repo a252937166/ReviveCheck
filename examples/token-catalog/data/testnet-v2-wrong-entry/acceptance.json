@@ -1,0 +1,29 @@
+{
+  "schema": "revivecheck.token-catalog-acceptance.v2",
+  "ok": false,
+  "generatedAt": "2026-10-25T09:36:36.681Z",
+  "source": "fixture examples/token-catalog/data/testnet-v2/captures/10-relist-r2.inputs.json",
+  "catalog": "examples/token-catalog/data/testnet-v2-wrong-entry/catalog.json",
+  "tokens": [
+    {
+      "address": "0x00001e6100000000000000000000000000010000",
+      "symbol": "pUSD",
+      "status": "valid",
+      "available": false,
+      "reasons": [
+        "entry-mismatch:decimals"
+      ],
+      "entry": {
+        "match": false,
+        "mismatches": [
+          {
+            "field": "decimals",
+            "configured": 18,
+            "approved": 6
+          }
+        ]
+      }
+    }
+  ],
+  "rule": "Every token must evaluate to valid and publish exactly the approved entry. recheck-required, expired, unknown, unbound and an entry that differs from the approved report all fail the job; an unavailable verification is never a pass."
+}

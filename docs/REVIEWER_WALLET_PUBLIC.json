@@ -1,0 +1,10 @@
+{
+  "name": "ReviveCheck isolated V3 testnet reviewer",
+  "role": "reviewer",
+  "network": "portaldot-v3-testnet",
+  "type": "sr25519",
+  "ss58Format": 42,
+  "ss58Address": "5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ",
+  "publicKey": "0x50f0ee28b1bfe11a8b043b4282d77056f26714e721483734e1f448acf8cc8f3a",
+  "createdAt": "2026-10-25T09:18:18.372Z"
+}

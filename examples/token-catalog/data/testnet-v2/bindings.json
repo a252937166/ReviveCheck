@@ -1,6 +1,6 @@
 {
   "schema": "revivecheck.token-catalog-bindings.v1",
-  "policyHash": "2314f14b1a9b1a6763c0968db846a5c07021ed15804f276a2e1a5e911e704142",
+  "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
   "migrationFrom": {
     "config": "examples/token-catalog/config/testnet.json",
     "bindings": "examples/token-catalog/data/testnet/bindings.json",
@@ -28,6 +28,46 @@
         "blockHash": "0xdeda40b38138e6b83de68871c8c66f147e37ec9968abe21ab4d63cf15f53eeea"
       },
       "bindingHash": "a320bb83fd6ed4795e79402a2820af811e4d39239eb8b2bc24b21c7aa962f482"
+    },
+    {
+      "schema": "revivecheck.binding.v1",
+      "id": "4896a5a5-1fc6-4160-9049-7a01b11a8591",
+      "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
+      "policyName": "pUSD catalog policy (testnet, consumer v2, separate reviewer)",
+      "subject": "0x00001e6100000000000000000000000000010000",
+      "subjectKind": "native-asset",
+      "reportHash": "eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+      "release": "v1.0.1",
+      "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+      "revision": "1",
+      "boundBy": "catalog operator (project author); the owner and reviewer are distinct project-controlled accounts",
+      "boundAt": "2026-10-25T09:22:56.979Z",
+      "note": "First binding on the v2 consumer: report eb960cc7… submitted as revision 1 of pusd-catalog-v2 at #187069, stored on-chain at #187058. Not yet approved or listed.",
+      "storage": {
+        "extrinsicHash": "0x2489bd65a330e17e422ef6ff0ce87132a6ecdb0d20554bbbc04560654fa15b44",
+        "blockHash": "0x76eac2817fcff3ce08bec3ce1d3eab8da323cbf04263535223792ad7f5491083"
+      },
+      "bindingHash": "b6687fdf3455c09aee640cff8d42dea4a763135375988e71def57808f86d5bc6"
+    },
+    {
+      "schema": "revivecheck.binding.v1",
+      "id": "cfff0845-b6a1-4f77-a5c9-1245ae3df3f0",
+      "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
+      "policyName": "pUSD catalog policy (testnet, consumer v2, separate reviewer)",
+      "subject": "0x00001e6100000000000000000000000000010000",
+      "subjectKind": "native-asset",
+      "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+      "release": "v1.0.1",
+      "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+      "revision": "2",
+      "boundBy": "catalog operator (project author); the owner and reviewer are distinct project-controlled accounts",
+      "boundAt": "2026-10-25T09:34:49.140Z",
+      "note": "Explicit rebinding after revision 2: report 1faef921… submitted at #187165, approved by the reviewer account at #187181, stored on-chain at #187145. The revision-1 binding stays as history. Not yet relisted.",
+      "storage": {
+        "extrinsicHash": "0x80d46a8611bb486f3b71bdd6e9e15c96e522c536e2671c9f35d0a4496792feb3",
+        "blockHash": "0x18a28f38f2a66093eab90d11f438664428141cfade5df5ce031ff3f4519ce868"
+      },
+      "bindingHash": "4bdb5b1763db76eda2c203946af9c7c074f063080bbfe21d161ded10cd275283"
     }
   ]
 }

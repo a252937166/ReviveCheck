@@ -1,0 +1,19 @@
+{
+  "schema": "revivecheck.funding.v1",
+  "network": "testnet",
+  "scope": "Transfers between project-controlled testnet accounts. A funded reviewer account demonstrates role separation on-chain, not independent review.",
+  "items": [
+    {
+      "from": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+      "to": "5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ",
+      "amountTpot": "12",
+      "purpose": "Fund the project-controlled reviewer account so registry decisions are signed by a distinct account from the release owner.",
+      "extrinsicHash": "0x5319ce555383c07e16243b4983a23b502ee952bfa4e73d3c0a7dc97a1b32fbac",
+      "blockHash": "0x3366967f6369af538ad7c7b9692bbaac2728fe35775a8635f4828aa73ec9353f",
+      "blockNumber": "187050",
+      "finalizedAt": "2026-10-25T09:20:31.137Z",
+      "feeTpot": "0.01500519419575",
+      "recipientBalanceAfterTpot": "12"
+    }
+  ]
+}

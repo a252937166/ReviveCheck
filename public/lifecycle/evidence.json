@@ -29,6 +29,34 @@
       "finalizedAt": "2026-10-23T19:14:42.955Z",
       "feeTpot": "0.75150452838897",
       "retrievedAt": "2026-10-23T19:14:43.980Z"
+    },
+    {
+      "reportHash": "eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+      "release": "v1.0.1",
+      "projectName": "pUSD token list",
+      "bytes": 7369,
+      "contentHash": "0x298e6c62b0bc0ef444ec723e25b483b666887b8d110fda1fe3c2e810d0434259",
+      "publisher": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+      "extrinsicHash": "0x2489bd65a330e17e422ef6ff0ce87132a6ecdb0d20554bbbc04560654fa15b44",
+      "blockHash": "0x76eac2817fcff3ce08bec3ce1d3eab8da323cbf04263535223792ad7f5491083",
+      "blockNumber": "187058",
+      "finalizedAt": "2026-10-25T09:21:19.191Z",
+      "feeTpot": "0.74800433769188",
+      "retrievedAt": "2026-10-25T09:21:20.158Z"
+    },
+    {
+      "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+      "release": "v1.0.1",
+      "projectName": "pUSD token list",
+      "bytes": 7404,
+      "contentHash": "0xcae9e2a7bd13559a6c3c5536dd63c2dedcbb4dfc2d10847fb21138b8b6050f05",
+      "publisher": "5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt",
+      "extrinsicHash": "0x80d46a8611bb486f3b71bdd6e9e15c96e522c536e2671c9f35d0a4496792feb3",
+      "blockHash": "0x18a28f38f2a66093eab90d11f438664428141cfade5df5ce031ff3f4519ce868",
+      "blockNumber": "187145",
+      "finalizedAt": "2026-10-25T09:30:01.162Z",
+      "feeTpot": "0.75150433734406",
+      "retrievedAt": "2026-10-25T09:30:02.155Z"
     }
   ]
 }

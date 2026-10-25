@@ -2,10 +2,11 @@ name: Token Catalog acceptance
 
 # The downstream acceptance workflow, run on the reference consumer itself. It is offline:
 # the lifecycle runs on the in-memory stand-in chain, and the acceptance command evaluates
-# captured inputs. A job is green only when every catalog entry evaluates to `valid`; an
-# incomplete verification (unknown, recheck-required, expired, unbound) fails it, and the
-# second acceptance step proves that by requiring a failure. A maintainer's own CI would run
-# the live variant instead: see examples/token-catalog/acceptance.workflow.yml.
+# captured inputs. A job is green only when every catalog entry evaluates to `valid` AND
+# publishes exactly the approved entry; an incomplete verification (unknown,
+# recheck-required, expired, unbound) or a configured entry that differs from the approved
+# report fails it, and the must-fail steps prove that. A maintainer's own CI would run the
+# live variant instead: see examples/token-catalog/acceptance.workflow.yml.
 on:
   push:
     branches: ['**']
@@ -25,15 +26,29 @@ jobs:
       - run: npm ci
       - name: The local lifecycle reproduces the expected sequence (A submits, B approves, A lists, revision invalidates, recheck, reapproval, explicit rebinding)
         run: node examples/token-catalog/catalog.js demo --strict
-      - name: Acceptance passes on complete captured inputs
+      - name: Acceptance passes on the v2 inputs captured after the live re-approval (2026-10-25, step 12)
+        run: node examples/token-catalog/catalog.js acceptance --config examples/token-catalog/config/testnet-v2.json --fixture examples/token-catalog/data/testnet-v2/captures/12-reapprove-r2.inputs.json --out artifacts/local/token-catalog/ci-v2-captured
+      - name: Acceptance passes on the historical v1 inputs
         run: node examples/token-catalog/catalog.js acceptance --config examples/token-catalog/config/testnet.json --fixture examples/token-catalog/fixtures/testnet-policy-verified-2026-10-24.inputs.json --out artifacts/local/token-catalog/ci-captured
+      - name: Acceptance fails when the configured entry differs from the approved report, under the same valid inputs
+        run: |
+          if node examples/token-catalog/catalog.js acceptance --config examples/token-catalog/config/testnet-v2-wrong-entry.json --fixture examples/token-catalog/data/testnet-v2/captures/12-reapprove-r2.inputs.json --out artifacts/local/token-catalog/ci-wrong-entry; then
+            echo "The acceptance command passed an entry the approved report did not verify; it must fail." >&2
+            exit 1
+          fi
+      - name: Acceptance fails on the inputs captured while the approval was revoked (step 11)
+        run: |
+          if node examples/token-catalog/catalog.js acceptance --config examples/token-catalog/config/testnet-v2.json --fixture examples/token-catalog/data/testnet-v2/captures/11-revoke-r2.inputs.json --out artifacts/local/token-catalog/ci-revoked; then
+            echo "The acceptance command passed on a revoked approval; it must fail." >&2
+            exit 1
+          fi
       - name: Acceptance fails on an incomplete verification
         run: |
           if node examples/token-catalog/catalog.js acceptance --config examples/token-catalog/config/testnet.json --fixture examples/token-catalog/fixtures/unreachable.inputs.json --out artifacts/local/token-catalog/ci-unreachable; then
             echo "The acceptance command passed on unreachable inputs; it must fail." >&2
             exit 1
           fi
-      - name: Every published record is intact and consistent; deployment-dependent work is listed as pending
+      - name: Every published record is intact and consistent; anything not yet proven is listed as pending
         run: node scripts/release-status.js --out artifacts/local/release-status.json
       - uses: actions/upload-artifact@v4
         if: always()

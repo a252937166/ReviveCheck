@@ -1,0 +1,8 @@
+{
+  "schema": "revivecheck.token-catalog-inputs.v1",
+  "capturedAt": "2026-10-25T09:21:51.696Z",
+  "now": "2026-10-25T09:21:51.696Z",
+  "config": "pUSD token catalog (Portaldot V3 testnet, consumer v2)",
+  "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
+  "tokens": {}
+}
