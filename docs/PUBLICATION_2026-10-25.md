@@ -40,4 +40,14 @@ The first upload of the same files was packed with macOS `tar`, which stored App
 
 ## Release r2
 
-A second release will carry this provenance document and the status record that names it; its receipt is appended below once it is verified.
+Release `20261025-e7044d1-public-r2` superseded r1 at 2026-10-25T11:38:11Z. It was built from commit `e7044d1` (clean working tree; GitHub `main` carries it), which adds this provenance document and the status record that names r1 to the r1 source; every other published file is byte-identical to r1. The commit that appends this paragraph is the only source change after r2, so the live site is one commit behind the repository by exactly this text.
+
+| | |
+| --- | --- |
+| Payload | `revivecheck-public-20261025-e7044d1-public-r2.tar.gz`, 2,943,269 bytes, SHA-256 `28d73e68a464e274e01d8ef21c3174d921c66894f5c3a3d9b1aebf6773c05c77`, packed without macOS metadata |
+| Files | 99 files, 5,324,725 bytes; index SHA-256 `8b1a33ae0b9bbf6df1b29a68f34bcc5ea11ea9af77e4acc28d14efa23269e1d0` (unchanged from r1) |
+| Verification | all 99 files matched the manifest on the server after extraction and again when fetched over HTTPS; blocked paths 404; the four neighboring sites answered 200 |
+| Live status record | `release-status.json` on the site was generated at commit `1af6ae8` and names `siteRelease 20261025-8aee632-public-r1`; that is the record this release was meant to publish |
+| Rollback | `current` → `releases/20261025-8aee632-public-r1` by the same symlink replacement; r1 and r3 are retained |
+
+Receipts: `deployment-20261025-8aee632-public-r1.json` and `deployment-20261025-e7044d1-public-r2.json` with their manifests, under `/var/www/revivecheck/ops/` on the server and in the author's local release bundle.
