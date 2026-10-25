@@ -45,7 +45,8 @@ async function check(id, work) {
   catch (error) { checks.push({ id, status: 'failed', detail: String(error?.message || error).slice(0, 400) }); }
 }
 const PUBLICATION = Object.freeze({
-  site: 'https://revivecheck.axiqo.xyz/', sourceRepository: 'https://github.com/a252937166/ReviveCheck', build: 'https://dorahacks.io/build/50176',
+  site: 'https://revivecheck.axiqo.xyz/', siteRelease: '20261025-8aee632-public-r1', siteSourceCommit: '8aee632f9eff67211e482605527a043d89aa6b8a', sitePublishedAt: '2026-10-25T11:27:50Z', siteRecord: 'docs/PUBLICATION_2026-10-25.md',
+  sourceRepository: 'https://github.com/a252937166/ReviveCheck', sourceBranch: 'main', build: 'https://dorahacks.io/build/50176', buildDescribes: 'the 2026-10-24 release; not yet updated',
   video: 'https://www.youtube.com/watch?v=CvpzlQfya4U', videoRecordedAgainst: '2026-10-24 release (v0.3): the v2 deployment and the simulated catalog lifecycle; it predates the live v2 lifecycle recorded on 2026-10-25',
   deck: 'docs/FINAL_DECK.md', historicalDeck: 'artifacts/ReviveCheck-Check-in-Deck.pdf', freeze: '2026-11-06T04:00:00Z (November 5, 2026, 23:00 EST)',
 });
@@ -281,7 +282,7 @@ const status = {
     ...(levels.lifecycle?.established ? [] : [{ item: 'live v2 lifecycle', why: levels.lifecycle?.why }]),
     { item: 'Independent adoption', why: 'No external builder has installed or configured ReviveCheck; the second consumer and the benchmark are author-run.' },
     { item: 'Maintainer pilot', why: 'docs/PILOT_PROTOCOL.md describes the study; no participant has run it.' },
-    { item: 'Publication of this source', why: 'The hosted site, the video and the DoraHacks build describe the 2026-10-24 release until they are republished from this commit; the video predates the live v2 lifecycle.' },
+    { item: 'Video and DoraHacks build', why: 'The site was republished from commit 8aee632 on 2026-10-25 (release 20261025-8aee632-public-r1, docs/PUBLICATION_2026-10-25.md); the video, recorded on 2026-10-24, and the DoraHacks build description still describe the 2026-10-24 release.' },
   ],
 };
 if (outIndex >= 0) await writeFile(path.resolve(root, args[outIndex + 1]), `${JSON.stringify(status, null, 2)}\n`);

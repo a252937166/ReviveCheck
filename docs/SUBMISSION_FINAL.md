@@ -31,7 +31,7 @@ The owner and reviewer accounts of the recorded lifecycle are both controlled by
 
 ### Try and verify
 
-- Application: https://revivecheck.axiqo.xyz/ (republication from the 2026-10-25 source pending)
+- Application: https://revivecheck.axiqo.xyz/ (republished on 2026-10-25 from commit `8aee632`)
 - Video: https://www.youtube.com/watch?v=CvpzlQfya4U (recorded 2026-10-24; predates the live lifecycle)
 - Source and setup: https://github.com/a252937166/ReviveCheck
 - Token Catalog: https://github.com/a252937166/ReviveCheck/tree/main/examples/token-catalog

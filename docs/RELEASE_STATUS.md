@@ -59,7 +59,7 @@ Fourteen sealed reports under `public/reports/` verify against their file names;
 
 ## Publication and remaining boundaries
 
-- The hosted site (<https://revivecheck.axiqo.xyz/>), the YouTube video and the DoraHacks build describe the 2026-10-24 release (`docs/PUBLICATION_2026-10-24.md`) until they are republished from a commit that carries the live v2 lifecycle. The video predates that lifecycle and labels the catalog sequence as simulated, which was true when it was recorded.
+- The hosted site (<https://revivecheck.axiqo.xyz/>) was republished on 2026-10-25 from commit `8aee632` as release `20261025-8aee632-public-r1` (`docs/PUBLICATION_2026-10-25.md`): 99 files verified byte for byte on the server and over HTTPS, the previous release kept for rollback. GitHub `main` carries the same commit. The YouTube video and the DoraHacks build still describe the 2026-10-24 release (`docs/PUBLICATION_2026-10-24.md`); the video predates the live lifecycle and labels the catalog sequence as simulated, which was true when it was recorded.
 - No builder outside the project has installed or configured ReviveCheck. The second consumer repository and the fair benchmark were run by the author; `docs/PILOT_PROTOCOL.md` describes the study that would change that.
 - No Discord message or new hackathon registration is part of this release. Updating the existing Build is not an organizer acceptance decision.
 - The official freeze is November 5, 2026, 23:00 EST (November 6, 04:00 UTC). Final materials must reflect the evidence completed by then.
