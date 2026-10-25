@@ -1,0 +1,474 @@
+{
+  "schema": "revivecheck.fair-benchmark.revivecheck-output.v1",
+  "note": "The two documents catalog.js build/acceptance writes (catalog.json and evaluations/<token>.json), bundled in one file for the reconstruction test.",
+  "source": "captured inputs examples/token-catalog/data/testnet-v2/captures/12-reapprove-r2.inputs.json",
+  "library": [
+    "lib/policy.js evaluateBinding",
+    "examples/token-catalog/lib/catalog.js buildCatalog (approvedEntry, compareEntry)"
+  ],
+  "catalog": {
+    "schema": "revivecheck.token-catalog.v2",
+    "name": "pUSD token catalog (Portaldot V3 testnet, consumer v2)",
+    "mode": "testnet",
+    "simulation": false,
+    "generatedAt": "2026-10-25T09:43:18.329Z",
+    "policy": {
+      "name": "pUSD catalog policy (testnet, consumer v2, separate reviewer)",
+      "hash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
+      "network": {
+        "key": "testnet",
+        "chainId": 420420777,
+        "genesisHash": "0xd4f9acbcf7f52388d8b095abe3c198d19fc510e0343e643e87cfbccb155283bd"
+      },
+      "runtime": {
+        "specName": "portaldot-v3",
+        "specVersions": [
+          "3002"
+        ]
+      },
+      "subject": {
+        "kind": "native-asset",
+        "assetId": "7777",
+        "address": "0x00001e6100000000000000000000000000010000"
+      },
+      "planHash": "ce76c98f90e2851aff534febe6c39a4802fbef32e478a665d3e4109352222191",
+      "evidence": {
+        "scope": "portaldot-testnet-readonly",
+        "maxAgeSeconds": 604800,
+        "maxObservationAgeSeconds": 900,
+        "requireInterfacesAgree": true,
+        "requireStoredOnChain": true
+      },
+      "reviewers": {
+        "trusted": [
+          "0x95db300103ec8b45884b13ed85230fbf02114065"
+        ],
+        "threshold": 1,
+        "basis": "The project's separate reviewer test account. The release owner's own approval does not count under this policy. Both accounts are controlled by the project, so this demonstrates role separation on-chain, not independent review; a production catalog would name reviewers it does not control."
+      },
+      "registry": {
+        "address": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339",
+        "owner": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+        "label": "pusd-catalog-v2"
+      },
+      "consumer": {
+        "address": "0xedaf8a25bb583ad164a94191b762414277198df9",
+        "requireListed": true,
+        "version": 2
+      }
+    },
+    "roles": {
+      "owner": {
+        "address": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+        "control": "the project's development test account (5GH8LpSTf6sp31FeacbFE99E3b9NQb5E7xWHeBL8XqW3YhTt); it owns the pusd-catalog-v2 release and signs the listings"
+      },
+      "reviewer": {
+        "address": "0x95db300103ec8b45884b13ed85230fbf02114065",
+        "control": "the project's separate reviewer test account (5DtqFzALznihBAE5wWmWJ1owZcFbiUX6hYKcvAZyt3sSUDjZ), funded from the development account on 2026-10-25; a distinct signer controlled by the same project, so this shows role separation, not independent review"
+      },
+      "operator": {
+        "control": "the project author, binding approved reports explicitly from a terminal and recording each live step; no independent adoption is claimed"
+      }
+    },
+    "tokens": [
+      {
+        "chainId": 420420777,
+        "address": "0x00001e6100000000000000000000000000010000",
+        "symbol": "pUSD",
+        "name": "Portaldot USD (test)",
+        "decimals": 6,
+        "assetId": "7777",
+        "available": true,
+        "status": "valid",
+        "reasons": [],
+        "nextAction": "Enable the subject under this policy. Validity is a point-in-time result: evaluate again before each use.",
+        "entry": {
+          "source": "approved-report",
+          "verified": [
+            "chainId",
+            "address",
+            "symbol",
+            "name",
+            "decimals",
+            "assetId"
+          ],
+          "match": true,
+          "mismatches": [],
+          "reason": null,
+          "configured": {
+            "chainId": 420420777,
+            "address": "0x00001e6100000000000000000000000000010000",
+            "symbol": "pUSD",
+            "name": "Portaldot USD (test)",
+            "decimals": 6,
+            "assetId": "7777"
+          },
+          "approved": {
+            "chainId": 420420777,
+            "address": "0x00001e6100000000000000000000000000010000",
+            "symbol": "pUSD",
+            "name": "Portaldot USD (test)",
+            "decimals": 6,
+            "assetId": "7777"
+          },
+          "identity": "3bbb9cc2ff10f7ea08b51556ceab5fd87b923191682c1c3758a5aaace105138c",
+          "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+          "checkpoint": {
+            "number": "187136",
+            "nativeHash": "0x08cbf463c726734e4837aebbe316bfac3b2fcafa65e14671217a3210bc81c798",
+            "evmHash": "0x7c6c56fe44ba519f936fd4fe2d78607aba07aff03c4ff4ba5bbdeb7365c44f91"
+          }
+        },
+        "binding": {
+          "id": "cfff0845-b6a1-4f77-a5c9-1245ae3df3f0",
+          "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+          "release": "v1.0.1",
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "revision": "2",
+          "boundBy": "catalog operator (project author); the owner and reviewer are distinct project-controlled accounts",
+          "boundAt": "2026-10-25T09:34:49.140Z",
+          "note": "Explicit rebinding after revision 2: report 1faef921… submitted at #187165, approved by the reviewer account at #187181, stored on-chain at #187145. The revision-1 binding stays as history. Not yet relisted.",
+          "storage": {
+            "extrinsicHash": "0x80d46a8611bb486f3b71bdd6e9e15c96e522c536e2671c9f35d0a4496792feb3",
+            "blockHash": "0x18a28f38f2a66093eab90d11f438664428141cfade5df5ce031ff3f4519ce868"
+          },
+          "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd"
+        },
+        "evaluation": {
+          "evaluatedAt": "2026-10-25T09:43:18.329Z",
+          "checkpoint": {
+            "registry": {
+              "number": "187279",
+              "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+              "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba"
+            },
+            "observation": {
+              "number": "187279",
+              "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+              "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39"
+            },
+            "listing": {
+              "number": "187279",
+              "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+              "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba"
+            }
+          },
+          "evaluationHash": "9dfc49fad1a14aecd56f1b4c36ae23133055a4d84922a5bb74a22cf834d2fec4",
+          "nextAction": "Enable the subject under this policy. Validity is a point-in-time result: evaluate again before each use.",
+          "checks": 35,
+          "failed": []
+        }
+      }
+    ],
+    "summary": {
+      "available": 1,
+      "total": 1
+    },
+    "history": {
+      "current": [
+        {
+          "id": "4896a5a5-1fc6-4160-9049-7a01b11a8591",
+          "reportHash": "eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+          "release": "v1.0.1",
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "revision": "1",
+          "boundBy": "catalog operator (project author); the owner and reviewer are distinct project-controlled accounts",
+          "boundAt": "2026-10-25T09:22:56.979Z",
+          "note": "First binding on the v2 consumer: report eb960cc7… submitted as revision 1 of pusd-catalog-v2 at #187069, stored on-chain at #187058. Not yet approved or listed.",
+          "storage": {
+            "extrinsicHash": "0x2489bd65a330e17e422ef6ff0ce87132a6ecdb0d20554bbbc04560654fa15b44",
+            "blockHash": "0x76eac2817fcff3ce08bec3ce1d3eab8da323cbf04263535223792ad7f5491083"
+          },
+          "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd"
+        },
+        {
+          "id": "cfff0845-b6a1-4f77-a5c9-1245ae3df3f0",
+          "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+          "release": "v1.0.1",
+          "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+          "revision": "2",
+          "boundBy": "catalog operator (project author); the owner and reviewer are distinct project-controlled accounts",
+          "boundAt": "2026-10-25T09:34:49.140Z",
+          "note": "Explicit rebinding after revision 2: report 1faef921… submitted at #187165, approved by the reviewer account at #187181, stored on-chain at #187145. The revision-1 binding stays as history. Not yet relisted.",
+          "storage": {
+            "extrinsicHash": "0x80d46a8611bb486f3b71bdd6e9e15c96e522c536e2671c9f35d0a4496792feb3",
+            "blockHash": "0x18a28f38f2a66093eab90d11f438664428141cfade5df5ce031ff3f4519ce868"
+          },
+          "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd"
+        }
+      ],
+      "historical": [
+        {
+          "id": "5029767f-1b1f-43d6-ab90-3e2c7f70d70c",
+          "reportHash": "cbd78faa85f8759860d88366794e0c70052b74f9ed775be5bb37ad20118ed427",
+          "release": "v1.0.1",
+          "releaseId": "0xe3f6ab7784cbaa8f60171e5201fea4e27fa5cec3d6682e06d8fcb7d89181f808",
+          "revision": "1",
+          "boundBy": "Project-controlled catalog operator; the release owner and reviewer are the same isolated test account.",
+          "boundAt": "2026-10-24T17:07:52.088Z",
+          "note": "Explicit migration to the verified v2 consumer. The report, Registry revision and existing exact-report approval are unchanged; the v1 policy and binding remain preserved.",
+          "storage": {
+            "extrinsicHash": "0x14b66988c9b160c1442485eae729ec92731fedd45820f8b63718f2c6405520ac",
+            "blockHash": "0xdeda40b38138e6b83de68871c8c66f147e37ec9968abe21ab4d63cf15f53eeea"
+          },
+          "policyHash": "2314f14b1a9b1a6763c0968db846a5c07021ed15804f276a2e1a5e911e704142",
+          "historical": {
+            "policyHash": "2314f14b1a9b1a6763c0968db846a5c07021ed15804f276a2e1a5e911e704142",
+            "note": "The first v2 policy (2026-10-24) trusted the owner account as its reviewer and named the pusd-token-list release; its binding of the v1 report was never listed on v2. Superseded on 2026-10-25 by this role-separated policy on the pusd-catalog-v2 release. The binding is kept as history."
+          }
+        }
+      ]
+    },
+    "rule": "An entry is available only when its latest binding evaluates to valid under this policy and the published fields equal the approved report field by field. A valid evaluation with a differing configured entry withholds the entry and names the field.",
+    "caveat": "An available entry means the policy held at the recorded checkpoints and time. The roles above say who controls each account; this catalog does not establish independent review or adoption."
+  },
+  "evaluation": {
+    "schema": "revivecheck.policy-evaluation.v1",
+    "policyName": "pUSD catalog policy (testnet, consumer v2, separate reviewer)",
+    "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
+    "subject": "0x00001e6100000000000000000000000000010000",
+    "subjectKind": "native-asset",
+    "bindingId": "cfff0845-b6a1-4f77-a5c9-1245ae3df3f0",
+    "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+    "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+    "revision": "2",
+    "status": "valid",
+    "enable": true,
+    "reasons": [],
+    "checks": [
+      {
+        "id": "evidence.integrity",
+        "status": "passed",
+        "observed": "binding and report verify",
+        "expected": "an intact binding under this policy and its exact semantically consistent report"
+      },
+      {
+        "id": "evidence.scope",
+        "status": "passed",
+        "observed": "live/portaldot-testnet-readonly",
+        "expected": "portaldot-testnet-readonly"
+      },
+      {
+        "id": "target.network",
+        "status": "passed",
+        "observed": "chain 420420777, genesis 0xd4f9acbcf7…",
+        "expected": "chain 420420777, genesis 0xd4f9acbcf7…"
+      },
+      {
+        "id": "target.subject",
+        "status": "passed",
+        "observed": "asset 7777 at 0x00001e6100000000000000000000000000010000",
+        "expected": "asset 7777 at 0x00001e6100000000000000000000000000010000"
+      },
+      {
+        "id": "plan.fingerprint",
+        "status": "passed",
+        "observed": "ce76c98f90e2851aff534febe6c39a4802fbef32e478a665d3e4109352222191",
+        "expected": "ce76c98f90e2851aff534febe6c39a4802fbef32e478a665d3e4109352222191"
+      },
+      {
+        "id": "report.status",
+        "status": "passed",
+        "observed": "passed",
+        "expected": "passed"
+      },
+      {
+        "id": "runtime.report",
+        "status": "passed",
+        "observed": "portaldot-v3/3002",
+        "expected": "portaldot-v3/3002"
+      },
+      {
+        "id": "observation.present",
+        "status": "passed",
+        "observed": "observation without a time",
+        "expected": "a dated finalized observation of the network"
+      },
+      {
+        "id": "observation.fresh",
+        "status": "passed",
+        "observed": "-11 s old",
+        "expected": "at most 900 s old"
+      },
+      {
+        "id": "observation.network",
+        "status": "passed",
+        "observed": "chain 420420777, genesis 0xd4f9acbcf7…",
+        "expected": "chain 420420777, genesis 0xd4f9acbcf7…"
+      },
+      {
+        "id": "runtime.current",
+        "status": "passed",
+        "observed": "portaldot-v3/3002",
+        "expected": "portaldot-v3/3002"
+      },
+      {
+        "id": "evidence.age",
+        "status": "passed",
+        "observed": "841 s since the report",
+        "expected": "at most 604800 s old, with at most 60 s clock skew"
+      },
+      {
+        "id": "registry.read",
+        "status": "passed",
+        "observed": "read",
+        "expected": "releaseOf and every trusted decision through both interfaces"
+      },
+      {
+        "id": "registry.provenance",
+        "status": "passed",
+        "observed": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339, 0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927, 2026-10-25T09:43:29.766Z",
+        "expected": "the dated registry contract and release"
+      },
+      {
+        "id": "registry.domain",
+        "status": "passed",
+        "observed": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339, 0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+        "expected": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339, 0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927"
+      },
+      {
+        "id": "registry.fresh",
+        "status": "passed",
+        "observed": "-11 s old",
+        "expected": "at most 900 s old"
+      },
+      {
+        "id": "registry.interfaces",
+        "status": "passed",
+        "observed": "EVM RPC and ReviveApi agree",
+        "expected": "agreement at one finalized block"
+      },
+      {
+        "id": "registry.release",
+        "status": "passed",
+        "observed": "revision 2",
+        "expected": "the release exists"
+      },
+      {
+        "id": "registry.owner",
+        "status": "passed",
+        "observed": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+        "expected": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b"
+      },
+      {
+        "id": "registry.label",
+        "status": "passed",
+        "observed": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+        "expected": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927"
+      },
+      {
+        "id": "registry.revision",
+        "status": "passed",
+        "observed": "revision 2, report 0x1faef921a720…",
+        "expected": "revision 2, report 0x1faef921a720…"
+      },
+      {
+        "id": "registry.approvals",
+        "status": "passed",
+        "observed": "1 of 1 trusted reviewer approved revision 2",
+        "expected": "at least 1, every trusted decision read and no trusted request for changes"
+      },
+      {
+        "id": "consumer.read",
+        "status": "passed",
+        "observed": "read",
+        "expected": "isListed and entryOf through both interfaces"
+      },
+      {
+        "id": "consumer.provenance",
+        "status": "passed",
+        "observed": "0xedaf8a25bb583ad164a94191b762414277198df9, 0x00001e6100000000000000000000000000010000, 2026-10-25T09:43:32.195Z",
+        "expected": "the dated consumer contract and token"
+      },
+      {
+        "id": "consumer.domain",
+        "status": "passed",
+        "observed": "0xedaf8a25bb583ad164a94191b762414277198df9, 0x00001e6100000000000000000000000000010000",
+        "expected": "0xedaf8a25bb583ad164a94191b762414277198df9, 0x00001e6100000000000000000000000000010000"
+      },
+      {
+        "id": "consumer.fresh",
+        "status": "passed",
+        "observed": "-14 s old",
+        "expected": "at most 900 s old"
+      },
+      {
+        "id": "consumer.identity",
+        "status": "passed",
+        "observed": "identity at 0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+        "expected": "consumer identity through both interfaces at the listing checkpoint"
+      },
+      {
+        "id": "consumer.registry",
+        "status": "passed",
+        "observed": "0xedaf8a25bb583ad164a94191b762414277198df9, registry 0xe949b200edf070b9d425b206ed24dc8fe5b7d339",
+        "expected": "0xedaf8a25bb583ad164a94191b762414277198df9, registry 0xe949b200edf070b9d425b206ed24dc8fe5b7d339"
+      },
+      {
+        "id": "consumer.version-known",
+        "status": "passed",
+        "observed": "2",
+        "expected": "an observed getter or the explicitly selected, code-verified legacy deployment"
+      },
+      {
+        "id": "consumer.version",
+        "status": "passed",
+        "observed": "2",
+        "expected": "2"
+      },
+      {
+        "id": "consumer.interfaces",
+        "status": "passed",
+        "observed": "EVM RPC and ReviveApi agree",
+        "expected": "agreement at one finalized block"
+      },
+      {
+        "id": "consumer.listed",
+        "status": "passed",
+        "observed": "listed",
+        "expected": "listed"
+      },
+      {
+        "id": "consumer.entry",
+        "status": "passed",
+        "observed": "release 0x28ab8a86a4…, report 0x1faef921a7…, reviewer 0x95db300103ec8b45884b13ed85230fbf02114065",
+        "expected": "release 0x28ab8a86a4…, report 0x1faef921a7…, a trusted reviewer"
+      },
+      {
+        "id": "storage.read",
+        "status": "passed",
+        "observed": "not verified",
+        "expected": "the report retrieved and verified from chain data"
+      },
+      {
+        "id": "storage.report",
+        "status": "passed",
+        "observed": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+        "expected": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51"
+      }
+    ],
+    "checkpoint": {
+      "registry": {
+        "number": "187279",
+        "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+        "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba"
+      },
+      "observation": {
+        "number": "187279",
+        "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+        "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39"
+      },
+      "listing": {
+        "number": "187279",
+        "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+        "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba"
+      }
+    },
+    "reviewerTrust": "The project's separate reviewer test account. The release owner's own approval does not count under this policy. Both accounts are controlled by the project, so this demonstrates role separation on-chain, not independent review; a production catalog would name reviewers it does not control.",
+    "simulation": false,
+    "evaluatedAt": "2026-10-25T09:43:18.329Z",
+    "nextAction": "Enable the subject under this policy. Validity is a point-in-time result: evaluate again before each use.",
+    "caveat": "A valid result means every policy condition held at the recorded checkpoints and time. It is not a guarantee of future state, a security audit or independent review; the trusted reviewer set is the policy author's choice.",
+    "evaluationHash": "9dfc49fad1a14aecd56f1b4c36ae23133055a4d84922a5bb74a22cf834d2fec4"
+  }
+}

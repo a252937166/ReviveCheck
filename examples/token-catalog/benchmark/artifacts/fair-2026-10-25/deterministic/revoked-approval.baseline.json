@@ -1,0 +1,132 @@
+{
+  "schema": "maintainer-ci-script.result.v1",
+  "script": "examples/token-catalog/benchmark/lib/baseline.mjs",
+  "startedAt": "2026-10-25T10:25:36.025Z",
+  "finishedAt": "2026-10-25T10:25:36.026Z",
+  "now": "2026-10-25T09:40:16.441Z",
+  "source": "replayed examples/token-catalog/data/testnet-v2/captures/11-revoke-r2.inputs.json: registry and listing views as eth_call results, the observation as the checkpoint, the stored report from evidence.run, entry chain values from the report's raw token.listing evidence",
+  "config": {
+    "entry": {
+      "chainId": 420420777,
+      "address": "0x00001e6100000000000000000000000000010000",
+      "symbol": "pUSD",
+      "name": "Portaldot USD (test)",
+      "decimals": 6,
+      "assetId": "7777"
+    },
+    "registry": {
+      "address": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339",
+      "owner": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+      "label": "pusd-catalog-v2"
+    },
+    "tokenList": {
+      "address": "0xedaf8a25bb583ad164a94191b762414277198df9"
+    },
+    "trustedReviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+    "approvalRecord": {
+      "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+      "revision": "2",
+      "storage": {
+        "extrinsicHash": "0x80d46a8611bb486f3b71bdd6e9e15c96e522c536e2671c9f35d0a4496792feb3",
+        "blockHash": "0x18a28f38f2a66093eab90d11f438664428141cfade5df5ce031ff3f4519ce868"
+      }
+    },
+    "limits": {
+      "maxReportAgeSeconds": 604800,
+      "runtime": "portaldot-v3/3002"
+    },
+    "endpoints": {
+      "evmRpc": "https://test-evm-rpc-v3.portaldot.dev",
+      "nativeRpc": "wss://test-node-v3.portaldot.dev"
+    }
+  },
+  "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+  "checkpoint": {
+    "number": "187248",
+    "nativeHash": "0x805c4748c4b246aa1de7b8cf261f9b8839bca3c03d994d7e264938301cce4d3d",
+    "evmHash": "0xa9df605b5a996912f3ea3fbba810c424809b7682ce03dad4c194c1786b19a189",
+    "runtime": "portaldot-v3/3002",
+    "chainId": 420420777
+  },
+  "checks": [
+    {
+      "id": "C1",
+      "name": "entry-vs-chain",
+      "ok": true,
+      "observed": "chainId 420420777, address 0x00001e6100000000000000000000000000010000, symbol pUSD, name Portaldot USD (test), decimals 6; native and ERC-20 agree",
+      "expected": "every entry field equals the chain through both interfaces",
+      "chainValues": {
+        "native": {
+          "exists": true,
+          "symbol": "pUSD",
+          "name": "Portaldot USD (test)",
+          "decimals": 6,
+          "readAt": "report checkpoint #187136 (native)"
+        },
+        "evm": {
+          "symbol": "pUSD",
+          "name": "Portaldot USD (test)",
+          "decimals": 6,
+          "readAt": "report checkpoint #187136 (evm)"
+        }
+      },
+      "readAt": "report checkpoint #187136 (native)"
+    },
+    {
+      "id": "C2",
+      "name": "trusted-approval",
+      "ok": false,
+      "observed": "registry revision 2 report 0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51 owner 0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b; reviewer 0x95db300103ec8b45884b13ed85230fbf02114065 reviewed true approved false; recorded revision 2 report 0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51; issues: changes-requested",
+      "expected": "the current revision carries the recorded report hash and the trusted reviewer approved it",
+      "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+      "release": {
+        "owner": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+        "revision": "2",
+        "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51"
+      },
+      "decision": {
+        "reviewed": true,
+        "approved": false
+      }
+    },
+    {
+      "id": "C3",
+      "name": "listing-entry",
+      "ok": false,
+      "observed": "isListed false; entry release 0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927, report 0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51, reviewer 0x95db300103ec8b45884b13ed85230fbf02114065; issues: not-listed",
+      "expected": "listed on the recorded release, report hash and reviewer",
+      "listed": false,
+      "entry": {
+        "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+        "reportHash": "0x1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+        "reviewer": "0x95db300103ec8b45884b13ed85230fbf02114065"
+      }
+    },
+    {
+      "id": "C4",
+      "name": "stored-report",
+      "ok": true,
+      "observed": "block #187145 canonical true finalized true; 7404 bytes; recomputed SHA-256 1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51; stored evidenceHash 1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+      "expected": "the stored report is in a canonical finalized block and its canonical SHA-256 is the recorded hash",
+      "blockNumber": "187145",
+      "bytes": 7404,
+      "recomputed": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51"
+    },
+    {
+      "id": "C5",
+      "name": "age-runtime",
+      "ok": true,
+      "observed": "report completed 2026-10-25T09:29:17.646Z, 659 s before 2026-10-25T09:40:16.441Z (limit 604800 s); report runtime portaldot-v3/3002, chain runtime portaldot-v3/3002, allowed portaldot-v3/3002",
+      "expected": "the report is within the maximum age and pinned the runtime the chain runs now",
+      "ageSeconds": 659,
+      "reportRuntime": "portaldot-v3/3002",
+      "currentRuntime": "portaldot-v3/3002"
+    }
+  ],
+  "problems": [
+    "C2:changes-requested",
+    "C3:not-listed"
+  ],
+  "decision": "refuse",
+  "exitCode": 1
+}

@@ -80,7 +80,7 @@ function ReleaseUpdate() {
         <p className="release-boundary"><strong>{V2_ACTIVE ? 'v2 deployed, listed and evaluated' : 'v1 deployed · v2 deployment pending'}</strong>{V2_ACTIVE ? 'Entry ownership and delisting fixes are deployed and verified on the V3 testnet. pUSD is listed on v2 on a separate project-controlled reviewer account’s approval, and the live lifecycle is recorded with receipts. Historical v1 receipts stay preserved. Expiry, a runtime change and a node outage remain local SIMULATED cases.' : 'Historical v1 reads remain available. New token-list writes are disabled until the corrected v2 deployment is verified and activated.'}</p>
       </div>
     </div>
-    <p className="stats-note">The value experiment compares a scripted baseline with two packaged commands. It records repeatability and decision evidence; it does not establish human time savings or external adoption. <a className="text-link" href={`${REPO}/blob/main/docs/VALUE_EXPERIMENT.md`} target="_blank" rel="noreferrer">Read the experiment</a>.</p>
+    <p className="stats-note">The value experiment runs the same five checks both ways, as a maintainer's script over raw reads and through ReviveCheck, on identical captured checkpoints and live. Both arms decided every scenario correctly; neither was shown to be faster; no human time saving or adoption is claimed. <a className="text-link" href={`${REPO}/blob/main/docs/VALUE_EXPERIMENT.md`} target="_blank" rel="noreferrer">Read the experiment</a>.</p>
   </section>;
 }
 

@@ -1,0 +1,93 @@
+{
+  "schema": "maintainer-ci-script.result.v1",
+  "script": "examples/token-catalog/benchmark/lib/baseline.mjs",
+  "startedAt": "2026-10-25T10:26:53.539Z",
+  "finishedAt": "2026-10-25T10:26:53.540Z",
+  "now": "2026-10-25T10:26:53.539Z",
+  "source": "live reads: eth_call over https://test-evm-rpc-v3.portaldot.dev at the finalized block's EVM hash; polkadot-js storage and blocks over wss://test-node-v3.portaldot.dev; one connection, sequential",
+  "config": {
+    "entry": {
+      "chainId": 420420777,
+      "address": "0x00001e6100000000000000000000000000010000",
+      "symbol": "pUSD",
+      "name": "Portaldot USD (test)",
+      "decimals": 6,
+      "assetId": "7777"
+    },
+    "registry": {
+      "address": "0xe949b200edf070b9d425b206ed24dc8fe5b7d339",
+      "owner": "0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b",
+      "label": "pusd-catalog-v2"
+    },
+    "tokenList": {
+      "address": "0xedaf8a25bb583ad164a94191b762414277198df9"
+    },
+    "trustedReviewer": "0x95db300103ec8b45884b13ed85230fbf02114065",
+    "approvalRecord": {
+      "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+      "revision": "2",
+      "storage": {
+        "extrinsicHash": "0x80d46a8611bb486f3b71bdd6e9e15c96e522c536e2671c9f35d0a4496792feb3",
+        "blockHash": "0x18a28f38f2a66093eab90d11f438664428141cfade5df5ce031ff3f4519ce868"
+      }
+    },
+    "limits": {
+      "maxReportAgeSeconds": 604800,
+      "runtime": "portaldot-v3/3002"
+    },
+    "endpoints": {
+      "evmRpc": "https://test-evm-rpc-v3.portaldot.dev",
+      "nativeRpc": "wss://test-node-v3.portaldot.dev"
+    }
+  },
+  "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+  "checkpoint": {
+    "error": "simulated outage: the native node is unreachable (benchmark injection)"
+  },
+  "checks": [
+    {
+      "id": "C1",
+      "name": "entry-vs-chain",
+      "ok": null,
+      "observed": "read failed: no finalized checkpoint",
+      "expected": "every entry field equals the chain through both interfaces"
+    },
+    {
+      "id": "C2",
+      "name": "trusted-approval",
+      "ok": null,
+      "observed": "read failed: no finalized checkpoint",
+      "expected": "the current revision carries the recorded report hash and the trusted reviewer approved it"
+    },
+    {
+      "id": "C3",
+      "name": "listing-entry",
+      "ok": null,
+      "observed": "read failed: no finalized checkpoint",
+      "expected": "listed on the recorded release, report hash and reviewer"
+    },
+    {
+      "id": "C4",
+      "name": "stored-report",
+      "ok": null,
+      "observed": "read failed: simulated outage: the native node is unreachable (benchmark injection)",
+      "expected": "the stored report is in a canonical finalized block and its canonical SHA-256 is the recorded hash"
+    },
+    {
+      "id": "C5",
+      "name": "age-runtime",
+      "ok": null,
+      "observed": "no verified stored report to date",
+      "expected": "the report is within the maximum age and pinned the runtime the chain runs now"
+    }
+  ],
+  "problems": [
+    "C1:unavailable",
+    "C2:unavailable",
+    "C3:unavailable",
+    "C4:unavailable",
+    "C5:unavailable"
+  ],
+  "decision": "refuse",
+  "exitCode": 1
+}

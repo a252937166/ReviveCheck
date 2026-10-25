@@ -1,0 +1,3712 @@
+{
+  "schema": "revivecheck.fair-value-benchmark.v1",
+  "startedAt": "2026-10-25T10:25:35.987Z",
+  "finishedAt": "2026-10-25T10:26:53.543Z",
+  "scope": "Author-run scripted comparison on the public Portaldot V3 testnet nodes. N = 1 run per mode. No human participant, no external maintainer, no adoption or willingness-to-pay evidence. Owner, reviewer and operator are project-controlled accounts. Case-level findings only.",
+  "protocol": {
+    "question": "May the pUSD entry { chainId 420420777, 0x00001e61...10000, pUSD, Portaldot USD (test), 6 decimals, asset 7777 } be enabled in the catalog right now?",
+    "arms": {
+      "baseline": {
+        "name": "CI script + explorer + approval record",
+        "implementation": "examples/token-catalog/benchmark/lib/baseline.mjs",
+        "reads": "JSON-RPC eth_call at the EVM hash of the finalized block (ethers for ABI), polkadot-js storage and blocks at the native hash; one connection per run, sequential reads",
+        "record": "the maintainer keeps the approved report hash, the revision and the remark.store extrinsic and block hash (what the explorer shows)",
+        "output": "maintainer-ci-script.result.v1: configuration echo, checkpoint, five checks with observed values, problem labels, decision, exit code"
+      },
+      "revivecheck": {
+        "name": "ReviveCheck policy evaluation and catalog entry comparison",
+        "implementation": "lib/policy.js evaluateBinding; examples/token-catalog/lib/catalog.js buildCatalog (approvedEntry, compareEntry); live inputs from lib/service.js collectPolicyInputs",
+        "invocation": "library calls in-process, the same calls catalog.js acceptance makes; the CLI was not spawned so both arms share one process and one timing tap",
+        "output": "catalog.json and evaluations/<token>.json as the CLI writes them, bundled"
+      }
+    },
+    "checks": [
+      {
+        "id": "C1",
+        "name": "entry-vs-chain",
+        "expected": "every entry field equals the chain through both interfaces",
+        "revivecheck": "approvedEntry requires a passed token.listing check that confirmed chainId, address, symbol, name and decimals through both interfaces at the report checkpoint; compareEntry requires the configured entry to equal that approved entry field by field (entry-mismatch:<field> otherwise); target.subject ties the report to the policy subject"
+      },
+      {
+        "id": "C2",
+        "name": "trusted-approval",
+        "expected": "the current revision carries the recorded report hash and the trusted reviewer approved it",
+        "revivecheck": "registry.read, registry.provenance, registry.domain, registry.fresh, registry.interfaces, registry.release, registry.owner, registry.label, registry.revision (exact report hash and revision), registry.approvals (trusted set, threshold, no request for changes)"
+      },
+      {
+        "id": "C3",
+        "name": "listing-entry",
+        "expected": "listed on the recorded release, report hash and reviewer",
+        "revivecheck": "consumer.read, consumer.provenance, consumer.domain, consumer.fresh, consumer.identity, consumer.registry, consumer.version-known, consumer.version, consumer.interfaces, consumer.listed, consumer.entry (release, exact report hash, a trusted reviewer)"
+      },
+      {
+        "id": "C4",
+        "name": "stored-report",
+        "expected": "the stored report is in a canonical finalized block and its canonical SHA-256 is the recorded hash",
+        "revivecheck": "storage.read (retrieved from a canonical finalized block, Remark.Stored event matches publisher and content hash, SHA-256 verifies), storage.report (it is the bound report)"
+      },
+      {
+        "id": "C5",
+        "name": "age-runtime",
+        "expected": "the report is within the maximum age and pinned the runtime the chain runs now",
+        "revivecheck": "evidence.age, runtime.report, observation.present, observation.fresh, observation.network, runtime.current"
+      }
+    ],
+    "reviveCheckOnly": [
+      "evidence.integrity (binding hash and report hash verify under this exact policy)",
+      "evidence.scope",
+      "target.network",
+      "plan.fingerprint",
+      "report.status",
+      "interface agreement for registry and consumer reads",
+      "consumer identity and version at the listing checkpoint",
+      "observation freshness windows",
+      "a documented reason vocabulary with the status each reason forces and a next action"
+    ],
+    "baselineOnly": [
+      "C1 re-reads the asset metadata at the evaluation checkpoint in live mode; ReviveCheck relies on the sealed report's token.listing check at the report checkpoint, bounded by evidence.age"
+    ],
+    "deterministicInputs": "Both arms consume the same captured inputs file (revivecheck.token-catalog-inputs.v1). The baseline replays registry.views.*.evm and listing.views.*.evm as its eth_call results, the observation as its finalized checkpoint and runtime, and evidence.run as the report it would decode from the block. No separate asset read was captured, so its C1 chain values come from the stored report's raw token.listing evidence (native field values and raw ERC-20 return data, decoded by the script) at the report checkpoint, which is also the checkpoint ReviveCheck's approvedEntry relies on. Both arms evaluate at the capture's recorded time.",
+    "liveInputs": "Each arm opens its own connection and reads a fresh finalized checkpoint; the checkpoints are recorded per arm and may differ by a block or more. The baseline reads sequentially; collectPolicyInputs reads observation, registry and listing in parallel and then the stored report.",
+    "timing": "wallMs: the arm's wall clock including its connection handshake and teardown. networkWaitMs: the union of intervals during which at least one network call was in flight (fetch for JSON-RPC, WsProvider.send and connect for the native node). computeMs = wallMs - networkWaitMs. networkCallSumMs: the sum of individual call durations; it exceeds networkWaitMs when calls overlap. connectMs: the WebSocket handshake. Every call is listed in callLog.",
+    "counterbalancing": "Live arm order alternates per scenario and is recorded. Scripts have no learning effect; the alternation only balances connection warm-up and node load.",
+    "correctness": "correct: the decision equals the predefined expectation; false-enable: enabled when the expectation was refuse; false-refusal: refused when the expectation was enable; incomplete: the arm threw and produced no decision.",
+    "operatorActions": "Distinct commands a person runs plus values a person must derive by hand (not copy from a record) to obtain one repeat decision for one scenario, once the arm is set up. Setup effort is counted separately under installation.",
+    "assistance": "Requests for help and corrections by a person during the task.",
+    "versions": {
+      "commit": "f08140f60017a35e9adaad9149841583a2486315",
+      "branch": "redesign/custody-record",
+      "uncommittedChanges": 8,
+      "node": "v22.23.1",
+      "platform": "darwin 27.0.0 arm64",
+      "dependencies": {
+        "ethers": "6.17.0",
+        "@polkadot/api": "16.5.6",
+        "@polkadot/util-crypto": "14.0.3",
+        "@noble/hashes": "2.4.0"
+      }
+    },
+    "endpoints": {
+      "evmRpc": "https://test-evm-rpc-v3.portaldot.dev",
+      "nativeRpc": "wss://test-node-v3.portaldot.dev",
+      "network": "Portaldot V3 Testnet",
+      "chainId": 420420777,
+      "genesisHash": "0xd4f9acbcf7f52388d8b095abe3c198d19fc510e0343e643e87cfbccb155283bd"
+    },
+    "writes": "none: no wallet is loaded and nothing is signed; all chain access is read-only"
+  },
+  "installation": {
+    "note": "First-time effort, measured once and separately from repeat decisions. Field counts stand in for the time to write a configuration; the time a person needs to read documentation, type, or understand a field was not measured.",
+    "freshClone": [
+      {
+        "file": "examples/token-catalog/benchmark/install/measure-2026-10-25-warm-cache.json",
+        "schema": "revivecheck.install-measurement.v1",
+        "method": "git clone --local of this repository into an empty temporary directory outside the repository, then `npm ci --no-audit --no-fund` in the clone; each step timed by wall clock in a Node wrapper (performance.now). The local npm cache was warm, so package tarballs were not downloaded. The clone was deleted afterwards.",
+        "startedAt": "2026-10-25T09:55:48.692Z",
+        "finishedAt": "2026-10-25T09:55:54.645Z",
+        "commit": "4dfb1e36000d09ff14a95855ee6bd8080c273542",
+        "branch": "redesign/custody-record",
+        "node": "v22.23.1",
+        "npm": "10.9.8",
+        "cloneMs": 604,
+        "npmCiMs": 4937,
+        "npmCiOutputTail": [
+          "added 260 packages in 5s"
+        ],
+        "installedPackages": 178,
+        "nodeModulesSize": "425M",
+        "humanTime": "not measured: no person read documentation or typed during this measurement",
+        "failures": []
+      },
+      {
+        "file": "examples/token-catalog/benchmark/install/measure-2026-10-25-cold-cache.json",
+        "schema": "revivecheck.install-measurement.v1",
+        "method": "The same fresh clone (commit 4dfb1e36000d09ff14a95855ee6bd8080c273542) with node_modules removed, then `npm ci --no-audit --no-fund --cache <empty directory>` so every package tarball was downloaded; timed by wall clock in a Node wrapper (performance.now). Residential network, Apple Silicon laptop. The clone and the cache directory were deleted afterwards.",
+        "startedAt": "2026-10-25T10:01:54.623Z",
+        "finishedAt": "2026-10-25T10:02:11.525Z",
+        "commit": "4dfb1e36000d09ff14a95855ee6bd8080c273542",
+        "node": "v22.23.1",
+        "npm": "10.9.8",
+        "npmCiColdCacheMs": 14375,
+        "npmCiOutputTail": [
+          "added 260 packages in 14s"
+        ],
+        "humanTime": "not measured: no person read documentation or typed during this measurement",
+        "failures": []
+      }
+    ],
+    "reviveCheckSetup": {
+      "steps": [
+        "git clone and npm ci (measured above)",
+        "write the catalog configuration with its policy",
+        "obtain the sealed report (check_release or an existing published report) and store it on-chain, or reference the stored one",
+        "bind the exact report once per approved revision: catalog.js bind with six arguments",
+        "run catalog.js acceptance for every later decision"
+      ],
+      "policyFields": 25,
+      "policyFieldPaths": [
+        "schema",
+        "name",
+        "network.key",
+        "network.chainId",
+        "network.genesisHash",
+        "runtime.specName",
+        "runtime.specVersions[0]",
+        "subject.kind",
+        "subject.assetId",
+        "subject.address",
+        "planHash",
+        "evidence.scope",
+        "evidence.maxAgeSeconds",
+        "evidence.maxObservationAgeSeconds",
+        "evidence.requireInterfacesAgree",
+        "evidence.requireStoredOnChain",
+        "reviewers.trusted[0]",
+        "reviewers.threshold",
+        "reviewers.basis",
+        "registry.address",
+        "registry.owner",
+        "registry.label",
+        "consumer.address",
+        "consumer.requireListed",
+        "consumer.version"
+      ],
+      "catalogFieldsExcludingPolicy": 17,
+      "catalogFieldPaths": [
+        "schema",
+        "name",
+        "mode",
+        "roles.owner.address",
+        "roles.owner.control",
+        "roles.reviewer.address",
+        "roles.reviewer.control",
+        "roles.operator.control",
+        "tokens[0].address",
+        "tokens[0].symbol",
+        "tokens[0].name",
+        "tokens[0].decimals",
+        "tokens[0].assetId",
+        "supersededPolicies[0].policyHash",
+        "supersededPolicies[0].note",
+        "data",
+        "reports"
+      ],
+      "bindCommandArguments": [
+        "--token",
+        "--report",
+        "--release-id",
+        "--revision",
+        "--storage-extrinsic",
+        "--storage-block"
+      ],
+      "bindOptionalArguments": [
+        "--by",
+        "--note"
+      ],
+      "valuesCopiedNotDerived": "the release ID, report hash, extrinsic hash and block hash are copied from receipts or read_registry output; none is computed by hand"
+    },
+    "baselineSetup": {
+      "steps": [
+        "npm install ethers @polkadot/api @polkadot/util @noble/hashes",
+        "write the script (its facts are listed under knowledge)",
+        "look up the stored report extrinsic hash and block hash in the explorer or the publishing receipt",
+        "record the approved report hash and revision",
+        "run the script for every decision"
+      ],
+      "configConstants": 19,
+      "configConstantPaths": [
+        "entry.chainId",
+        "entry.address",
+        "entry.symbol",
+        "entry.name",
+        "entry.decimals",
+        "entry.assetId",
+        "registry.address",
+        "registry.owner",
+        "registry.label",
+        "tokenList.address",
+        "trustedReviewer",
+        "approvalRecord.reportHash",
+        "approvalRecord.revision",
+        "approvalRecord.storage.extrinsicHash",
+        "approvalRecord.storage.blockHash",
+        "limits.maxReportAgeSeconds",
+        "limits.runtime",
+        "endpoints.evmRpc",
+        "endpoints.nativeRpc"
+      ],
+      "knowledgeItems": 10,
+      "knowledge": [
+        "The ERC-20 precompile address scheme of native assets on Portaldot V3 (u32 big-endian id, 12 zero bytes, 00010000), verified for spec 3002 only.",
+        "Native and EVM block hashes differ; ReviveApi.ethBlockHash maps the finalized native block to the EVM block tag for eth_call.",
+        "The runtime types bundle for spec 3002 (NativeOrWithId / TAssetConversion), without which block decoding fails.",
+        "The ReleaseRegistry ABI (releaseOf, decisionOf) and the release ID scheme keccak256(abi.encode(owner, bytes32(label))).",
+        "The VerifiedTokenList ABI (isListed, entryOf) and that an entry names a release, a report hash and a reviewer.",
+        "Where the report bytes are: the remark.store extrinsic hash and block hash, taken from the explorer or the publishing receipt.",
+        "The canonical JSON form that the report hash is computed over (sorted keys, undefined dropped, evidenceHash excluded).",
+        "Which report fields date it (completedAt) and pin its runtime (network.specName/specVersion).",
+        "The ERC-20 metadata ABI (symbol, name, decimals) and how to decode the returned strings and uint8.",
+        "Which reviewer counts as trusted, and that the release owner approving its own release does not."
+      ],
+      "scriptNonCommentLines": 217,
+      "script": "examples/token-catalog/benchmark/lib/baseline.mjs",
+      "dependencies": [
+        "ethers",
+        "@polkadot/api",
+        "@polkadot/util",
+        "@noble/hashes",
+        "the project connection helper lib/chain.js connectNative for the spec-3002 types bundle"
+      ]
+    }
+  },
+  "operatorActions": {
+    "definition": "Distinct commands a person runs plus values a person must derive by hand (not copy from a record) to obtain one repeat decision for one scenario, once the arm is set up. Setup effort is counted separately under installation.",
+    "baseline": {
+      "commands": 1,
+      "command": "node <maintainer-script>",
+      "manualDerivations": 0,
+      "total": 1,
+      "note": "Once the script exists it is one command; the facts it encodes are counted under installation.baselineSetup. The benchmark runs the same script in-process."
+    },
+    "revivecheck": {
+      "commands": 1,
+      "command": "node examples/token-catalog/catalog.js acceptance --config <config> [--fixture <capture>]",
+      "manualDerivations": 0,
+      "total": 1,
+      "note": "One command; the policy and the explicit binding are counted under installation.reviveCheckSetup. The benchmark makes the same library calls in-process."
+    }
+  },
+  "assistance": {
+    "definition": "Requests for help and corrections by a person during the task.",
+    "baseline": 0,
+    "revivecheck": 0,
+    "note": "Both arms are scripts run by the benchmark. No person performed a step, so no assistance request or correction could occur or be observed. Human effort was not measured."
+  },
+  "runs": [
+    {
+      "mode": "deterministic",
+      "startedAt": "2026-10-25T10:25:36.012Z",
+      "finishedAt": "2026-10-25T10:25:36.028Z",
+      "scenarios": [
+        {
+          "id": "correct-entry",
+          "title": "Correct entry",
+          "description": "The configured entry (6 decimals) is the entry the approved revision-2 report verified; the trusted reviewer approved revision 2 again and the v2 token list lists pUSD on it.",
+          "expected": "enable",
+          "inputs": {
+            "config": {
+              "path": "examples/token-catalog/config/testnet-v2.json",
+              "sha256": "2c77d74087a2d0e96cb0cdd6a7f42521a64f37416ec8cdcd58432f1911e5b94f",
+              "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
+              "configuredDecimals": 6
+            },
+            "bindings": {
+              "path": "examples/token-catalog/data/testnet-v2/bindings.json",
+              "sha256": "e2307a69e766fbbf528924e44980e48f412dc6de60e062d62dba99d1985032e9"
+            },
+            "binding": {
+              "id": "cfff0845-b6a1-4f77-a5c9-1245ae3df3f0",
+              "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+              "release": "v1.0.1",
+              "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+              "revision": "2",
+              "storage": {
+                "extrinsicHash": "0x80d46a8611bb486f3b71bdd6e9e15c96e522c536e2671c9f35d0a4496792feb3",
+                "blockHash": "0x18a28f38f2a66093eab90d11f438664428141cfade5df5ce031ff3f4519ce868"
+              },
+              "bindingHash": "4bdb5b1763db76eda2c203946af9c7c074f063080bbfe21d161ded10cd275283"
+            },
+            "report": {
+              "path": "public/reports/1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51.json",
+              "sha256": "0c40cc9ba14190eac1e114e6effe1ff781d971dc46302a564c786234d9af09d7",
+              "completedAt": "2026-10-25T09:29:17.646Z",
+              "checkpoint": "187136"
+            },
+            "capture": {
+              "path": "examples/token-catalog/data/testnet-v2/captures/12-reapprove-r2.inputs.json",
+              "sha256": "555365c9594c67f51aaebeec09113c19311040a4e59d71d4297ec595d46c5227",
+              "now": "2026-10-25T09:43:18.329Z",
+              "capturedState": "lifecycle step 12 (reapprove-r2), finalized #187279"
+            }
+          },
+          "liveMode": null,
+          "order": [
+            "baseline",
+            "revivecheck"
+          ],
+          "arms": {
+            "baseline": {
+              "arm": "baseline",
+              "now": "2026-10-25T09:43:18.329Z",
+              "expected": "enable",
+              "timing": {
+                "wallMs": 3.3,
+                "networkWaitMs": 0,
+                "computeMs": 3.3,
+                "networkCallSumMs": 0,
+                "connectMs": null,
+                "calls": 0,
+                "failedCalls": 0,
+                "unfinishedCalls": 0,
+                "byTransport": {},
+                "callLog": []
+              },
+              "operatorActions": {
+                "commands": 1,
+                "command": "node <maintainer-script>",
+                "manualDerivations": 0,
+                "total": 1,
+                "note": "Once the script exists it is one command; the facts it encodes are counted under installation.baselineSetup. The benchmark runs the same script in-process."
+              },
+              "assistance": 0,
+              "decision": "enable",
+              "classification": "correct",
+              "status": null,
+              "reasons": [],
+              "nextAction": null,
+              "checkpoint": {
+                "number": "187279",
+                "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+                "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba",
+                "runtime": "portaldot-v3/3002",
+                "chainId": 420420777
+              },
+              "checks": [
+                {
+                  "id": "C1",
+                  "name": "entry-vs-chain",
+                  "ok": true
+                },
+                {
+                  "id": "C2",
+                  "name": "trusted-approval",
+                  "ok": true
+                },
+                {
+                  "id": "C3",
+                  "name": "listing-entry",
+                  "ok": true
+                },
+                {
+                  "id": "C4",
+                  "name": "stored-report",
+                  "ok": true
+                },
+                {
+                  "id": "C5",
+                  "name": "age-runtime",
+                  "ok": true
+                }
+              ],
+              "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/deterministic/correct-entry.baseline.json",
+              "reconstruction": {
+                "requiredPresent": 5,
+                "requiredTotal": 6,
+                "extrasPresent": 0,
+                "extrasTotal": 4,
+                "absent": [
+                  "next action",
+                  "artifact integrity hash",
+                  "trust basis",
+                  "policy identity",
+                  "role control"
+                ],
+                "rederivedDecision": "enable",
+                "consistent": true
+              }
+            },
+            "revivecheck": {
+              "arm": "revivecheck",
+              "now": "2026-10-25T09:43:18.329Z",
+              "expected": "enable",
+              "timing": {
+                "wallMs": 2,
+                "networkWaitMs": 0,
+                "computeMs": 2,
+                "networkCallSumMs": 0,
+                "connectMs": null,
+                "calls": 0,
+                "failedCalls": 0,
+                "unfinishedCalls": 0,
+                "byTransport": {},
+                "callLog": []
+              },
+              "operatorActions": {
+                "commands": 1,
+                "command": "node examples/token-catalog/catalog.js acceptance --config <config> [--fixture <capture>]",
+                "manualDerivations": 0,
+                "total": 1,
+                "note": "One command; the policy and the explicit binding are counted under installation.reviveCheckSetup. The benchmark makes the same library calls in-process."
+              },
+              "assistance": 0,
+              "decision": "enable",
+              "classification": "correct",
+              "status": "valid",
+              "reasons": [],
+              "nextAction": "Enable the subject under this policy. Validity is a point-in-time result: evaluate again before each use.",
+              "checkpoint": {
+                "registry": {
+                  "number": "187279",
+                  "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+                  "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba"
+                },
+                "observation": {
+                  "number": "187279",
+                  "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+                  "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39"
+                },
+                "listing": {
+                  "number": "187279",
+                  "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+                  "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba"
+                }
+              },
+              "checks": {
+                "total": 35,
+                "failed": [],
+                "entryMatch": true
+              },
+              "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/deterministic/correct-entry.revivecheck.json",
+              "reconstruction": {
+                "requiredPresent": 6,
+                "requiredTotal": 6,
+                "extrasPresent": 4,
+                "extrasTotal": 4,
+                "absent": [],
+                "rederivedDecision": "enable",
+                "consistent": true
+              }
+            }
+          },
+          "agreement": true,
+          "checkpoints": {
+            "baseline": {
+              "number": "187279",
+              "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+              "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba",
+              "runtime": "portaldot-v3/3002",
+              "chainId": 420420777
+            },
+            "revivecheck": {
+              "registry": {
+                "number": "187279",
+                "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+                "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba"
+              },
+              "observation": {
+                "number": "187279",
+                "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+                "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39"
+              },
+              "listing": {
+                "number": "187279",
+                "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+                "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba"
+              }
+            }
+          }
+        },
+        {
+          "id": "incorrect-decimals",
+          "title": "Incorrect decimals",
+          "description": "The same chain state and binding, but the maintainer configured 18 decimals (the Ethereum default); the chain and the approved report say 6.",
+          "expected": "refuse",
+          "inputs": {
+            "config": {
+              "path": "examples/token-catalog/config/testnet-v2-wrong-entry.json",
+              "sha256": "6487a3fcf897315ecf366ae632e6547d22d838fc611b0a943133f52afc369807",
+              "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
+              "configuredDecimals": 18
+            },
+            "bindings": {
+              "path": "examples/token-catalog/data/testnet-v2-wrong-entry/bindings.json",
+              "sha256": "e2307a69e766fbbf528924e44980e48f412dc6de60e062d62dba99d1985032e9"
+            },
+            "binding": {
+              "id": "cfff0845-b6a1-4f77-a5c9-1245ae3df3f0",
+              "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+              "release": "v1.0.1",
+              "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+              "revision": "2",
+              "storage": {
+                "extrinsicHash": "0x80d46a8611bb486f3b71bdd6e9e15c96e522c536e2671c9f35d0a4496792feb3",
+                "blockHash": "0x18a28f38f2a66093eab90d11f438664428141cfade5df5ce031ff3f4519ce868"
+              },
+              "bindingHash": "4bdb5b1763db76eda2c203946af9c7c074f063080bbfe21d161ded10cd275283"
+            },
+            "report": {
+              "path": "public/reports/1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51.json",
+              "sha256": "0c40cc9ba14190eac1e114e6effe1ff781d971dc46302a564c786234d9af09d7",
+              "completedAt": "2026-10-25T09:29:17.646Z",
+              "checkpoint": "187136"
+            },
+            "capture": {
+              "path": "examples/token-catalog/data/testnet-v2/captures/12-reapprove-r2.inputs.json",
+              "sha256": "555365c9594c67f51aaebeec09113c19311040a4e59d71d4297ec595d46c5227",
+              "now": "2026-10-25T09:43:18.329Z",
+              "capturedState": "lifecycle step 12 (reapprove-r2), finalized #187279"
+            }
+          },
+          "liveMode": null,
+          "order": [
+            "revivecheck",
+            "baseline"
+          ],
+          "arms": {
+            "revivecheck": {
+              "arm": "revivecheck",
+              "now": "2026-10-25T09:43:18.329Z",
+              "expected": "refuse",
+              "timing": {
+                "wallMs": 1.3,
+                "networkWaitMs": 0,
+                "computeMs": 1.3,
+                "networkCallSumMs": 0,
+                "connectMs": null,
+                "calls": 0,
+                "failedCalls": 0,
+                "unfinishedCalls": 0,
+                "byTransport": {},
+                "callLog": []
+              },
+              "operatorActions": {
+                "commands": 1,
+                "command": "node examples/token-catalog/catalog.js acceptance --config <config> [--fixture <capture>]",
+                "manualDerivations": 0,
+                "total": 1,
+                "note": "One command; the policy and the explicit binding are counted under installation.reviveCheckSetup. The benchmark makes the same library calls in-process."
+              },
+              "assistance": 0,
+              "decision": "refuse",
+              "classification": "correct",
+              "status": "valid",
+              "reasons": [
+                "entry-mismatch:decimals"
+              ],
+              "nextAction": "Do not publish this entry. Correct the catalog configuration to the approved values, or check and approve a release that carries the configured values and bind that report explicitly.",
+              "checkpoint": {
+                "registry": {
+                  "number": "187279",
+                  "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+                  "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba"
+                },
+                "observation": {
+                  "number": "187279",
+                  "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+                  "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39"
+                },
+                "listing": {
+                  "number": "187279",
+                  "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+                  "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba"
+                }
+              },
+              "checks": {
+                "total": 35,
+                "failed": [],
+                "entryMatch": false
+              },
+              "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/deterministic/incorrect-decimals.revivecheck.json",
+              "reconstruction": {
+                "requiredPresent": 6,
+                "requiredTotal": 6,
+                "extrasPresent": 4,
+                "extrasTotal": 4,
+                "absent": [],
+                "rederivedDecision": "refuse",
+                "consistent": true
+              }
+            },
+            "baseline": {
+              "arm": "baseline",
+              "now": "2026-10-25T09:43:18.329Z",
+              "expected": "refuse",
+              "timing": {
+                "wallMs": 0.9,
+                "networkWaitMs": 0,
+                "computeMs": 0.9,
+                "networkCallSumMs": 0,
+                "connectMs": null,
+                "calls": 0,
+                "failedCalls": 0,
+                "unfinishedCalls": 0,
+                "byTransport": {},
+                "callLog": []
+              },
+              "operatorActions": {
+                "commands": 1,
+                "command": "node <maintainer-script>",
+                "manualDerivations": 0,
+                "total": 1,
+                "note": "Once the script exists it is one command; the facts it encodes are counted under installation.baselineSetup. The benchmark runs the same script in-process."
+              },
+              "assistance": 0,
+              "decision": "refuse",
+              "classification": "correct",
+              "status": null,
+              "reasons": [
+                "C1:decimals"
+              ],
+              "nextAction": null,
+              "checkpoint": {
+                "number": "187279",
+                "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+                "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba",
+                "runtime": "portaldot-v3/3002",
+                "chainId": 420420777
+              },
+              "checks": [
+                {
+                  "id": "C1",
+                  "name": "entry-vs-chain",
+                  "ok": false
+                },
+                {
+                  "id": "C2",
+                  "name": "trusted-approval",
+                  "ok": true
+                },
+                {
+                  "id": "C3",
+                  "name": "listing-entry",
+                  "ok": true
+                },
+                {
+                  "id": "C4",
+                  "name": "stored-report",
+                  "ok": true
+                },
+                {
+                  "id": "C5",
+                  "name": "age-runtime",
+                  "ok": true
+                }
+              ],
+              "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/deterministic/incorrect-decimals.baseline.json",
+              "reconstruction": {
+                "requiredPresent": 5,
+                "requiredTotal": 6,
+                "extrasPresent": 0,
+                "extrasTotal": 4,
+                "absent": [
+                  "next action",
+                  "artifact integrity hash",
+                  "trust basis",
+                  "policy identity",
+                  "role control"
+                ],
+                "rederivedDecision": "refuse",
+                "consistent": true
+              }
+            }
+          },
+          "agreement": true,
+          "checkpoints": {
+            "baseline": {
+              "number": "187279",
+              "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+              "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba",
+              "runtime": "portaldot-v3/3002",
+              "chainId": 420420777
+            },
+            "revivecheck": {
+              "registry": {
+                "number": "187279",
+                "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+                "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba"
+              },
+              "observation": {
+                "number": "187279",
+                "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+                "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39"
+              },
+              "listing": {
+                "number": "187279",
+                "nativeHash": "0xb169abbb66b10ad660593c54ea824b5dc53940fc3d22538fffe552e8fb658b39",
+                "evmHash": "0xadf67adfbae52c64468d6ca752fbcc2a77932a4856e51735416f197487712cba"
+              }
+            }
+          }
+        },
+        {
+          "id": "superseded-report",
+          "title": "Superseded report",
+          "description": "The maintainer still relies on the revision-1 approval record (report eb960cc7...) after the owner submitted revision 2; the registry cleared the approval and the token list stopped listing pUSD.",
+          "expected": "refuse",
+          "inputs": {
+            "config": {
+              "path": "examples/token-catalog/config/testnet-v2.json",
+              "sha256": "2c77d74087a2d0e96cb0cdd6a7f42521a64f37416ec8cdcd58432f1911e5b94f",
+              "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
+              "configuredDecimals": 6
+            },
+            "bindings": {
+              "path": "examples/token-catalog/data/testnet-v2/bindings.json",
+              "sha256": "e2307a69e766fbbf528924e44980e48f412dc6de60e062d62dba99d1985032e9"
+            },
+            "binding": {
+              "id": "4896a5a5-1fc6-4160-9049-7a01b11a8591",
+              "reportHash": "eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+              "release": "v1.0.1",
+              "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+              "revision": "1",
+              "storage": {
+                "extrinsicHash": "0x2489bd65a330e17e422ef6ff0ce87132a6ecdb0d20554bbbc04560654fa15b44",
+                "blockHash": "0x76eac2817fcff3ce08bec3ce1d3eab8da323cbf04263535223792ad7f5491083"
+              },
+              "bindingHash": "b6687fdf3455c09aee640cff8d42dea4a763135375988e71def57808f86d5bc6"
+            },
+            "report": {
+              "path": "public/reports/eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8.json",
+              "sha256": "70f920984dba17543e87cc35c421c961b3951d187cfa6e4ae833672017ef1794",
+              "completedAt": "2026-10-25T09:19:23.187Z",
+              "checkpoint": "187037"
+            },
+            "capture": {
+              "path": "examples/token-catalog/data/testnet-v2/captures/07-submit-r2.inputs.json",
+              "sha256": "7d19a11837f5d8f6ea0fa35b9880799be4a3ca20a694060aa9ae9679dbb4ef06",
+              "now": "2026-10-25T09:32:32.374Z",
+              "capturedState": "lifecycle step 7 (submit-r2), finalized #187171"
+            }
+          },
+          "liveMode": null,
+          "order": [
+            "baseline",
+            "revivecheck"
+          ],
+          "arms": {
+            "baseline": {
+              "arm": "baseline",
+              "now": "2026-10-25T09:32:32.374Z",
+              "expected": "refuse",
+              "timing": {
+                "wallMs": 0.8,
+                "networkWaitMs": 0,
+                "computeMs": 0.8,
+                "networkCallSumMs": 0,
+                "connectMs": null,
+                "calls": 0,
+                "failedCalls": 0,
+                "unfinishedCalls": 0,
+                "byTransport": {},
+                "callLog": []
+              },
+              "operatorActions": {
+                "commands": 1,
+                "command": "node <maintainer-script>",
+                "manualDerivations": 0,
+                "total": 1,
+                "note": "Once the script exists it is one command; the facts it encodes are counted under installation.baselineSetup. The benchmark runs the same script in-process."
+              },
+              "assistance": 0,
+              "decision": "refuse",
+              "classification": "correct",
+              "status": null,
+              "reasons": [
+                "C2:report-superseded+revision+not-reviewed",
+                "C3:not-listed"
+              ],
+              "nextAction": null,
+              "checkpoint": {
+                "number": "187171",
+                "nativeHash": "0x23fcd00231e79f6cf858c84d38b1fdcfa74cedbbab461c8a77a942c6294c2f28",
+                "evmHash": "0x731258f542c9ce4de74997ffb81ba3185855d025fbe98adb7a15d67033833f6c",
+                "runtime": "portaldot-v3/3002",
+                "chainId": 420420777
+              },
+              "checks": [
+                {
+                  "id": "C1",
+                  "name": "entry-vs-chain",
+                  "ok": true
+                },
+                {
+                  "id": "C2",
+                  "name": "trusted-approval",
+                  "ok": false
+                },
+                {
+                  "id": "C3",
+                  "name": "listing-entry",
+                  "ok": false
+                },
+                {
+                  "id": "C4",
+                  "name": "stored-report",
+                  "ok": true
+                },
+                {
+                  "id": "C5",
+                  "name": "age-runtime",
+                  "ok": true
+                }
+              ],
+              "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/deterministic/superseded-report.baseline.json",
+              "reconstruction": {
+                "requiredPresent": 5,
+                "requiredTotal": 6,
+                "extrasPresent": 0,
+                "extrasTotal": 4,
+                "absent": [
+                  "next action",
+                  "artifact integrity hash",
+                  "trust basis",
+                  "policy identity",
+                  "role control"
+                ],
+                "rederivedDecision": "refuse",
+                "consistent": true
+              }
+            },
+            "revivecheck": {
+              "arm": "revivecheck",
+              "now": "2026-10-25T09:32:32.374Z",
+              "expected": "refuse",
+              "timing": {
+                "wallMs": 0.7,
+                "networkWaitMs": 0,
+                "computeMs": 0.7,
+                "networkCallSumMs": 0,
+                "connectMs": null,
+                "calls": 0,
+                "failedCalls": 0,
+                "unfinishedCalls": 0,
+                "byTransport": {},
+                "callLog": []
+              },
+              "operatorActions": {
+                "commands": 1,
+                "command": "node examples/token-catalog/catalog.js acceptance --config <config> [--fixture <capture>]",
+                "manualDerivations": 0,
+                "total": 1,
+                "note": "One command; the policy and the explicit binding are counted under installation.reviveCheckSetup. The benchmark makes the same library calls in-process."
+              },
+              "assistance": 0,
+              "decision": "refuse",
+              "classification": "correct",
+              "status": "recheck-required",
+              "reasons": [
+                "revision-superseded",
+                "approval-missing",
+                "consumer-not-listed"
+              ],
+              "nextAction": "Do not enable. Produce a new report for the current release, obtain approval of its exact hash from a trusted reviewer, and bind the new report explicitly. Earlier evidence stays as history.",
+              "checkpoint": {
+                "registry": {
+                  "number": "187171",
+                  "nativeHash": "0x23fcd00231e79f6cf858c84d38b1fdcfa74cedbbab461c8a77a942c6294c2f28",
+                  "evmHash": "0x731258f542c9ce4de74997ffb81ba3185855d025fbe98adb7a15d67033833f6c"
+                },
+                "observation": {
+                  "number": "187171",
+                  "nativeHash": "0x23fcd00231e79f6cf858c84d38b1fdcfa74cedbbab461c8a77a942c6294c2f28",
+                  "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0x23fcd00231e79f6cf858c84d38b1fdcfa74cedbbab461c8a77a942c6294c2f28"
+                },
+                "listing": {
+                  "number": "187171",
+                  "nativeHash": "0x23fcd00231e79f6cf858c84d38b1fdcfa74cedbbab461c8a77a942c6294c2f28",
+                  "evmHash": "0x731258f542c9ce4de74997ffb81ba3185855d025fbe98adb7a15d67033833f6c"
+                }
+              },
+              "checks": {
+                "total": 34,
+                "failed": [
+                  "registry.revision:failed",
+                  "registry.approvals:failed",
+                  "consumer.listed:failed"
+                ],
+                "entryMatch": true
+              },
+              "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/deterministic/superseded-report.revivecheck.json",
+              "reconstruction": {
+                "requiredPresent": 6,
+                "requiredTotal": 6,
+                "extrasPresent": 4,
+                "extrasTotal": 4,
+                "absent": [],
+                "rederivedDecision": "refuse",
+                "consistent": true
+              }
+            }
+          },
+          "agreement": true,
+          "checkpoints": {
+            "baseline": {
+              "number": "187171",
+              "nativeHash": "0x23fcd00231e79f6cf858c84d38b1fdcfa74cedbbab461c8a77a942c6294c2f28",
+              "evmHash": "0x731258f542c9ce4de74997ffb81ba3185855d025fbe98adb7a15d67033833f6c",
+              "runtime": "portaldot-v3/3002",
+              "chainId": 420420777
+            },
+            "revivecheck": {
+              "registry": {
+                "number": "187171",
+                "nativeHash": "0x23fcd00231e79f6cf858c84d38b1fdcfa74cedbbab461c8a77a942c6294c2f28",
+                "evmHash": "0x731258f542c9ce4de74997ffb81ba3185855d025fbe98adb7a15d67033833f6c"
+              },
+              "observation": {
+                "number": "187171",
+                "nativeHash": "0x23fcd00231e79f6cf858c84d38b1fdcfa74cedbbab461c8a77a942c6294c2f28",
+                "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0x23fcd00231e79f6cf858c84d38b1fdcfa74cedbbab461c8a77a942c6294c2f28"
+              },
+              "listing": {
+                "number": "187171",
+                "nativeHash": "0x23fcd00231e79f6cf858c84d38b1fdcfa74cedbbab461c8a77a942c6294c2f28",
+                "evmHash": "0x731258f542c9ce4de74997ffb81ba3185855d025fbe98adb7a15d67033833f6c"
+              }
+            }
+          }
+        },
+        {
+          "id": "revoked-approval",
+          "title": "Revoked approval",
+          "description": "The trusted reviewer requested changes on revision 2; the token list stopped listing pUSD on that decision alone.",
+          "expected": "refuse",
+          "inputs": {
+            "config": {
+              "path": "examples/token-catalog/config/testnet-v2.json",
+              "sha256": "2c77d74087a2d0e96cb0cdd6a7f42521a64f37416ec8cdcd58432f1911e5b94f",
+              "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
+              "configuredDecimals": 6
+            },
+            "bindings": {
+              "path": "examples/token-catalog/data/testnet-v2/bindings.json",
+              "sha256": "e2307a69e766fbbf528924e44980e48f412dc6de60e062d62dba99d1985032e9"
+            },
+            "binding": {
+              "id": "cfff0845-b6a1-4f77-a5c9-1245ae3df3f0",
+              "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+              "release": "v1.0.1",
+              "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+              "revision": "2",
+              "storage": {
+                "extrinsicHash": "0x80d46a8611bb486f3b71bdd6e9e15c96e522c536e2671c9f35d0a4496792feb3",
+                "blockHash": "0x18a28f38f2a66093eab90d11f438664428141cfade5df5ce031ff3f4519ce868"
+              },
+              "bindingHash": "4bdb5b1763db76eda2c203946af9c7c074f063080bbfe21d161ded10cd275283"
+            },
+            "report": {
+              "path": "public/reports/1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51.json",
+              "sha256": "0c40cc9ba14190eac1e114e6effe1ff781d971dc46302a564c786234d9af09d7",
+              "completedAt": "2026-10-25T09:29:17.646Z",
+              "checkpoint": "187136"
+            },
+            "capture": {
+              "path": "examples/token-catalog/data/testnet-v2/captures/11-revoke-r2.inputs.json",
+              "sha256": "545458943259b2aee282fd2afaae4c61061e774b6f8ac11e87093c1be326641c",
+              "now": "2026-10-25T09:40:16.441Z",
+              "capturedState": "lifecycle step 11 (revoke-r2), finalized #187248"
+            }
+          },
+          "liveMode": null,
+          "order": [
+            "revivecheck",
+            "baseline"
+          ],
+          "arms": {
+            "revivecheck": {
+              "arm": "revivecheck",
+              "now": "2026-10-25T09:40:16.441Z",
+              "expected": "refuse",
+              "timing": {
+                "wallMs": 0.5,
+                "networkWaitMs": 0,
+                "computeMs": 0.5,
+                "networkCallSumMs": 0,
+                "connectMs": null,
+                "calls": 0,
+                "failedCalls": 0,
+                "unfinishedCalls": 0,
+                "byTransport": {},
+                "callLog": []
+              },
+              "operatorActions": {
+                "commands": 1,
+                "command": "node examples/token-catalog/catalog.js acceptance --config <config> [--fixture <capture>]",
+                "manualDerivations": 0,
+                "total": 1,
+                "note": "One command; the policy and the explicit binding are counted under installation.reviveCheckSetup. The benchmark makes the same library calls in-process."
+              },
+              "assistance": 0,
+              "decision": "refuse",
+              "classification": "correct",
+              "status": "recheck-required",
+              "reasons": [
+                "approval-revoked",
+                "consumer-not-listed"
+              ],
+              "nextAction": "Do not enable. Produce a new report for the current release, obtain approval of its exact hash from a trusted reviewer, and bind the new report explicitly. Earlier evidence stays as history.",
+              "checkpoint": {
+                "registry": {
+                  "number": "187248",
+                  "nativeHash": "0x805c4748c4b246aa1de7b8cf261f9b8839bca3c03d994d7e264938301cce4d3d",
+                  "evmHash": "0xa9df605b5a996912f3ea3fbba810c424809b7682ce03dad4c194c1786b19a189"
+                },
+                "observation": {
+                  "number": "187248",
+                  "nativeHash": "0x805c4748c4b246aa1de7b8cf261f9b8839bca3c03d994d7e264938301cce4d3d",
+                  "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0x805c4748c4b246aa1de7b8cf261f9b8839bca3c03d994d7e264938301cce4d3d"
+                },
+                "listing": {
+                  "number": "187248",
+                  "nativeHash": "0x805c4748c4b246aa1de7b8cf261f9b8839bca3c03d994d7e264938301cce4d3d",
+                  "evmHash": "0xa9df605b5a996912f3ea3fbba810c424809b7682ce03dad4c194c1786b19a189"
+                }
+              },
+              "checks": {
+                "total": 34,
+                "failed": [
+                  "registry.approvals:failed",
+                  "consumer.listed:failed"
+                ],
+                "entryMatch": true
+              },
+              "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/deterministic/revoked-approval.revivecheck.json",
+              "reconstruction": {
+                "requiredPresent": 6,
+                "requiredTotal": 6,
+                "extrasPresent": 4,
+                "extrasTotal": 4,
+                "absent": [],
+                "rederivedDecision": "refuse",
+                "consistent": true
+              }
+            },
+            "baseline": {
+              "arm": "baseline",
+              "now": "2026-10-25T09:40:16.441Z",
+              "expected": "refuse",
+              "timing": {
+                "wallMs": 0.3,
+                "networkWaitMs": 0,
+                "computeMs": 0.3,
+                "networkCallSumMs": 0,
+                "connectMs": null,
+                "calls": 0,
+                "failedCalls": 0,
+                "unfinishedCalls": 0,
+                "byTransport": {},
+                "callLog": []
+              },
+              "operatorActions": {
+                "commands": 1,
+                "command": "node <maintainer-script>",
+                "manualDerivations": 0,
+                "total": 1,
+                "note": "Once the script exists it is one command; the facts it encodes are counted under installation.baselineSetup. The benchmark runs the same script in-process."
+              },
+              "assistance": 0,
+              "decision": "refuse",
+              "classification": "correct",
+              "status": null,
+              "reasons": [
+                "C2:changes-requested",
+                "C3:not-listed"
+              ],
+              "nextAction": null,
+              "checkpoint": {
+                "number": "187248",
+                "nativeHash": "0x805c4748c4b246aa1de7b8cf261f9b8839bca3c03d994d7e264938301cce4d3d",
+                "evmHash": "0xa9df605b5a996912f3ea3fbba810c424809b7682ce03dad4c194c1786b19a189",
+                "runtime": "portaldot-v3/3002",
+                "chainId": 420420777
+              },
+              "checks": [
+                {
+                  "id": "C1",
+                  "name": "entry-vs-chain",
+                  "ok": true
+                },
+                {
+                  "id": "C2",
+                  "name": "trusted-approval",
+                  "ok": false
+                },
+                {
+                  "id": "C3",
+                  "name": "listing-entry",
+                  "ok": false
+                },
+                {
+                  "id": "C4",
+                  "name": "stored-report",
+                  "ok": true
+                },
+                {
+                  "id": "C5",
+                  "name": "age-runtime",
+                  "ok": true
+                }
+              ],
+              "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/deterministic/revoked-approval.baseline.json",
+              "reconstruction": {
+                "requiredPresent": 5,
+                "requiredTotal": 6,
+                "extrasPresent": 0,
+                "extrasTotal": 4,
+                "absent": [
+                  "next action",
+                  "artifact integrity hash",
+                  "trust basis",
+                  "policy identity",
+                  "role control"
+                ],
+                "rederivedDecision": "refuse",
+                "consistent": true
+              }
+            }
+          },
+          "agreement": true,
+          "checkpoints": {
+            "baseline": {
+              "number": "187248",
+              "nativeHash": "0x805c4748c4b246aa1de7b8cf261f9b8839bca3c03d994d7e264938301cce4d3d",
+              "evmHash": "0xa9df605b5a996912f3ea3fbba810c424809b7682ce03dad4c194c1786b19a189",
+              "runtime": "portaldot-v3/3002",
+              "chainId": 420420777
+            },
+            "revivecheck": {
+              "registry": {
+                "number": "187248",
+                "nativeHash": "0x805c4748c4b246aa1de7b8cf261f9b8839bca3c03d994d7e264938301cce4d3d",
+                "evmHash": "0xa9df605b5a996912f3ea3fbba810c424809b7682ce03dad4c194c1786b19a189"
+              },
+              "observation": {
+                "number": "187248",
+                "nativeHash": "0x805c4748c4b246aa1de7b8cf261f9b8839bca3c03d994d7e264938301cce4d3d",
+                "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0x805c4748c4b246aa1de7b8cf261f9b8839bca3c03d994d7e264938301cce4d3d"
+              },
+              "listing": {
+                "number": "187248",
+                "nativeHash": "0x805c4748c4b246aa1de7b8cf261f9b8839bca3c03d994d7e264938301cce4d3d",
+                "evmHash": "0xa9df605b5a996912f3ea3fbba810c424809b7682ce03dad4c194c1786b19a189"
+              }
+            }
+          }
+        },
+        {
+          "id": "unavailable-verification",
+          "title": "Unavailable verification",
+          "description": "Every read fails, as when both public nodes time out. Deterministic: a copy of capture 12 whose reads are errors. Live: every connection and request is refused at the transport layer for both arms.",
+          "expected": "refuse",
+          "inputs": {
+            "config": {
+              "path": "examples/token-catalog/config/testnet-v2.json",
+              "sha256": "2c77d74087a2d0e96cb0cdd6a7f42521a64f37416ec8cdcd58432f1911e5b94f",
+              "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
+              "configuredDecimals": 6
+            },
+            "bindings": {
+              "path": "examples/token-catalog/data/testnet-v2/bindings.json",
+              "sha256": "e2307a69e766fbbf528924e44980e48f412dc6de60e062d62dba99d1985032e9"
+            },
+            "binding": {
+              "id": "cfff0845-b6a1-4f77-a5c9-1245ae3df3f0",
+              "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+              "release": "v1.0.1",
+              "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+              "revision": "2",
+              "storage": {
+                "extrinsicHash": "0x80d46a8611bb486f3b71bdd6e9e15c96e522c536e2671c9f35d0a4496792feb3",
+                "blockHash": "0x18a28f38f2a66093eab90d11f438664428141cfade5df5ce031ff3f4519ce868"
+              },
+              "bindingHash": "4bdb5b1763db76eda2c203946af9c7c074f063080bbfe21d161ded10cd275283"
+            },
+            "report": {
+              "path": "public/reports/1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51.json",
+              "sha256": "0c40cc9ba14190eac1e114e6effe1ff781d971dc46302a564c786234d9af09d7",
+              "completedAt": "2026-10-25T09:29:17.646Z",
+              "checkpoint": "187136"
+            },
+            "capture": {
+              "path": "examples/token-catalog/benchmark/fixtures/12-reapprove-r2-unavailable.inputs.json",
+              "sha256": "a395018f02c8b56f0b01d184822f04a22a459bc09a770adb511db2a01857c680",
+              "now": "2026-10-25T09:43:18.329Z",
+              "capturedState": "derived from lifecycle step 12 with every read replaced by an error"
+            }
+          },
+          "liveMode": null,
+          "order": [
+            "baseline",
+            "revivecheck"
+          ],
+          "arms": {
+            "baseline": {
+              "arm": "baseline",
+              "now": "2026-10-25T09:43:18.329Z",
+              "expected": "refuse",
+              "timing": {
+                "wallMs": 0.3,
+                "networkWaitMs": 0,
+                "computeMs": 0.3,
+                "networkCallSumMs": 0,
+                "connectMs": null,
+                "calls": 0,
+                "failedCalls": 0,
+                "unfinishedCalls": 0,
+                "byTransport": {},
+                "callLog": []
+              },
+              "operatorActions": {
+                "commands": 1,
+                "command": "node <maintainer-script>",
+                "manualDerivations": 0,
+                "total": 1,
+                "note": "Once the script exists it is one command; the facts it encodes are counted under installation.baselineSetup. The benchmark runs the same script in-process."
+              },
+              "assistance": 0,
+              "decision": "refuse",
+              "classification": "correct",
+              "status": null,
+              "reasons": [
+                "C1:unavailable",
+                "C2:unavailable",
+                "C3:unavailable",
+                "C4:unavailable",
+                "C5:unavailable"
+              ],
+              "nextAction": null,
+              "checkpoint": {
+                "error": "Portaldot V3 Testnet did not answer in time (The read-only request timed out or was cancelled.). Nothing was signed; retry in a moment."
+              },
+              "checks": [
+                {
+                  "id": "C1",
+                  "name": "entry-vs-chain",
+                  "ok": null
+                },
+                {
+                  "id": "C2",
+                  "name": "trusted-approval",
+                  "ok": null
+                },
+                {
+                  "id": "C3",
+                  "name": "listing-entry",
+                  "ok": null
+                },
+                {
+                  "id": "C4",
+                  "name": "stored-report",
+                  "ok": null
+                },
+                {
+                  "id": "C5",
+                  "name": "age-runtime",
+                  "ok": null
+                }
+              ],
+              "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/deterministic/unavailable-verification.baseline.json",
+              "reconstruction": {
+                "requiredPresent": 4,
+                "requiredTotal": 6,
+                "extrasPresent": 0,
+                "extrasTotal": 4,
+                "absent": [
+                  "checkpoint(s)",
+                  "next action",
+                  "artifact integrity hash",
+                  "trust basis",
+                  "policy identity",
+                  "role control"
+                ],
+                "rederivedDecision": "refuse",
+                "consistent": true
+              }
+            },
+            "revivecheck": {
+              "arm": "revivecheck",
+              "now": "2026-10-25T09:43:18.329Z",
+              "expected": "refuse",
+              "timing": {
+                "wallMs": 0.4,
+                "networkWaitMs": 0,
+                "computeMs": 0.4,
+                "networkCallSumMs": 0,
+                "connectMs": null,
+                "calls": 0,
+                "failedCalls": 0,
+                "unfinishedCalls": 0,
+                "byTransport": {},
+                "callLog": []
+              },
+              "operatorActions": {
+                "commands": 1,
+                "command": "node examples/token-catalog/catalog.js acceptance --config <config> [--fixture <capture>]",
+                "manualDerivations": 0,
+                "total": 1,
+                "note": "One command; the policy and the explicit binding are counted under installation.reviveCheckSetup. The benchmark makes the same library calls in-process."
+              },
+              "assistance": 0,
+              "decision": "refuse",
+              "classification": "correct",
+              "status": "unknown",
+              "reasons": [
+                "observation-missing",
+                "registry-unavailable",
+                "consumer-unavailable",
+                "storage-unverified"
+              ],
+              "nextAction": "Do not enable. The verification could not complete; retry the reads. Unavailable verification never counts as valid.",
+              "checkpoint": {
+                "registry": null,
+                "observation": null,
+                "listing": null
+              },
+              "checks": {
+                "total": 12,
+                "failed": [
+                  "observation.present:unknown",
+                  "registry.read:unknown",
+                  "consumer.read:unknown",
+                  "storage.read:unknown"
+                ],
+                "entryMatch": true
+              },
+              "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/deterministic/unavailable-verification.revivecheck.json",
+              "reconstruction": {
+                "requiredPresent": 5,
+                "requiredTotal": 6,
+                "extrasPresent": 4,
+                "extrasTotal": 4,
+                "absent": [
+                  "checkpoint(s)"
+                ],
+                "rederivedDecision": "refuse",
+                "consistent": true
+              }
+            }
+          },
+          "agreement": true,
+          "checkpoints": {
+            "baseline": {
+              "error": "Portaldot V3 Testnet did not answer in time (The read-only request timed out or was cancelled.). Nothing was signed; retry in a moment."
+            },
+            "revivecheck": {
+              "registry": null,
+              "observation": null,
+              "listing": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "mode": "live",
+      "startedAt": "2026-10-25T10:25:36.028Z",
+      "finishedAt": "2026-10-25T10:26:53.543Z",
+      "scenarios": [
+        {
+          "id": "correct-entry",
+          "title": "Correct entry",
+          "description": "The configured entry (6 decimals) is the entry the approved revision-2 report verified; the trusted reviewer approved revision 2 again and the v2 token list lists pUSD on it.",
+          "expected": "enable",
+          "inputs": {
+            "config": {
+              "path": "examples/token-catalog/config/testnet-v2.json",
+              "sha256": "2c77d74087a2d0e96cb0cdd6a7f42521a64f37416ec8cdcd58432f1911e5b94f",
+              "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
+              "configuredDecimals": 6
+            },
+            "bindings": {
+              "path": "examples/token-catalog/data/testnet-v2/bindings.json",
+              "sha256": "e2307a69e766fbbf528924e44980e48f412dc6de60e062d62dba99d1985032e9"
+            },
+            "binding": {
+              "id": "cfff0845-b6a1-4f77-a5c9-1245ae3df3f0",
+              "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+              "release": "v1.0.1",
+              "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+              "revision": "2",
+              "storage": {
+                "extrinsicHash": "0x80d46a8611bb486f3b71bdd6e9e15c96e522c536e2671c9f35d0a4496792feb3",
+                "blockHash": "0x18a28f38f2a66093eab90d11f438664428141cfade5df5ce031ff3f4519ce868"
+              },
+              "bindingHash": "4bdb5b1763db76eda2c203946af9c7c074f063080bbfe21d161ded10cd275283"
+            },
+            "report": {
+              "path": "public/reports/1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51.json",
+              "sha256": "0c40cc9ba14190eac1e114e6effe1ff781d971dc46302a564c786234d9af09d7",
+              "completedAt": "2026-10-25T09:29:17.646Z",
+              "checkpoint": "187136"
+            },
+            "capture": {
+              "path": "examples/token-catalog/data/testnet-v2/captures/12-reapprove-r2.inputs.json",
+              "sha256": "555365c9594c67f51aaebeec09113c19311040a4e59d71d4297ec595d46c5227",
+              "now": "2026-10-25T09:43:18.329Z",
+              "capturedState": "lifecycle step 12 (reapprove-r2), finalized #187279"
+            }
+          },
+          "liveMode": "fresh-reads",
+          "order": [
+            "baseline",
+            "revivecheck"
+          ],
+          "arms": {
+            "baseline": {
+              "arm": "baseline",
+              "now": "2026-10-25T10:25:36.028Z",
+              "expected": "enable",
+              "timing": {
+                "wallMs": 19082.2,
+                "networkWaitMs": 18951.5,
+                "computeMs": 130.7,
+                "networkCallSumMs": 21873.4,
+                "connectMs": 2192.5,
+                "calls": 35,
+                "failedCalls": 0,
+                "unfinishedCalls": 0,
+                "byTransport": {
+                  "native-ws": {
+                    "calls": 27,
+                    "failed": 0,
+                    "unfinished": 0,
+                    "sumMs": 15963.7
+                  },
+                  "evm-rpc": {
+                    "calls": 8,
+                    "failed": 0,
+                    "unfinished": 0,
+                    "sumMs": 5909.7
+                  }
+                },
+                "callLog": [
+                  {
+                    "transport": "native-ws",
+                    "method": "connect",
+                    "atMs": 0.5,
+                    "ms": 2192.5,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getBlockHash",
+                    "atMs": 2199.2,
+                    "ms": 479.4,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 2200.2,
+                    "ms": 530.6,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "system_chain",
+                    "atMs": 2200.5,
+                    "ms": 479.8,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "system_properties",
+                    "atMs": 2200.6,
+                    "ms": 525.8,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "rpc_methods",
+                    "atMs": 2200.8,
+                    "ms": 525.6,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 2734.4,
+                    "ms": 477.7,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 3213.3,
+                    "ms": 3549.2,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_subscribeRuntimeVersion",
+                    "atMs": 6838,
+                    "ms": 486.5,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getFinalizedHead",
+                    "atMs": 6888.9,
+                    "ms": 477.6,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 7367.8,
+                    "ms": 478,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 7846.9,
+                    "ms": 478.3,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 8326,
+                    "ms": 0.2,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 8338.7,
+                    "ms": 477.7,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 8817,
+                    "ms": 478.8,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_chainId",
+                    "atMs": 9296.6,
+                    "ms": 2264,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getStorage",
+                    "atMs": 11563,
+                    "ms": 478.3,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getStorage",
+                    "atMs": 12043.7,
+                    "ms": 477.9,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 12524.4,
+                    "ms": 512.7,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 13037.9,
+                    "ms": 510.7,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 13549.7,
+                    "ms": 508.3,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 14059.4,
+                    "ms": 504.5,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 14565.4,
+                    "ms": 533.7,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 15100.2,
+                    "ms": 522.6,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 15623.7,
+                    "ms": 553.2,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 16179.5,
+                    "ms": 477.7,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 16657.6,
+                    "ms": 476.4,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "system_health",
+                    "atMs": 16890.1,
+                    "ms": 477.4,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 17134.3,
+                    "ms": 0,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getBlockHash",
+                    "atMs": 17134.6,
+                    "ms": 487,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getFinalizedHead",
+                    "atMs": 17622,
+                    "ms": 478.7,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 18101.6,
+                    "ms": 488.4,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 18590.5,
+                    "ms": 0.1,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 18590.9,
+                    "ms": 0,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getBlock",
+                    "atMs": 18592,
+                    "ms": 484.1,
+                    "ok": true
+                  }
+                ]
+              },
+              "operatorActions": {
+                "commands": 1,
+                "command": "node <maintainer-script>",
+                "manualDerivations": 0,
+                "total": 1,
+                "note": "Once the script exists it is one command; the facts it encodes are counted under installation.baselineSetup. The benchmark runs the same script in-process."
+              },
+              "assistance": 0,
+              "decision": "enable",
+              "classification": "correct",
+              "status": null,
+              "reasons": [],
+              "nextAction": null,
+              "checkpoint": {
+                "number": "187702",
+                "nativeHash": "0x41338da3c20acb543d3ddb9f225b2c26cbd1cb3b460fe4d3f8af4e86dad06ca5",
+                "evmHash": "0x925d3d1d7949ade5c19a2f9b26b515f8281a0d9f9f10d24dd08a70f578a24dc4",
+                "runtime": "portaldot-v3/3002",
+                "chainId": 420420777
+              },
+              "checks": [
+                {
+                  "id": "C1",
+                  "name": "entry-vs-chain",
+                  "ok": true
+                },
+                {
+                  "id": "C2",
+                  "name": "trusted-approval",
+                  "ok": true
+                },
+                {
+                  "id": "C3",
+                  "name": "listing-entry",
+                  "ok": true
+                },
+                {
+                  "id": "C4",
+                  "name": "stored-report",
+                  "ok": true
+                },
+                {
+                  "id": "C5",
+                  "name": "age-runtime",
+                  "ok": true
+                }
+              ],
+              "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/live/correct-entry.baseline.json",
+              "reconstruction": {
+                "requiredPresent": 5,
+                "requiredTotal": 6,
+                "extrasPresent": 0,
+                "extrasTotal": 4,
+                "absent": [
+                  "next action",
+                  "artifact integrity hash",
+                  "trust basis",
+                  "policy identity",
+                  "role control"
+                ],
+                "rederivedDecision": "enable",
+                "consistent": true
+              }
+            },
+            "revivecheck": {
+              "arm": "revivecheck",
+              "now": "2026-10-25T10:25:55.111Z",
+              "expected": "enable",
+              "timing": {
+                "wallMs": 17257.1,
+                "networkWaitMs": 17104.3,
+                "computeMs": 152.8,
+                "networkCallSumMs": 28054.2,
+                "connectMs": 2162.3,
+                "calls": 46,
+                "failedCalls": 0,
+                "unfinishedCalls": 0,
+                "byTransport": {
+                  "native-ws": {
+                    "calls": 37,
+                    "failed": 0,
+                    "unfinished": 0,
+                    "sumMs": 19413.2
+                  },
+                  "evm-rpc": {
+                    "calls": 9,
+                    "failed": 0,
+                    "unfinished": 0,
+                    "sumMs": 8641
+                  }
+                },
+                "callLog": [
+                  {
+                    "transport": "native-ws",
+                    "method": "connect",
+                    "atMs": 10.5,
+                    "ms": 2162.3,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getBlockHash",
+                    "atMs": 2173.1,
+                    "ms": 483,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 2173.2,
+                    "ms": 474.5,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "system_chain",
+                    "atMs": 2173.3,
+                    "ms": 474.5,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "system_properties",
+                    "atMs": 2173.3,
+                    "ms": 474.5,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "rpc_methods",
+                    "atMs": 2173.3,
+                    "ms": 474.4,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 2656.6,
+                    "ms": 468.4,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 3125.3,
+                    "ms": 4018.7,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_subscribeRuntimeVersion",
+                    "atMs": 7231.3,
+                    "ms": 476.3,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getFinalizedHead",
+                    "atMs": 7274.6,
+                    "ms": 466.1,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 7741.2,
+                    "ms": 469.4,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 8211.1,
+                    "ms": 476,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 8687.4,
+                    "ms": 0.1,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 8687.4,
+                    "ms": 471.9,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 8697.7,
+                    "ms": 470,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_chainId",
+                    "atMs": 9159.9,
+                    "ms": 2198.4,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 9168.1,
+                    "ms": 473.3,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 9168.3,
+                    "ms": 473.1,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 9643.7,
+                    "ms": 1754.4,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 9645.1,
+                    "ms": 1710.5,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 9646.1,
+                    "ms": 468,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 9646.7,
+                    "ms": 469,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 11356.4,
+                    "ms": 500.9,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 11356.8,
+                    "ms": 466.5,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 11398.8,
+                    "ms": 498.9,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 11399.8,
+                    "ms": 466.8,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 11899.1,
+                    "ms": 0,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 11899.6,
+                    "ms": 501.9,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 11900.8,
+                    "ms": 472.7,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 12406.8,
+                    "ms": 488.4,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 12407.6,
+                    "ms": 466.6,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 12895.9,
+                    "ms": 494.2,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 12896.7,
+                    "ms": 468.3,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_getCode",
+                    "atMs": 13390.4,
+                    "ms": 493.4,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 13890.5,
+                    "ms": 466.6,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 14357.3,
+                    "ms": 467.8,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 14825.4,
+                    "ms": 0,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getBlockHash",
+                    "atMs": 14825.6,
+                    "ms": 486.6,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getFinalizedHead",
+                    "atMs": 15312.4,
+                    "ms": 481.7,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 15794.4,
+                    "ms": 470.7,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 16265.3,
+                    "ms": 0,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 16265.5,
+                    "ms": 0,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getBlock",
+                    "atMs": 16265.8,
+                    "ms": 488.1,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 16757,
+                    "ms": 0.1,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 16757.2,
+                    "ms": 0,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getStorage",
+                    "atMs": 16774.6,
+                    "ms": 467.2,
+                    "ok": true
+                  }
+                ]
+              },
+              "operatorActions": {
+                "commands": 1,
+                "command": "node examples/token-catalog/catalog.js acceptance --config <config> [--fixture <capture>]",
+                "manualDerivations": 0,
+                "total": 1,
+                "note": "One command; the policy and the explicit binding are counted under installation.reviveCheckSetup. The benchmark makes the same library calls in-process."
+              },
+              "assistance": 0,
+              "decision": "enable",
+              "classification": "correct",
+              "status": "valid",
+              "reasons": [],
+              "nextAction": "Enable the subject under this policy. Validity is a point-in-time result: evaluate again before each use.",
+              "checkpoint": {
+                "registry": {
+                  "number": "187705",
+                  "nativeHash": "0x14d235ccf1adf01f975145d4bd394e92b523640647f870f9592d2dc0a10994e0",
+                  "evmHash": "0x4c02979d92c59b9346e89e1c558401ff0fbcb48a7a6a33ce4c7e40322dba4cbc"
+                },
+                "observation": {
+                  "number": "187705",
+                  "nativeHash": "0x14d235ccf1adf01f975145d4bd394e92b523640647f870f9592d2dc0a10994e0",
+                  "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0x14d235ccf1adf01f975145d4bd394e92b523640647f870f9592d2dc0a10994e0"
+                },
+                "listing": {
+                  "number": "187705",
+                  "nativeHash": "0x14d235ccf1adf01f975145d4bd394e92b523640647f870f9592d2dc0a10994e0",
+                  "evmHash": "0x4c02979d92c59b9346e89e1c558401ff0fbcb48a7a6a33ce4c7e40322dba4cbc"
+                }
+              },
+              "checks": {
+                "total": 35,
+                "failed": [],
+                "entryMatch": true
+              },
+              "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/live/correct-entry.revivecheck.json",
+              "reconstruction": {
+                "requiredPresent": 6,
+                "requiredTotal": 6,
+                "extrasPresent": 4,
+                "extrasTotal": 4,
+                "absent": [],
+                "rederivedDecision": "enable",
+                "consistent": true
+              }
+            }
+          },
+          "agreement": true,
+          "checkpoints": {
+            "baseline": {
+              "number": "187702",
+              "nativeHash": "0x41338da3c20acb543d3ddb9f225b2c26cbd1cb3b460fe4d3f8af4e86dad06ca5",
+              "evmHash": "0x925d3d1d7949ade5c19a2f9b26b515f8281a0d9f9f10d24dd08a70f578a24dc4",
+              "runtime": "portaldot-v3/3002",
+              "chainId": 420420777
+            },
+            "revivecheck": {
+              "registry": {
+                "number": "187705",
+                "nativeHash": "0x14d235ccf1adf01f975145d4bd394e92b523640647f870f9592d2dc0a10994e0",
+                "evmHash": "0x4c02979d92c59b9346e89e1c558401ff0fbcb48a7a6a33ce4c7e40322dba4cbc"
+              },
+              "observation": {
+                "number": "187705",
+                "nativeHash": "0x14d235ccf1adf01f975145d4bd394e92b523640647f870f9592d2dc0a10994e0",
+                "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0x14d235ccf1adf01f975145d4bd394e92b523640647f870f9592d2dc0a10994e0"
+              },
+              "listing": {
+                "number": "187705",
+                "nativeHash": "0x14d235ccf1adf01f975145d4bd394e92b523640647f870f9592d2dc0a10994e0",
+                "evmHash": "0x4c02979d92c59b9346e89e1c558401ff0fbcb48a7a6a33ce4c7e40322dba4cbc"
+              }
+            }
+          }
+        },
+        {
+          "id": "incorrect-decimals",
+          "title": "Incorrect decimals",
+          "description": "The same chain state and binding, but the maintainer configured 18 decimals (the Ethereum default); the chain and the approved report say 6.",
+          "expected": "refuse",
+          "inputs": {
+            "config": {
+              "path": "examples/token-catalog/config/testnet-v2-wrong-entry.json",
+              "sha256": "6487a3fcf897315ecf366ae632e6547d22d838fc611b0a943133f52afc369807",
+              "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
+              "configuredDecimals": 18
+            },
+            "bindings": {
+              "path": "examples/token-catalog/data/testnet-v2-wrong-entry/bindings.json",
+              "sha256": "e2307a69e766fbbf528924e44980e48f412dc6de60e062d62dba99d1985032e9"
+            },
+            "binding": {
+              "id": "cfff0845-b6a1-4f77-a5c9-1245ae3df3f0",
+              "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+              "release": "v1.0.1",
+              "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+              "revision": "2",
+              "storage": {
+                "extrinsicHash": "0x80d46a8611bb486f3b71bdd6e9e15c96e522c536e2671c9f35d0a4496792feb3",
+                "blockHash": "0x18a28f38f2a66093eab90d11f438664428141cfade5df5ce031ff3f4519ce868"
+              },
+              "bindingHash": "4bdb5b1763db76eda2c203946af9c7c074f063080bbfe21d161ded10cd275283"
+            },
+            "report": {
+              "path": "public/reports/1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51.json",
+              "sha256": "0c40cc9ba14190eac1e114e6effe1ff781d971dc46302a564c786234d9af09d7",
+              "completedAt": "2026-10-25T09:29:17.646Z",
+              "checkpoint": "187136"
+            },
+            "capture": {
+              "path": "examples/token-catalog/data/testnet-v2/captures/12-reapprove-r2.inputs.json",
+              "sha256": "555365c9594c67f51aaebeec09113c19311040a4e59d71d4297ec595d46c5227",
+              "now": "2026-10-25T09:43:18.329Z",
+              "capturedState": "lifecycle step 12 (reapprove-r2), finalized #187279"
+            }
+          },
+          "liveMode": "fresh-reads",
+          "order": [
+            "revivecheck",
+            "baseline"
+          ],
+          "arms": {
+            "revivecheck": {
+              "arm": "revivecheck",
+              "now": "2026-10-25T10:26:12.369Z",
+              "expected": "refuse",
+              "timing": {
+                "wallMs": 24024.3,
+                "networkWaitMs": 23819.6,
+                "computeMs": 204.8,
+                "networkCallSumMs": 37446.5,
+                "connectMs": 2256,
+                "calls": 56,
+                "failedCalls": 0,
+                "unfinishedCalls": 0,
+                "byTransport": {
+                  "native-ws": {
+                    "calls": 47,
+                    "failed": 0,
+                    "unfinished": 0,
+                    "sumMs": 29236
+                  },
+                  "evm-rpc": {
+                    "calls": 9,
+                    "failed": 0,
+                    "unfinished": 0,
+                    "sumMs": 8210.5
+                  }
+                },
+                "callLog": [
+                  {
+                    "transport": "native-ws",
+                    "method": "connect",
+                    "atMs": 0.1,
+                    "ms": 2256,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getBlockHash",
+                    "atMs": 2256.3,
+                    "ms": 484.6,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 2256.4,
+                    "ms": 484.5,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "system_chain",
+                    "atMs": 2256.5,
+                    "ms": 484.1,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "system_properties",
+                    "atMs": 2256.5,
+                    "ms": 484,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "rpc_methods",
+                    "atMs": 2256.5,
+                    "ms": 484,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 2741.3,
+                    "ms": 477.2,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 3218.7,
+                    "ms": 2891.7,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_subscribeRuntimeVersion",
+                    "atMs": 6187.9,
+                    "ms": 480.8,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getFinalizedHead",
+                    "atMs": 6231.9,
+                    "ms": 477.2,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 6716.7,
+                    "ms": 480.3,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 7197.5,
+                    "ms": 478,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 7676.1,
+                    "ms": 6,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 7676.2,
+                    "ms": 483.1,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 7694.7,
+                    "ms": 477.1,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_chainId",
+                    "atMs": 8159.6,
+                    "ms": 1724.1,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 8172,
+                    "ms": 478.7,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 8172.1,
+                    "ms": 478.6,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 8651.5,
+                    "ms": 1776.2,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 8653.8,
+                    "ms": 1712.8,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 8656.7,
+                    "ms": 477.5,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 8658,
+                    "ms": 478,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 10367,
+                    "ms": 507.1,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 10367.4,
+                    "ms": 478.8,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 10428.1,
+                    "ms": 505.1,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 10428.5,
+                    "ms": 476.7,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 10934.3,
+                    "ms": 0,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 10934.5,
+                    "ms": 501.8,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 10934.9,
+                    "ms": 478.3,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 11436.6,
+                    "ms": 500,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 11436.9,
+                    "ms": 478.2,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 11937,
+                    "ms": 487.1,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 11937.5,
+                    "ms": 477.7,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_getCode",
+                    "atMs": 12424.3,
+                    "ms": 496.3,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "connect",
+                    "atMs": 12921.7,
+                    "ms": 2210.5,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getBlockHash",
+                    "atMs": 15132.4,
+                    "ms": 500.8,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 15132.7,
+                    "ms": 544,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "system_chain",
+                    "atMs": 15132.8,
+                    "ms": 500.5,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "system_properties",
+                    "atMs": 15132.8,
+                    "ms": 543.5,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "rpc_methods",
+                    "atMs": 15132.9,
+                    "ms": 543.5,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 15677,
+                    "ms": 503.4,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 16180.8,
+                    "ms": 3732.8,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "system_health",
+                    "atMs": 16234.4,
+                    "ms": 478.6,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_subscribeRuntimeVersion",
+                    "atMs": 19992.3,
+                    "ms": 493.6,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 20036.1,
+                    "ms": 493.2,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 20529.6,
+                    "ms": 492,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 21022.4,
+                    "ms": 0.1,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getBlockHash",
+                    "atMs": 21023.8,
+                    "ms": 493.2,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getFinalizedHead",
+                    "atMs": 21517.2,
+                    "ms": 495.3,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 22012.7,
+                    "ms": 491.2,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 22504.2,
+                    "ms": 496.4,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 23001.1,
+                    "ms": 0,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getBlock",
+                    "atMs": 23001.6,
+                    "ms": 496.9,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 23502.6,
+                    "ms": 0.1,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 23507.2,
+                    "ms": 0.1,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getStorage",
+                    "atMs": 23520.1,
+                    "ms": 495.2,
+                    "ok": true
+                  }
+                ]
+              },
+              "operatorActions": {
+                "commands": 1,
+                "command": "node examples/token-catalog/catalog.js acceptance --config <config> [--fixture <capture>]",
+                "manualDerivations": 0,
+                "total": 1,
+                "note": "One command; the policy and the explicit binding are counted under installation.reviveCheckSetup. The benchmark makes the same library calls in-process."
+              },
+              "assistance": 0,
+              "decision": "refuse",
+              "classification": "correct",
+              "status": "valid",
+              "reasons": [
+                "entry-mismatch:decimals"
+              ],
+              "nextAction": "Do not publish this entry. Correct the catalog configuration to the approved values, or check and approve a release that carries the configured values and bind that report explicitly.",
+              "checkpoint": {
+                "registry": {
+                  "number": "187708",
+                  "nativeHash": "0xb75f91d4a3fbe372da7b162c45871d654662ce1c89af8cf93c54d72c5ff50f3c",
+                  "evmHash": "0x33e23fe8c0b375e71c7da5621df12fa2ad9eaaee35b722b246c8b30e320f4174"
+                },
+                "observation": {
+                  "number": "187708",
+                  "nativeHash": "0xb75f91d4a3fbe372da7b162c45871d654662ce1c89af8cf93c54d72c5ff50f3c",
+                  "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0xb75f91d4a3fbe372da7b162c45871d654662ce1c89af8cf93c54d72c5ff50f3c"
+                },
+                "listing": {
+                  "number": "187708",
+                  "nativeHash": "0xb75f91d4a3fbe372da7b162c45871d654662ce1c89af8cf93c54d72c5ff50f3c",
+                  "evmHash": "0x33e23fe8c0b375e71c7da5621df12fa2ad9eaaee35b722b246c8b30e320f4174"
+                }
+              },
+              "checks": {
+                "total": 35,
+                "failed": [],
+                "entryMatch": false
+              },
+              "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/live/incorrect-decimals.revivecheck.json",
+              "reconstruction": {
+                "requiredPresent": 6,
+                "requiredTotal": 6,
+                "extrasPresent": 4,
+                "extrasTotal": 4,
+                "absent": [],
+                "rederivedDecision": "refuse",
+                "consistent": true
+              }
+            },
+            "baseline": {
+              "arm": "baseline",
+              "now": "2026-10-25T10:26:36.395Z",
+              "expected": "refuse",
+              "timing": {
+                "wallMs": 17141.7,
+                "networkWaitMs": 17013.2,
+                "computeMs": 128.5,
+                "networkCallSumMs": 20846.1,
+                "connectMs": 2208.8,
+                "calls": 37,
+                "failedCalls": 0,
+                "unfinishedCalls": 0,
+                "byTransport": {
+                  "native-ws": {
+                    "calls": 29,
+                    "failed": 0,
+                    "unfinished": 0,
+                    "sumMs": 15542
+                  },
+                  "evm-rpc": {
+                    "calls": 8,
+                    "failed": 0,
+                    "unfinished": 0,
+                    "sumMs": 5304.1
+                  }
+                },
+                "callLog": [
+                  {
+                    "transport": "native-ws",
+                    "method": "connect",
+                    "atMs": 0.5,
+                    "ms": 2208.8,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getBlockHash",
+                    "atMs": 2209.6,
+                    "ms": 471.2,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 2210,
+                    "ms": 518.6,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "system_chain",
+                    "atMs": 2210,
+                    "ms": 471.2,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "system_properties",
+                    "atMs": 2210,
+                    "ms": 517.3,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "rpc_methods",
+                    "atMs": 2210.1,
+                    "ms": 517.3,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "system_health",
+                    "atMs": 2210.3,
+                    "ms": 477.8,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 2729.4,
+                    "ms": 472.6,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 3206.4,
+                    "ms": 1807.6,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_subscribeRuntimeVersion",
+                    "atMs": 5094.5,
+                    "ms": 472.4,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getFinalizedHead",
+                    "atMs": 5138.7,
+                    "ms": 477.6,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 5617.4,
+                    "ms": 471.4,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 6089.3,
+                    "ms": 470.7,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 6563.5,
+                    "ms": 0.1,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_call",
+                    "atMs": 6573.9,
+                    "ms": 468.5,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 7042.9,
+                    "ms": 524.7,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_chainId",
+                    "atMs": 7569.6,
+                    "ms": 1771.7,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getStorage",
+                    "atMs": 9343.4,
+                    "ms": 473.6,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getStorage",
+                    "atMs": 9823.4,
+                    "ms": 468.5,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 10296.5,
+                    "ms": 503.3,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 10800.3,
+                    "ms": 501.4,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 11302.3,
+                    "ms": 504.4,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 11808.3,
+                    "ms": 506.3,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "system_health",
+                    "atMs": 12213,
+                    "ms": 477.5,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 12314.9,
+                    "ms": 500.4,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 12816.5,
+                    "ms": 506.3,
+                    "ok": true
+                  },
+                  {
+                    "transport": "evm-rpc",
+                    "method": "eth_call",
+                    "atMs": 13323.4,
+                    "ms": 510.3,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 13834.3,
+                    "ms": 471.6,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 14306.2,
+                    "ms": 468.3,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 14774.7,
+                    "ms": 0,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getBlockHash",
+                    "atMs": 14774.9,
+                    "ms": 480.2,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "system_health",
+                    "atMs": 15140.7,
+                    "ms": 473.3,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getFinalizedHead",
+                    "atMs": 15255.2,
+                    "ms": 469.8,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 15725.1,
+                    "ms": 468.7,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "state_getRuntimeVersion",
+                    "atMs": 16194.1,
+                    "ms": 470.8,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getHeader",
+                    "atMs": 16665.1,
+                    "ms": 0,
+                    "ok": true
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "chain_getBlock",
+                    "atMs": 16665.3,
+                    "ms": 471.9,
+                    "ok": true
+                  }
+                ]
+              },
+              "operatorActions": {
+                "commands": 1,
+                "command": "node <maintainer-script>",
+                "manualDerivations": 0,
+                "total": 1,
+                "note": "Once the script exists it is one command; the facts it encodes are counted under installation.baselineSetup. The benchmark runs the same script in-process."
+              },
+              "assistance": 0,
+              "decision": "refuse",
+              "classification": "correct",
+              "status": null,
+              "reasons": [
+                "C1:decimals"
+              ],
+              "nextAction": null,
+              "checkpoint": {
+                "number": "187711",
+                "nativeHash": "0x2ce6e5baf323a41c6ae5c7c63e4886ed9998b0499eaf94a2a6a4024bfebef84c",
+                "evmHash": "0x3dff53275e6c822082c6efa77b34aabbc6475883dbad0042c6e416bb82aeea5b",
+                "runtime": "portaldot-v3/3002",
+                "chainId": 420420777
+              },
+              "checks": [
+                {
+                  "id": "C1",
+                  "name": "entry-vs-chain",
+                  "ok": false
+                },
+                {
+                  "id": "C2",
+                  "name": "trusted-approval",
+                  "ok": true
+                },
+                {
+                  "id": "C3",
+                  "name": "listing-entry",
+                  "ok": true
+                },
+                {
+                  "id": "C4",
+                  "name": "stored-report",
+                  "ok": true
+                },
+                {
+                  "id": "C5",
+                  "name": "age-runtime",
+                  "ok": true
+                }
+              ],
+              "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/live/incorrect-decimals.baseline.json",
+              "reconstruction": {
+                "requiredPresent": 5,
+                "requiredTotal": 6,
+                "extrasPresent": 0,
+                "extrasTotal": 4,
+                "absent": [
+                  "next action",
+                  "artifact integrity hash",
+                  "trust basis",
+                  "policy identity",
+                  "role control"
+                ],
+                "rederivedDecision": "refuse",
+                "consistent": true
+              }
+            }
+          },
+          "agreement": true,
+          "checkpoints": {
+            "baseline": {
+              "number": "187711",
+              "nativeHash": "0x2ce6e5baf323a41c6ae5c7c63e4886ed9998b0499eaf94a2a6a4024bfebef84c",
+              "evmHash": "0x3dff53275e6c822082c6efa77b34aabbc6475883dbad0042c6e416bb82aeea5b",
+              "runtime": "portaldot-v3/3002",
+              "chainId": 420420777
+            },
+            "revivecheck": {
+              "registry": {
+                "number": "187708",
+                "nativeHash": "0xb75f91d4a3fbe372da7b162c45871d654662ce1c89af8cf93c54d72c5ff50f3c",
+                "evmHash": "0x33e23fe8c0b375e71c7da5621df12fa2ad9eaaee35b722b246c8b30e320f4174"
+              },
+              "observation": {
+                "number": "187708",
+                "nativeHash": "0xb75f91d4a3fbe372da7b162c45871d654662ce1c89af8cf93c54d72c5ff50f3c",
+                "explorerUrl": "https://scanner-testnet-v3.portaldot.dev/#/blocks/0xb75f91d4a3fbe372da7b162c45871d654662ce1c89af8cf93c54d72c5ff50f3c"
+              },
+              "listing": {
+                "number": "187708",
+                "nativeHash": "0xb75f91d4a3fbe372da7b162c45871d654662ce1c89af8cf93c54d72c5ff50f3c",
+                "evmHash": "0x33e23fe8c0b375e71c7da5621df12fa2ad9eaaee35b722b246c8b30e320f4174"
+              }
+            }
+          }
+        },
+        {
+          "id": "superseded-report",
+          "title": "Superseded report",
+          "description": "The maintainer still relies on the revision-1 approval record (report eb960cc7...) after the owner submitted revision 2; the registry cleared the approval and the token list stopped listing pUSD.",
+          "expected": "refuse",
+          "inputs": {
+            "config": {
+              "path": "examples/token-catalog/config/testnet-v2.json",
+              "sha256": "2c77d74087a2d0e96cb0cdd6a7f42521a64f37416ec8cdcd58432f1911e5b94f",
+              "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
+              "configuredDecimals": 6
+            },
+            "bindings": {
+              "path": "examples/token-catalog/data/testnet-v2/bindings.json",
+              "sha256": "e2307a69e766fbbf528924e44980e48f412dc6de60e062d62dba99d1985032e9"
+            },
+            "binding": {
+              "id": "4896a5a5-1fc6-4160-9049-7a01b11a8591",
+              "reportHash": "eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8",
+              "release": "v1.0.1",
+              "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+              "revision": "1",
+              "storage": {
+                "extrinsicHash": "0x2489bd65a330e17e422ef6ff0ce87132a6ecdb0d20554bbbc04560654fa15b44",
+                "blockHash": "0x76eac2817fcff3ce08bec3ce1d3eab8da323cbf04263535223792ad7f5491083"
+              },
+              "bindingHash": "b6687fdf3455c09aee640cff8d42dea4a763135375988e71def57808f86d5bc6"
+            },
+            "report": {
+              "path": "public/reports/eb960cc73214722f3c0cbf3a87caae572d44aafa69219d2c53b492b85e7622b8.json",
+              "sha256": "70f920984dba17543e87cc35c421c961b3951d187cfa6e4ae833672017ef1794",
+              "completedAt": "2026-10-25T09:19:23.187Z",
+              "checkpoint": "187037"
+            },
+            "capture": {
+              "path": "examples/token-catalog/data/testnet-v2/captures/07-submit-r2.inputs.json",
+              "sha256": "7d19a11837f5d8f6ea0fa35b9880799be4a3ca20a694060aa9ae9679dbb4ef06",
+              "now": "2026-10-25T09:32:32.374Z",
+              "capturedState": "lifecycle step 7 (submit-r2), finalized #187171"
+            }
+          },
+          "skipped": "Not reproducible read-only: the registry would have to hold a newer revision than the record, which needs a signed submit."
+        },
+        {
+          "id": "revoked-approval",
+          "title": "Revoked approval",
+          "description": "The trusted reviewer requested changes on revision 2; the token list stopped listing pUSD on that decision alone.",
+          "expected": "refuse",
+          "inputs": {
+            "config": {
+              "path": "examples/token-catalog/config/testnet-v2.json",
+              "sha256": "2c77d74087a2d0e96cb0cdd6a7f42521a64f37416ec8cdcd58432f1911e5b94f",
+              "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
+              "configuredDecimals": 6
+            },
+            "bindings": {
+              "path": "examples/token-catalog/data/testnet-v2/bindings.json",
+              "sha256": "e2307a69e766fbbf528924e44980e48f412dc6de60e062d62dba99d1985032e9"
+            },
+            "binding": {
+              "id": "cfff0845-b6a1-4f77-a5c9-1245ae3df3f0",
+              "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+              "release": "v1.0.1",
+              "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+              "revision": "2",
+              "storage": {
+                "extrinsicHash": "0x80d46a8611bb486f3b71bdd6e9e15c96e522c536e2671c9f35d0a4496792feb3",
+                "blockHash": "0x18a28f38f2a66093eab90d11f438664428141cfade5df5ce031ff3f4519ce868"
+              },
+              "bindingHash": "4bdb5b1763db76eda2c203946af9c7c074f063080bbfe21d161ded10cd275283"
+            },
+            "report": {
+              "path": "public/reports/1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51.json",
+              "sha256": "0c40cc9ba14190eac1e114e6effe1ff781d971dc46302a564c786234d9af09d7",
+              "completedAt": "2026-10-25T09:29:17.646Z",
+              "checkpoint": "187136"
+            },
+            "capture": {
+              "path": "examples/token-catalog/data/testnet-v2/captures/11-revoke-r2.inputs.json",
+              "sha256": "545458943259b2aee282fd2afaae4c61061e774b6f8ac11e87093c1be326641c",
+              "now": "2026-10-25T09:40:16.441Z",
+              "capturedState": "lifecycle step 11 (revoke-r2), finalized #187248"
+            }
+          },
+          "skipped": "Not reproducible read-only: revoking the approval needs a signed review transaction."
+        },
+        {
+          "id": "unavailable-verification",
+          "title": "Unavailable verification",
+          "description": "Every read fails, as when both public nodes time out. Deterministic: a copy of capture 12 whose reads are errors. Live: every connection and request is refused at the transport layer for both arms.",
+          "expected": "refuse",
+          "inputs": {
+            "config": {
+              "path": "examples/token-catalog/config/testnet-v2.json",
+              "sha256": "2c77d74087a2d0e96cb0cdd6a7f42521a64f37416ec8cdcd58432f1911e5b94f",
+              "policyHash": "ce1388f97d27489c770615d720ed39893e6250788eada8c45de6d8ab2b0534fd",
+              "configuredDecimals": 6
+            },
+            "bindings": {
+              "path": "examples/token-catalog/data/testnet-v2/bindings.json",
+              "sha256": "e2307a69e766fbbf528924e44980e48f412dc6de60e062d62dba99d1985032e9"
+            },
+            "binding": {
+              "id": "cfff0845-b6a1-4f77-a5c9-1245ae3df3f0",
+              "reportHash": "1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51",
+              "release": "v1.0.1",
+              "releaseId": "0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927",
+              "revision": "2",
+              "storage": {
+                "extrinsicHash": "0x80d46a8611bb486f3b71bdd6e9e15c96e522c536e2671c9f35d0a4496792feb3",
+                "blockHash": "0x18a28f38f2a66093eab90d11f438664428141cfade5df5ce031ff3f4519ce868"
+              },
+              "bindingHash": "4bdb5b1763db76eda2c203946af9c7c074f063080bbfe21d161ded10cd275283"
+            },
+            "report": {
+              "path": "public/reports/1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51.json",
+              "sha256": "0c40cc9ba14190eac1e114e6effe1ff781d971dc46302a564c786234d9af09d7",
+              "completedAt": "2026-10-25T09:29:17.646Z",
+              "checkpoint": "187136"
+            },
+            "capture": {
+              "path": "examples/token-catalog/benchmark/fixtures/12-reapprove-r2-unavailable.inputs.json",
+              "sha256": "a395018f02c8b56f0b01d184822f04a22a459bc09a770adb511db2a01857c680",
+              "now": "2026-10-25T09:43:18.329Z",
+              "capturedState": "derived from lifecycle step 12 with every read replaced by an error"
+            }
+          },
+          "liveMode": "outage-injected",
+          "order": [
+            "baseline",
+            "revivecheck"
+          ],
+          "arms": {
+            "baseline": {
+              "arm": "baseline",
+              "now": "2026-10-25T10:26:53.539Z",
+              "expected": "refuse",
+              "timing": {
+                "wallMs": 0.8,
+                "networkWaitMs": 0,
+                "computeMs": 0.8,
+                "networkCallSumMs": 0,
+                "connectMs": 0,
+                "calls": 1,
+                "failedCalls": 1,
+                "unfinishedCalls": 0,
+                "byTransport": {
+                  "native-ws": {
+                    "calls": 1,
+                    "failed": 1,
+                    "unfinished": 0,
+                    "sumMs": 0
+                  }
+                },
+                "callLog": [
+                  {
+                    "transport": "native-ws",
+                    "method": "connect",
+                    "atMs": 0.4,
+                    "ms": 0,
+                    "ok": false,
+                    "error": "simulated outage"
+                  }
+                ]
+              },
+              "operatorActions": {
+                "commands": 1,
+                "command": "node <maintainer-script>",
+                "manualDerivations": 0,
+                "total": 1,
+                "note": "Once the script exists it is one command; the facts it encodes are counted under installation.baselineSetup. The benchmark runs the same script in-process."
+              },
+              "assistance": 0,
+              "decision": "refuse",
+              "classification": "correct",
+              "status": null,
+              "reasons": [
+                "C1:unavailable",
+                "C2:unavailable",
+                "C3:unavailable",
+                "C4:unavailable",
+                "C5:unavailable"
+              ],
+              "nextAction": null,
+              "checkpoint": {
+                "error": "simulated outage: the native node is unreachable (benchmark injection)"
+              },
+              "checks": [
+                {
+                  "id": "C1",
+                  "name": "entry-vs-chain",
+                  "ok": null
+                },
+                {
+                  "id": "C2",
+                  "name": "trusted-approval",
+                  "ok": null
+                },
+                {
+                  "id": "C3",
+                  "name": "listing-entry",
+                  "ok": null
+                },
+                {
+                  "id": "C4",
+                  "name": "stored-report",
+                  "ok": null
+                },
+                {
+                  "id": "C5",
+                  "name": "age-runtime",
+                  "ok": null
+                }
+              ],
+              "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/live/unavailable-verification.baseline.json",
+              "reconstruction": {
+                "requiredPresent": 4,
+                "requiredTotal": 6,
+                "extrasPresent": 0,
+                "extrasTotal": 4,
+                "absent": [
+                  "checkpoint(s)",
+                  "next action",
+                  "artifact integrity hash",
+                  "trust basis",
+                  "policy identity",
+                  "role control"
+                ],
+                "rederivedDecision": "refuse",
+                "consistent": true
+              }
+            },
+            "revivecheck": {
+              "arm": "revivecheck",
+              "now": "2026-10-25T10:26:53.540Z",
+              "expected": "refuse",
+              "timing": {
+                "wallMs": 1.8,
+                "networkWaitMs": 0,
+                "computeMs": 1.8,
+                "networkCallSumMs": 0,
+                "connectMs": 0,
+                "calls": 2,
+                "failedCalls": 2,
+                "unfinishedCalls": 0,
+                "byTransport": {
+                  "native-ws": {
+                    "calls": 2,
+                    "failed": 2,
+                    "unfinished": 0,
+                    "sumMs": 0
+                  }
+                },
+                "callLog": [
+                  {
+                    "transport": "native-ws",
+                    "method": "connect",
+                    "atMs": 0.3,
+                    "ms": 0,
+                    "ok": false,
+                    "error": "simulated outage"
+                  },
+                  {
+                    "transport": "native-ws",
+                    "method": "connect",
+                    "atMs": 0.4,
+                    "ms": 0,
+                    "ok": false,
+                    "error": "simulated outage"
+                  }
+                ]
+              },
+              "operatorActions": {
+                "commands": 1,
+                "command": "node examples/token-catalog/catalog.js acceptance --config <config> [--fixture <capture>]",
+                "manualDerivations": 0,
+                "total": 1,
+                "note": "One command; the policy and the explicit binding are counted under installation.reviveCheckSetup. The benchmark makes the same library calls in-process."
+              },
+              "assistance": 0,
+              "decision": "refuse",
+              "classification": "correct",
+              "status": "unknown",
+              "reasons": [
+                "observation-missing",
+                "registry-unavailable",
+                "consumer-unavailable",
+                "storage-unverified"
+              ],
+              "nextAction": "Do not enable. The verification could not complete; retry the reads. Unavailable verification never counts as valid.",
+              "checkpoint": {
+                "registry": null,
+                "observation": null,
+                "listing": null
+              },
+              "checks": {
+                "total": 12,
+                "failed": [
+                  "observation.present:unknown",
+                  "registry.read:unknown",
+                  "consumer.read:unknown",
+                  "storage.read:unknown"
+                ],
+                "entryMatch": true
+              },
+              "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/live/unavailable-verification.revivecheck.json",
+              "reconstruction": {
+                "requiredPresent": 5,
+                "requiredTotal": 6,
+                "extrasPresent": 4,
+                "extrasTotal": 4,
+                "absent": [
+                  "checkpoint(s)"
+                ],
+                "rederivedDecision": "refuse",
+                "consistent": true
+              }
+            }
+          },
+          "agreement": true,
+          "checkpoints": {
+            "baseline": {
+              "error": "simulated outage: the native node is unreachable (benchmark injection)"
+            },
+            "revivecheck": {
+              "registry": null,
+              "observation": null,
+              "listing": null
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "failures": [],
+  "reconstruction": [
+    {
+      "mode": "deterministic",
+      "scenario": "correct-entry",
+      "arm": "baseline",
+      "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/deterministic/correct-entry.baseline.json",
+      "requiredPresent": 5,
+      "requiredTotal": 6,
+      "extrasPresent": 0,
+      "extrasTotal": 4,
+      "absent": [
+        "next action",
+        "artifact integrity hash",
+        "trust basis",
+        "policy identity",
+        "role control"
+      ],
+      "rederivedDecision": "enable",
+      "consistent": true
+    },
+    {
+      "mode": "deterministic",
+      "scenario": "correct-entry",
+      "arm": "revivecheck",
+      "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/deterministic/correct-entry.revivecheck.json",
+      "requiredPresent": 6,
+      "requiredTotal": 6,
+      "extrasPresent": 4,
+      "extrasTotal": 4,
+      "absent": [],
+      "rederivedDecision": "enable",
+      "consistent": true
+    },
+    {
+      "mode": "deterministic",
+      "scenario": "incorrect-decimals",
+      "arm": "baseline",
+      "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/deterministic/incorrect-decimals.baseline.json",
+      "requiredPresent": 5,
+      "requiredTotal": 6,
+      "extrasPresent": 0,
+      "extrasTotal": 4,
+      "absent": [
+        "next action",
+        "artifact integrity hash",
+        "trust basis",
+        "policy identity",
+        "role control"
+      ],
+      "rederivedDecision": "refuse",
+      "consistent": true
+    },
+    {
+      "mode": "deterministic",
+      "scenario": "incorrect-decimals",
+      "arm": "revivecheck",
+      "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/deterministic/incorrect-decimals.revivecheck.json",
+      "requiredPresent": 6,
+      "requiredTotal": 6,
+      "extrasPresent": 4,
+      "extrasTotal": 4,
+      "absent": [],
+      "rederivedDecision": "refuse",
+      "consistent": true
+    },
+    {
+      "mode": "deterministic",
+      "scenario": "superseded-report",
+      "arm": "baseline",
+      "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/deterministic/superseded-report.baseline.json",
+      "requiredPresent": 5,
+      "requiredTotal": 6,
+      "extrasPresent": 0,
+      "extrasTotal": 4,
+      "absent": [
+        "next action",
+        "artifact integrity hash",
+        "trust basis",
+        "policy identity",
+        "role control"
+      ],
+      "rederivedDecision": "refuse",
+      "consistent": true
+    },
+    {
+      "mode": "deterministic",
+      "scenario": "superseded-report",
+      "arm": "revivecheck",
+      "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/deterministic/superseded-report.revivecheck.json",
+      "requiredPresent": 6,
+      "requiredTotal": 6,
+      "extrasPresent": 4,
+      "extrasTotal": 4,
+      "absent": [],
+      "rederivedDecision": "refuse",
+      "consistent": true
+    },
+    {
+      "mode": "deterministic",
+      "scenario": "revoked-approval",
+      "arm": "baseline",
+      "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/deterministic/revoked-approval.baseline.json",
+      "requiredPresent": 5,
+      "requiredTotal": 6,
+      "extrasPresent": 0,
+      "extrasTotal": 4,
+      "absent": [
+        "next action",
+        "artifact integrity hash",
+        "trust basis",
+        "policy identity",
+        "role control"
+      ],
+      "rederivedDecision": "refuse",
+      "consistent": true
+    },
+    {
+      "mode": "deterministic",
+      "scenario": "revoked-approval",
+      "arm": "revivecheck",
+      "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/deterministic/revoked-approval.revivecheck.json",
+      "requiredPresent": 6,
+      "requiredTotal": 6,
+      "extrasPresent": 4,
+      "extrasTotal": 4,
+      "absent": [],
+      "rederivedDecision": "refuse",
+      "consistent": true
+    },
+    {
+      "mode": "deterministic",
+      "scenario": "unavailable-verification",
+      "arm": "baseline",
+      "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/deterministic/unavailable-verification.baseline.json",
+      "requiredPresent": 4,
+      "requiredTotal": 6,
+      "extrasPresent": 0,
+      "extrasTotal": 4,
+      "absent": [
+        "checkpoint(s)",
+        "next action",
+        "artifact integrity hash",
+        "trust basis",
+        "policy identity",
+        "role control"
+      ],
+      "rederivedDecision": "refuse",
+      "consistent": true
+    },
+    {
+      "mode": "deterministic",
+      "scenario": "unavailable-verification",
+      "arm": "revivecheck",
+      "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/deterministic/unavailable-verification.revivecheck.json",
+      "requiredPresent": 5,
+      "requiredTotal": 6,
+      "extrasPresent": 4,
+      "extrasTotal": 4,
+      "absent": [
+        "checkpoint(s)"
+      ],
+      "rederivedDecision": "refuse",
+      "consistent": true
+    },
+    {
+      "mode": "live",
+      "scenario": "correct-entry",
+      "arm": "baseline",
+      "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/live/correct-entry.baseline.json",
+      "requiredPresent": 5,
+      "requiredTotal": 6,
+      "extrasPresent": 0,
+      "extrasTotal": 4,
+      "absent": [
+        "next action",
+        "artifact integrity hash",
+        "trust basis",
+        "policy identity",
+        "role control"
+      ],
+      "rederivedDecision": "enable",
+      "consistent": true
+    },
+    {
+      "mode": "live",
+      "scenario": "correct-entry",
+      "arm": "revivecheck",
+      "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/live/correct-entry.revivecheck.json",
+      "requiredPresent": 6,
+      "requiredTotal": 6,
+      "extrasPresent": 4,
+      "extrasTotal": 4,
+      "absent": [],
+      "rederivedDecision": "enable",
+      "consistent": true
+    },
+    {
+      "mode": "live",
+      "scenario": "incorrect-decimals",
+      "arm": "baseline",
+      "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/live/incorrect-decimals.baseline.json",
+      "requiredPresent": 5,
+      "requiredTotal": 6,
+      "extrasPresent": 0,
+      "extrasTotal": 4,
+      "absent": [
+        "next action",
+        "artifact integrity hash",
+        "trust basis",
+        "policy identity",
+        "role control"
+      ],
+      "rederivedDecision": "refuse",
+      "consistent": true
+    },
+    {
+      "mode": "live",
+      "scenario": "incorrect-decimals",
+      "arm": "revivecheck",
+      "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/live/incorrect-decimals.revivecheck.json",
+      "requiredPresent": 6,
+      "requiredTotal": 6,
+      "extrasPresent": 4,
+      "extrasTotal": 4,
+      "absent": [],
+      "rederivedDecision": "refuse",
+      "consistent": true
+    },
+    {
+      "mode": "live",
+      "scenario": "unavailable-verification",
+      "arm": "baseline",
+      "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/live/unavailable-verification.baseline.json",
+      "requiredPresent": 4,
+      "requiredTotal": 6,
+      "extrasPresent": 0,
+      "extrasTotal": 4,
+      "absent": [
+        "checkpoint(s)",
+        "next action",
+        "artifact integrity hash",
+        "trust basis",
+        "policy identity",
+        "role control"
+      ],
+      "rederivedDecision": "refuse",
+      "consistent": true
+    },
+    {
+      "mode": "live",
+      "scenario": "unavailable-verification",
+      "arm": "revivecheck",
+      "artifact": "examples/token-catalog/benchmark/artifacts/fair-2026-10-25/live/unavailable-verification.revivecheck.json",
+      "requiredPresent": 5,
+      "requiredTotal": 6,
+      "extrasPresent": 4,
+      "extrasTotal": 4,
+      "absent": [
+        "checkpoint(s)"
+      ],
+      "rederivedDecision": "refuse",
+      "consistent": true
+    }
+  ]
+}

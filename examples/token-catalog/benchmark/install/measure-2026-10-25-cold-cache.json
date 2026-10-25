@@ -1,0 +1,13 @@
+{
+  "schema": "revivecheck.install-measurement.v1",
+  "method": "The same fresh clone (commit 4dfb1e36000d09ff14a95855ee6bd8080c273542) with node_modules removed, then `npm ci --no-audit --no-fund --cache <empty directory>` so every package tarball was downloaded; timed by wall clock in a Node wrapper (performance.now). Residential network, Apple Silicon laptop. The clone and the cache directory were deleted afterwards.",
+  "startedAt": "2026-10-25T10:01:54.623Z",
+  "finishedAt": "2026-10-25T10:02:11.525Z",
+  "commit": "4dfb1e36000d09ff14a95855ee6bd8080c273542",
+  "node": "v22.23.1",
+  "npm": "10.9.8",
+  "npmCiColdCacheMs": 14375,
+  "npmCiOutputTail": ["added 260 packages in 14s"],
+  "humanTime": "not measured: no person read documentation or typed during this measurement",
+  "failures": []
+}

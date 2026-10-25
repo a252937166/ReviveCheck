@@ -1,0 +1,17 @@
+{
+  "schema": "revivecheck.install-measurement.v1",
+  "method": "git clone --local of this repository into an empty temporary directory outside the repository, then `npm ci --no-audit --no-fund` in the clone; each step timed by wall clock in a Node wrapper (performance.now). The local npm cache was warm, so package tarballs were not downloaded. The clone was deleted afterwards.",
+  "startedAt": "2026-10-25T09:55:48.692Z",
+  "finishedAt": "2026-10-25T09:55:54.645Z",
+  "commit": "4dfb1e36000d09ff14a95855ee6bd8080c273542",
+  "branch": "redesign/custody-record",
+  "node": "v22.23.1",
+  "npm": "10.9.8",
+  "cloneMs": 604,
+  "npmCiMs": 4937,
+  "npmCiOutputTail": ["added 260 packages in 5s"],
+  "installedPackages": 178,
+  "nodeModulesSize": "425M",
+  "humanTime": "not measured: no person read documentation or typed during this measurement",
+  "failures": []
+}
