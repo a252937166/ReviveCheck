@@ -4,6 +4,38 @@
   "private": true,
   "type": "module",
   "description": "Check Portaldot V3 releases against the chain, approve them on-chain, and assess promotion to V3 Live",
+  "exports": {
+    ".": "./lib/service.js",
+    "./policy": "./lib/policy.js",
+    "./service": "./lib/service.js",
+    "./report": "./lib/report.js",
+    "./registry": "./lib/registry.js",
+    "./tokenlist": "./lib/tokenlist.js",
+    "./networks": "./lib/networks.js",
+    "./chain": "./lib/chain.js",
+    "./evidence": "./lib/evidence.js",
+    "./plan": "./lib/plan.js",
+    "./demo": "./lib/demo.js",
+    "./lib/*": "./lib/*",
+    "./contracts/*": "./contracts/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "contracts/*.sol",
+    "contracts/deployed",
+    "mcp",
+    "scripts/revivecheck.js",
+    "docs/API.md",
+    "docs/POLICY.md",
+    "docs/INTEGRATION.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "bin": {
+    "revivecheck": "scripts/revivecheck.js",
+    "revivecheck-mcp": "mcp/server.js"
+  },
   "scripts": {
     "dev": "node server/index.js",
     "build": "vite build",
