@@ -55,7 +55,9 @@
     "release:status": "node scripts/release-status.js",
     "package:verify": "node scripts/verify-artifact.mjs",
     "hosting:manifest": "node scripts/hosting-manifest.mjs",
-    "hosting:verify": "node scripts/verify-hosting.mjs"
+    "hosting:verify": "node scripts/verify-hosting.mjs",
+    "journey:studio": "node test/browser/studio-journey.mjs",
+    "journey:projects": "node test/browser/projects-journey.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.1",

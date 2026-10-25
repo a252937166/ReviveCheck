@@ -172,3 +172,32 @@
 .own-import { margin-top: 1rem; }
 .code-block.entry pre { max-height: 22rem; }
 @media (max-width: 960px) { .own-grid { grid-template-columns: 1fr; } }
+
+/* My projects and the studio's project switcher (product plan 2026-10-25, D-01 and D-02). */
+.project-select { font: inherit; font-size: .9rem; padding: .3rem .5rem; border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--bg); color: var(--ink); max-width: 100%; }
+.studio-needs dd .project-select { margin-right: .25rem; }
+.ledger-active { font-size: .8125rem; margin: -.4rem 0 .2rem; }
+.ledger-history { border-top: 1px solid var(--line); padding-top: .6rem; font-size: .8125rem; }
+.ledger-history summary { cursor: pointer; display: flex; align-items: center; gap: .35rem; color: var(--ink-3); }
+.ledger-history ol { margin: .5rem 0 0; padding-left: 1.1rem; display: grid; gap: .4rem; }
+.ledger-history li small { display: block; color: var(--ink-3); }
+.project-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.25rem; align-items: start; }
+.project-grid > .card:first-child, .project-grid > .card:nth-child(5), .project-grid > .card:nth-child(6) { grid-column: 1 / -1; }
+.project-policy, .project-roles { display: grid; gap: .9rem; }
+.project-policy .field-row, .project-roles .field-row { margin: 0; }
+.project-policy textarea, .project-policy input, .project-policy select, .project-roles input { width: 100%; font: inherit; font-size: .9rem; padding: .5rem .65rem; border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--bg); color: var(--ink); }
+.project-policy textarea { font-family: var(--mono); font-size: .8125rem; resize: vertical; }
+.project-policy .field, .project-roles .field { display: grid; gap: .3rem; font-size: .875rem; font-weight: 500; color: var(--ink-2); }
+.project-policy .form-error, .project-policy .muted { font-size: .875rem; margin: 0; }
+.projects-list { list-style: none; margin: 0; padding: 0; }
+.projects-list li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem 1rem; padding: .9rem 1.25rem; border-top: 1px solid var(--line); }
+.projects-list li:first-child { border-top: 0; }
+.projects-list li > a { display: flex; align-items: flex-start; gap: .65rem; text-decoration: none; color: var(--ink); min-width: 0; flex: 1 1 320px; }
+.projects-list li > a svg { margin-top: .15rem; color: var(--ink-3); flex: none; }
+.projects-list li > a strong { font-weight: 600; margin-right: .5rem; }
+.projects-list li > a small.block { color: var(--ink-3); margin-top: .15rem; }
+.project-state { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.import-area { width: 100%; font-family: var(--mono); font-size: .8125rem; padding: .55rem .7rem; border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--bg); color: var(--ink); margin: .5rem 0 .6rem; resize: vertical; }
+.form-ok { padding: .75rem 1rem; border-radius: var(--radius); background: var(--pass-soft); border: 1px solid var(--pass-line); color: var(--ink); font-size: .9rem; margin: 0 0 1rem; }
+.steps { margin: .5rem 0 0; padding-left: 1.2rem; display: grid; gap: .35rem; font-size: .875rem; color: var(--ink-2); }
+@media (max-width: 960px) { .project-grid { grid-template-columns: 1fr; } .project-grid > .card { grid-column: auto; } }

@@ -2,11 +2,12 @@
 // through the same service the MCP server uses, the lifecycle run, the report
 // reviewer and (on loopback) the local workbench. Reads need no wallet.
 import React, { useEffect, useState } from 'react';
-import { Activity, ArrowRight, ArrowUpRight, CircleAlert, ClipboardCheck, Database, ExternalLink, FileCheck2, LayoutDashboard, ListChecks, LoaderCircle, Play, ScanSearch, Search, Wrench } from 'lucide-react';
+import { Activity, ArrowRight, ArrowUpRight, CircleAlert, ClipboardCheck, Database, ExternalLink, FileCheck2, FolderKanban, LayoutDashboard, ListChecks, LoaderCircle, Play, ScanSearch, Search, Wrench } from 'lucide-react';
 import Lifecycle from './Lifecycle.jsx';
 import Try from './Try.jsx';
 import CatalogPage from './Catalog.jsx';
 import CheckTokenPage from './CheckToken.jsx';
+import ProjectsPage from './Projects.jsx';
 import Workspace, { isLoopback } from './Workspace.jsx';
 import { Mark, short } from './components.jsx';
 import { Badge, ChainLink, CopyButton, NetworkPill, WalletButton, useNetworkHead, useSubRoute, useTestnetHead } from './site.jsx';
@@ -18,7 +19,7 @@ const engine = () => import('./engine.js');
 const strip = (hash) => String(hash || '').replace(/^0x/, '');
 const addressUrl = (network, address) => `${network.explorer}/#/accounts/${address}`;
 const KIND = { submitted: 'submitted', approved: 'approved', changes: 'changes requested', listed: 'listed', stored: 'stored' };
-const PAGES = [['', 'Overview', LayoutDashboard], ['catalog', 'Catalog decision', ClipboardCheck], ['check', 'Check my token', Search], ['releases', 'Releases', Database], ['tokens', 'Token list', ListChecks], ['evidence', 'Evidence', FileCheck2], ['activity', 'Activity', Activity], ['run', 'Run the lifecycle', Play]];
+const PAGES = [['', 'Overview', LayoutDashboard], ['catalog', 'Catalog decision', ClipboardCheck], ['check', 'Check my token', Search], ['projects', 'My projects', FolderKanban], ['releases', 'Releases', Database], ['tokens', 'Token list', ListChecks], ['evidence', 'Evidence', FileCheck2], ['activity', 'Activity', Activity], ['run', 'Run the lifecycle', Play]];
 const isHash = (value) => /^0x[0-9a-fA-F]{64}$/.test(value.trim());
 const isAddress = (value) => /^0x[0-9a-fA-F]{40}$/.test(value.trim());
 
@@ -292,6 +293,6 @@ export default function Dashboard() {
   useEffect(() => { if (page !== 'run') window.scrollTo({ top: 0 }); }, [page]);
   if (page === 'run') return <AppShell page="run" bare><Try/></AppShell>;
   if (page === 'workbench') return <AppShell page="workbench" bare wide>{isLoopback() ? <Workspace/> : <main className="app-main" id="main"><NotLocal/></main>}</AppShell>;
-  const Page = { '': Overview, catalog: CatalogPage, check: CheckTokenPage, releases: Releases, tokens: Tokens, evidence: Evidence, activity: ActivityPage }[page] || Overview;
-  return <AppShell page={page in { catalog: 1, check: 1, releases: 1, tokens: 1, evidence: 1, activity: 1 } ? page : ''}><Page data={data} head={head} liveHead={liveHead}/></AppShell>;
+  const Page = { '': Overview, catalog: CatalogPage, check: CheckTokenPage, projects: ProjectsPage, releases: Releases, tokens: Tokens, evidence: Evidence, activity: ActivityPage }[page] || Overview;
+  return <AppShell page={page in { catalog: 1, check: 1, projects: 1, releases: 1, tokens: 1, evidence: 1, activity: 1 } ? page : ''}><Page data={data} head={head} liveHead={liveHead}/></AppShell>;
 }

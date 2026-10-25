@@ -13,19 +13,22 @@ import { CopyButton } from './site.jsx';
 import { short } from './components.jsx';
 import { downloadJson } from '../lib/share.js';
 import { NETWORKS } from '../lib/networks.js';
+import { adoptReport } from './studio-store.js';
 
 const engine = () => import('./engine.js');
-const STUDIO_KEY = 'revivecheck.studio.v1';
 const TESTNET = NETWORKS.testnet;
 const EXAMPLE = { projectName: 'pUSD token list', logicalContractId: 'token-list:portaldot-v3:pusd', release: 'v1.0.1', sourceRevision: 'pusd-token-list@1.0.1', assetId: '7777', holder: '', symbol: 'pUSD', tokenName: 'Portaldot USD (test)', decimals: '6' };
 
-/** The studio session this page hands a report to, so the visitor can replay, store and submit it there. */
-function handToStudio(plan, report) {
-  let session = {};
-  try { session = JSON.parse(localStorage.getItem(STUDIO_KEY)) || {}; } catch { session = {}; }
-  const { recheck, replay, store, submit, review, consume, promote, watch, ...rest } = session; // the earlier steps belonged to another report
-  try { localStorage.setItem(STUDIO_KEY, JSON.stringify({ ...rest, check: { choice: 'own', custom: { symbol: plan.listing.symbol, name: plan.listing.name, decimals: plan.listing.decimals, plan }, report } })); } catch { /* the session lives in memory only */ }
-  location.hash = report.status === 'passed' ? '#/app/run/replay' : '#/app/run/recheck';
+/**
+ * "Use this report in my project": the browser-local project this plan belongs to is
+ * created (or selected when it already exists for the same name and plan), the report
+ * becomes the active report of that project's own studio session, and the visitor lands
+ * where the report leads: the studio (replay, store, submit) or the project page (policy,
+ * binding candidate, export). Nothing of another project or an earlier report carries over.
+ */
+function useInProject(plan, report, destination) {
+  const { project } = adoptReport({ plan, report });
+  location.hash = destination === 'project' ? `#/app/projects/${encodeURIComponent(project.id)}` : report.status === 'passed' ? '#/app/run/replay' : '#/app/run/recheck';
 }
 
 export default function CheckTokenPage() {
@@ -137,8 +140,8 @@ export default function CheckTokenPage() {
       <div className="card-body">
         {stale && <p className="form-error" role="status"><CircleAlert size={15} aria-hidden="true"/><span>The form has changed since this report was sealed (plan {short(result.described.planHash, 8)}, artifact {short(result.described.releaseArtifactHash, 8)}). A changed input needs a new check; this report stays what it was.</span></p>}
         <ReportResult report={result.report} title={`${result.report.release} · ${result.report.status === 'passed' ? 'every check passed' : result.report.status === 'failed' ? 'a check failed' : 'not established'}`}/>
-        <p className="muted own-next">This report belongs to the plan it names (fingerprint <span className="mono">{short(result.described.planHash, 12)}</span>). To use it in a bound release, continue in the studio: replay it at its block, store it on-chain, submit its hash, obtain a trusted reviewer's approval of that exact hash and bind it explicitly. A later report, even for the same asset, needs the same steps again.</p>
-        <div className="step-actions"><button type="button" className="btn btn-primary" onClick={() => handToStudio(result.plan, result.report)}>Continue in the studio<ArrowRight size={15} aria-hidden="true"/></button><button type="button" className="btn btn-secondary" onClick={() => downloadJson(result.report, `revivecheck-${result.report.release}-${result.report.evidenceHash.slice(0, 12)}.json`)}><Download size={14} aria-hidden="true"/>Report JSON</button></div>
+        <p className="muted own-next">This report belongs to the plan it names (fingerprint <span className="mono">{short(result.described.planHash, 12)}</span>). To use it in a bound release, make it the active report of your own browser-local project (<strong>{result.plan.name}</strong>): the studio then replays it at its block, stores it on-chain, submits its hash and lets a reviewer approve that exact hash; the project page holds your policy, the binding candidate and the exported consumer configuration. A later report, even for the same asset, needs the same steps again. Nothing from the demonstration or from another project is carried over.</p>
+        <div className="step-actions"><button type="button" className="btn btn-primary" onClick={() => useInProject(result.plan, result.report, 'studio')}>Use this report in my project<ArrowRight size={15} aria-hidden="true"/></button><button type="button" className="btn btn-secondary" onClick={() => useInProject(result.plan, result.report, 'project')}>Open the project page</button><button type="button" className="btn btn-secondary" onClick={() => downloadJson(result.report, `revivecheck-${result.report.release}-${result.report.evidenceHash.slice(0, 12)}.json`)}><Download size={14} aria-hidden="true"/>Report JSON</button></div>
       </div>
     </section>}
 
