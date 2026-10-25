@@ -9,6 +9,7 @@ What the installed package (`npm install revivecheck-<version>.tgz`) gives a con
 | `revivecheck/entry` | `approvedEntry`, `compareEntry`, `entryDecision`, `canonicalEntry`, `entryIdentity`, `ENTRY_FIELDS` |
 | `revivecheck/current` | `initialDecision`, `beginCheck`, `settleCheck`, `failCheck`, `changeSelection`, `ageDecision`, `checkPermission`, `canAct`, `decisionValidity`, `describeDecision`, `VALIDITY_LIMITS` |
 | `revivecheck/decision` | `buildDecisionEvidence`, `reconstructDecision`, `formatReconstruction`, `decisionSheetHtml`, `explainReason`, `evidenceExpiry`, `RENEWAL_STEPS`, `RECOVERY` |
+| `revivecheck/catalog-release` | `buildCatalogRelease`, `verifyCatalogRelease`, `readCatalogRelease`, `compareCatalogReleases`, `releaseDiagnostics`, `gateOutcome`, `loadConsumerConfig`, `selectorFrom`, `EXIT`; the `revivecheck-catalog` command |
 | `revivecheck/report` | `verifyRun`, `validateImportedRun`, `fingerprint`, `canonical`, `sealRun`, `compareRuns`, `reportHtml` |
 | `revivecheck/registry`, `revivecheck/tokenlist`, `revivecheck/networks`, `revivecheck/chain`, `revivecheck/evidence`, `revivecheck/plan`, `revivecheck/demo` | the lower-level modules the above are built from; their exports are stable but documented in source |
 
@@ -102,6 +103,42 @@ The settled result carries `validity`, derived by `decisionValidity({ policy, re
 ## `revivecheck/decision`
 
 `buildDecisionEvidence({ producer, policy, binding, report, evaluation, inputs, configuredEntry })` → a frozen `revivecheck.decision-evidence.v1` document with the outcome (`available`, `status`, `reasons`, per-reason explanations with `who` and `then`, `nextAction`), the entry comparison, every identity hash, the release, the reviewer trust basis, the storage locator, evidence age and expiry, observation freshness, the permission deadline (`validity`, from `decisionValidity`), checkpoints, verified links and QR payloads, and the full policy, binding, report, evaluation and inputs, hashed as `evidenceHash`. Throws when the artifacts do not belong together. `reconstructDecision(document)` re-derives the evaluation, the entry comparison, the outcome and the permission deadline from the document alone and returns `{ ok, checks[], rederived, stated }`. `decisionSheetHtml(document, { qrSvgs })` renders a self-contained HTML sheet. `explainReason(code)` gives the documented meaning, the status it forces, who acts and what happens next for every evaluator and entry reason; `evidenceExpiry(report, policy, now)` gives `expiresAt` and `secondsLeft`; `RENEWAL_STEPS` is the renewal checklist by role.
+
+## `revivecheck/catalog-release`
+
+The business output: a versioned token-catalog release, the release gate's outcome and the reader. Added 2026-10-25 for the product plan's D-03 and D-05. The command `revivecheck-catalog` (installed with the package) wraps these functions: `prepare` (gate and write), `read`, `compare`, `verify`; `examples/release-gate-starter/` in the package is a clean-directory recipe with its CI workflow.
+
+### `buildCatalogRelease({ name, producer, decisions, previous?, generatedAt?, note? })` → frozen `revivecheck.catalog-release.v1`
+
+`decisions` are the pieces of each entry's decision (`{ policy, binding, report, evaluation, inputs, configuredEntry }`, as `buildDecisionEvidence` takes them) or ready-made `{ evidence }` documents; one per subject, all on one network. The release includes exactly the entries whose decision was available and whose permission deadline (`validity.validUntil`, derived from the evidence) had not passed at `generatedAt`; every included field comes from the approved report. The rest are listed under `withheld` with `reasons`, `nextAction` and field-level `diagnostics`. `evidence` embeds every decision-evidence document; `validity` is the earliest included deadline; `previous` chains `version` (previous + 1, else 1) and `previousReleaseHash`; `releaseHash` is the SHA-256 of the document. Throws when a decision does not reconstruct, when two decisions name one subject, or when `previous` is not a release.
+
+### `verifyCatalogRelease(document)` → `{ ok, checks[] }`
+
+From the document alone: schema, hash, version chain, every embedded decision reconstructs, the included entries are exactly the eligible decisions at generation, the withheld list and the validity recompute, one network. Never throws.
+
+### `readCatalogRelease(document, { now?, reads? })` → frozen `revivecheck.catalog-release-read.v1`
+
+Verifies, then decides per included entry at `now`: without `reads`, only the entry's permission deadline is applied (`freshness: 'deadline-only'`, and the result says that chain-state changes since the recorded reads are not checked); with `reads` (per subject address, the shape `collectPolicyInputs` returns), the binding is evaluated again under the release's own policy, the entry compared again and a new deadline derived (`freshness: 'fresh-reads'`). A release that does not verify permits nothing (`release-unverified`); an entry past its deadline is `lapsed`; a subject without reads is `reads-missing`. `usable` and `withheld` carry the entries with reasons and a detail line; `ok` is true when at least one entry is usable.
+
+### `compareCatalogReleases(before, after)` → diff
+
+`added`, `removed` (with the withheld record of `after` when there is one), `changed` (entry fields and evidence identities that differ), `unchanged`, `chained` (whether `after` names `before`), and a summary.
+
+### `releaseDiagnostics(evidence)` → diagnostics[]
+
+For each failed check of the evaluation and each entry mismatch of a decision-evidence document: `pointer` (JSON pointer into the document), `code`, `observed`/`expected` or `configured`/`approved`, the `checkpoint` the observation was made at and its kind, the responsible `role` and the `nextAction`.
+
+### `gateOutcome({ evidence?, release?, error?, subject?, generatedAt? })` → `revivecheck.release-gate-outcome.v1`
+
+The machine-readable result of one gate run: `status` `permitted` (the release includes the subject), `refused` (a known policy or entry refusal), `unknown` (a read was unavailable) or `configuration-error`, with `exitCode` from `EXIT` (0, 1, 2, 3), the reason codes, the diagnostics and the release identity. A refusal and an unavailable node both block publication and stay distinguishable.
+
+### `loadConsumerConfig(config, name?)` → validated configuration
+
+The document the gate reads (`revivecheck-consumer.config.v1`, the one the App's My projects page exports and the separate Token eligibility demo uses): the policy is normalized, `release.{label, owner, releaseId, revision, reportHash, storage}` are required and checked, `entry.address` must be the policy subject, `boundBy` is required, and a policy that requires stored evidence needs `release.storage.extrinsicHash`. Throws naming the field.
+
+### `selectorFrom(read)` → rows
+
+The entries of a read release as token-selector rows (`id`, `label`, `selectable`, `reason`, `entry`), the shape the Token eligibility demo's selector uses.
 
 ## Behavior outside the source checkout
 

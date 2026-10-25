@@ -1,6 +1,6 @@
 {
   "name": "revivecheck",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
   "description": "Check Portaldot V3 releases against the chain, approve them on-chain, and assess promotion to V3 Live",
@@ -10,6 +10,7 @@
     "./entry": "./lib/entry.js",
     "./current": "./lib/current.js",
     "./decision": "./lib/decision.js",
+    "./catalog-release": "./lib/catalog-release.js",
     "./service": "./lib/service.js",
     "./report": "./lib/report.js",
     "./registry": "./lib/registry.js",
@@ -29,6 +30,8 @@
     "contracts/deployed",
     "mcp",
     "scripts/revivecheck.js",
+    "scripts/catalog-release.js",
+    "examples/release-gate-starter",
     "public/lifecycle/reference.json",
     "public/lifecycle/registry.json",
     "docs/API.md",
@@ -40,7 +43,8 @@
   ],
   "bin": {
     "revivecheck": "scripts/revivecheck.js",
-    "revivecheck-mcp": "mcp/server.js"
+    "revivecheck-mcp": "mcp/server.js",
+    "revivecheck-catalog": "scripts/catalog-release.js"
   },
   "scripts": {
     "dev": "node server/index.js",
@@ -57,7 +61,8 @@
     "hosting:manifest": "node scripts/hosting-manifest.mjs",
     "hosting:verify": "node scripts/verify-hosting.mjs",
     "journey:studio": "node test/browser/studio-journey.mjs",
-    "journey:projects": "node test/browser/projects-journey.mjs"
+    "journey:projects": "node test/browser/projects-journey.mjs",
+    "catalog:release": "node scripts/catalog-release.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.1",

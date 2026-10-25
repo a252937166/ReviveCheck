@@ -1,0 +1,65 @@
+# The release gate in CI, on the installed package alone. The offline job proves both
+# directions on captured reads (the approved case writes a release and the reader uses it;
+# the revoked case writes no release) and keeps every outcome, decision-evidence and release
+# document as a build artifact. The live job is manual: it reads the public Portaldot V3
+# testnet nodes and fails when they do not answer, because an unavailable verification is
+# unknown, never a pass, and never silently a fixture-backed success.
+name: release-gate
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  offline:
+    name: Gate on captured reads, then read the release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install the ReviveCheck artifact named in package.json
+        run: npm ci
+      - name: Permitted case writes a release (exit 0)
+        run: npm run gate:fixture
+      - name: Refused case writes no release (exit 1)
+        run: |
+          set -e
+          if npm run gate:refused; then echo "::error::the revoked case was permitted; it must be refused"; exit 1; fi
+          test ! -e releases-refused/catalog-release-1.json
+          node -e "const o=require('./releases-refused/outcome.json'); if (o.status!=='refused') { console.error(o); process.exit(1) } console.log('refused:', o.reasons.join(', '))"
+      - name: Read the release at its generation clock (the deadline is a point in time)
+        run: |
+          NOW=$(node -e "console.log(require('./releases/catalog-release-1.json').generatedAt)")
+          npm run read -- releases/catalog-release-1.json --now "$NOW"
+          npm run read:example -- releases/catalog-release-1.json --now "$NOW"
+      - name: Keep the outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-gate-outputs
+          path: |
+            releases
+            releases-refused
+
+  live:
+    name: Live gate (manual; needs the public testnet nodes)
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - name: Gate on fresh reads; write the release only when permitted
+        run: npm run gate
+      - name: Read it back with fresh reads
+        run: npm run read -- releases/catalog-release-1.json --live
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-gate-live
+          path: releases

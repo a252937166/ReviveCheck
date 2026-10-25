@@ -1,0 +1,21 @@
+{
+  "name": "revivecheck-release-gate-starter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A token-catalog maintainer's release gate on ReviveCheck: configure one project, retrieve and verify its evidence from the chain, evaluate the policy on fresh reads, write a versioned catalog release only when the entry is permitted, and read that release in a separate process.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "gate": "revivecheck-catalog prepare --config project.json --out releases",
+    "gate:fixture": "revivecheck-catalog prepare --config project.json --out releases --fixture fixtures/reapprove-r2.inputs.json",
+    "gate:refused": "revivecheck-catalog prepare --config project.json --out releases-refused --fixture fixtures/revoke-r2.inputs.json",
+    "read": "revivecheck-catalog read",
+    "read:example": "node read-example.mjs",
+    "compare": "revivecheck-catalog compare"
+  },
+  "dependencies": {
+    "revivecheck": "file:./revivecheck.tgz"
+  }
+}
