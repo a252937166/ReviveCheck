@@ -171,7 +171,8 @@ test('differently dated network, registry and listing reads: the earliest deadli
   const { validity } = decision.current;
   assert.equal(validity.limitedBy, 'registry');
   assert.equal(validity.validUntil, plus(T, 600_000));
-  assert.deepEqual(VALIDITY_LIMITS, ['report', 'observation', 'registry', 'listing']);
+  assert.deepEqual(VALIDITY_LIMITS, ['report', 'observation', 'registry', 'listing', 'subject']);
+  assert.equal(validity.deadlines.subject, null, 'the subject read is not required by this policy');
   assert.equal(validity.deadlines.observation.until, plus(T, 800_000));
   assert.equal(validity.deadlines.listing.until, plus(T, 700_000));
   assert.equal(validity.deadlines.report.until, EXPIRY);

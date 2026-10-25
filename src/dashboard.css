@@ -201,3 +201,4 @@
 .form-ok { padding: .75rem 1rem; border-radius: var(--radius); background: var(--pass-soft); border: 1px solid var(--pass-line); color: var(--ink); font-size: .9rem; margin: 0 0 1rem; }
 .steps { margin: .5rem 0 0; padding-left: 1.2rem; display: grid; gap: .35rem; font-size: .875rem; color: var(--ink-2); }
 @media (max-width: 960px) { .project-grid { grid-template-columns: 1fr; } .project-grid > .card { grid-column: auto; } }
+.project-policy .assurance { font-size: .8125rem; align-self: end; margin: 0; }

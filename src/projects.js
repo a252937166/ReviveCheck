@@ -32,7 +32,7 @@ const slug = (text) => String(text || '').toLowerCase().replace(/[^a-z0-9._-]+/g
 /** The policy defaults a new project starts from: the deployed registry, the active consumer, seven days of evidence age, fifteen minutes of read freshness. */
 export const POLICY_DEFAULTS = Object.freeze({
   name: '', reviewers: { trusted: [], threshold: 1, basis: '', confirmed: true, imported: null },
-  evidence: { maxAgeSeconds: 604800, maxObservationAgeSeconds: 900, requireInterfacesAgree: true, requireStoredOnChain: true },
+  evidence: { maxAgeSeconds: 604800, maxObservationAgeSeconds: 900, requireInterfacesAgree: true, requireStoredOnChain: true, requireFreshSubject: false },
   consumer: { address: TOKEN_LIST.address, version: TOKEN_LIST.version, requireListed: true },
 });
 export const ROLE_DEFAULTS = Object.freeze({
@@ -130,7 +130,7 @@ export function policyFor(project, view = null) {
     runtime: { specName: 'portaldot-v3', specVersions: ['3002'] },
     subject: { kind: 'native-asset', assetId: project.plan.nativeAsset.assetId, address: project.plan.listing.address },
     planHash: project.planHash,
-    evidence: { scope: 'portaldot-testnet-readonly', maxAgeSeconds: Number(draft.evidence.maxAgeSeconds), maxObservationAgeSeconds: Number(draft.evidence.maxObservationAgeSeconds), requireInterfacesAgree: draft.evidence.requireInterfacesAgree !== false, requireStoredOnChain: draft.evidence.requireStoredOnChain === true },
+    evidence: { scope: 'portaldot-testnet-readonly', maxAgeSeconds: Number(draft.evidence.maxAgeSeconds), maxObservationAgeSeconds: Number(draft.evidence.maxObservationAgeSeconds), requireInterfacesAgree: draft.evidence.requireInterfacesAgree !== false, requireStoredOnChain: draft.evidence.requireStoredOnChain === true, ...(draft.evidence.requireFreshSubject === true ? { requireFreshSubject: true } : {}) },
     reviewers: { trusted: draft.reviewers.trusted, threshold: Number(draft.reviewers.threshold || 1), basis: draft.reviewers.basis },
     registry: { address: REGISTRY.address, ...(H160.test(owner || '') ? { owner } : {}), label: project.release.label },
     ...(draft.consumer ? { consumer: { address: draft.consumer.address, requireListed: draft.consumer.requireListed !== false, ...(draft.consumer.version !== undefined && draft.consumer.version !== '' ? { version: Number(draft.consumer.version) } : {}) } } : {}),

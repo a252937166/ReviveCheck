@@ -67,8 +67,8 @@ async function evaluateAll({ config, bindings, fixture = null, capture = null })
       } else {
         inputs = await service.collectPolicyInputs({ policy: config.policy, binding });
       }
-      captured.tokens[token.address] = { observation: inputs.observation, registry: inputs.registry, listing: inputs.listing, evidence: inputs.evidence, collectedAt: inputs.collectedAt ?? now.toISOString() };
-      const evaluation = evaluateBinding({ policy: config.policy, binding, report, registry: inputs.registry, observation: inputs.observation, listing: inputs.listing, evidence: inputs.evidence, now });
+      captured.tokens[token.address] = { observation: inputs.observation, registry: inputs.registry, listing: inputs.listing, evidence: inputs.evidence, ...(inputs.subject !== undefined ? { subject: inputs.subject } : {}), collectedAt: inputs.collectedAt ?? now.toISOString() };
+      const evaluation = evaluateBinding({ policy: config.policy, binding, report, registry: inputs.registry, observation: inputs.observation, listing: inputs.listing, evidence: inputs.evidence, subject: inputs.subject ?? null, now });
       entries.push({ token: token.address, binding, report, evaluation, inputs });
     }
   } finally { if (service) await service.closeConnections(); }

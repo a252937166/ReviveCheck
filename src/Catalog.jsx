@@ -19,6 +19,7 @@ import { fetchJson, reviewerLink, fmt, when } from './records.js';
 import { ENTRY_FIELDS, entryDecision } from '../lib/entry.js';
 import { initialDecision, beginCheck, settleCheck, failCheck, changeSelection, ageDecision, checkPermission, describeDecision, CURRENT_WORDS, VALIDITY_LIMITS } from '../lib/current.js';
 import { explainReason, evidenceExpiry, RENEWAL_STEPS } from '../lib/decision.js';
+import { policyAssurance } from '../lib/policy.js';
 
 const engine = () => import('./engine.js');
 const CATALOGS = [
@@ -72,6 +73,7 @@ function Freshness({ catalog, evaluation, report, now }) {
   return <dl className="kv-list compact">
     <div className="kv"><dt>Evidence age</dt><dd>{report ? <>{span(ageNow)} of the {span(maxAge)} the policy allows, since the report sealed at {when(report.completedAt)}. {expiry?.expiresAt ? <>{expiry.expired ? <strong>Expired at {when(expiry.expiresAt)}.</strong> : <>Acceptable until <strong>{when(expiry.expiresAt)}</strong> ({span(expiry.secondsLeft)} left).</>}</> : null}<div className="age-track" aria-hidden="true"><div className={`age-fill ${used >= 100 ? 'spent' : used >= 75 ? 'late' : ''}`} style={{ width: `${used}%` }}/></div><small className="block">A fresh registry read does not renew the report's age; only a new check, a new approval of its exact hash and an explicit binding do.</small></> : 'no bound report'}</dd></div>
     <div className="kv"><dt>Observation</dt><dd>{evaluation ? <>{observation ? `${observation.observed} at the recorded evaluation` : 'no fresh network observation was available at the recorded evaluation'}; the policy accepts a read at most {maxObservation} s old. Checkpoints: registry #{fmt(evaluation.checkpoint.registry?.number)}, listing #{fmt(evaluation.checkpoint.listing?.number)}, observation #{fmt(evaluation.checkpoint.observation?.number)}.</> : 'no evaluation recorded'}{Number.isFinite(ageAtEvaluation) && <small className="block">At the recorded evaluation ({when(evaluation.evaluatedAt)}) the report was {span(ageAtEvaluation)} old.</small>}</dd></div>
+    <div className="kv"><dt>Subject metadata</dt><dd>{(() => { try { const assurance = policyAssurance(policy); return <><Badge status={assurance.subject === 'fresh-read' ? 'passed' : 'idle'}>{assurance.subject === 'fresh-read' ? 'read again on every evaluation' : 'from the approved report'}</Badge> {assurance.text}</>; } catch { return 'unknown'; } })()}</dd></div>
   </dl>;
 }
 
@@ -192,7 +194,7 @@ export default function CatalogPage() {
       const work = (async () => {
         const api = await engine();
         const inputs = await api.collectPolicyInputs({ policy, binding });
-        const result = api.evaluateBinding({ policy, binding, report, registry: inputs.registry, observation: inputs.observation, listing: inputs.listing, evidence: inputs.evidence, now: new Date() });
+        const result = api.evaluateBinding({ policy, binding, report, registry: inputs.registry, observation: inputs.observation, listing: inputs.listing, evidence: inputs.evidence, subject: inputs.subject ?? null, now: new Date() });
         return { evaluation: result, entry: entryDecision(token.entry.configured, report), inputs, policy, report };
       })();
       const timeout = new Promise((_, reject) => setTimeout(() => reject(Object.assign(new Error(`No answer within ${TIMEOUT_MS / 1000} s. The public nodes can be slow; read again.`), { kind: 'timeout' })), TIMEOUT_MS));

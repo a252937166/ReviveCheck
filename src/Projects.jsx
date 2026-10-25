@@ -17,6 +17,7 @@ import { short } from './components.jsx';
 import { fmt, when } from './records.js';
 import { downloadJson } from '../lib/share.js';
 import { entryDecision } from '../lib/entry.js';
+import { policyAssurance } from '../lib/policy.js';
 import { initialDecision, beginCheck, settleCheck, failCheck, changeSelection, ageDecision, checkPermission, describeDecision, CURRENT_WORDS, VALIDITY_LIMITS } from '../lib/current.js';
 import { explainReason, RENEWAL_STEPS } from '../lib/decision.js';
 import { loadProjects, saveProjects, withProject, selectProject, removeProject, listProjects, projectView, policyStatus, updatePolicy, updateRoles, renameProject, setReleaseLabel, confirmReviewers, bindCandidate, consumerConfigFor, exportBundle, importBundle, entryFor, POLICY_DEFAULTS } from './projects.js';
@@ -64,6 +65,10 @@ function PolicyEditor({ project, view, onChange }) {
       <Field label="Report age limit (s)" hint="604800 = 7 days"><input type="number" min="1" value={draft.evidence.maxAgeSeconds} onChange={(event) => set({ evidence: { maxAgeSeconds: Number(event.target.value) } })}/></Field>
       <Field label="Read freshness limit (s)" hint="each read's age"><input type="number" min="1" value={draft.evidence.maxObservationAgeSeconds} onChange={(event) => set({ evidence: { maxObservationAgeSeconds: Number(event.target.value) } })}/></Field>
       <Field label="Stored report required"><select value={String(draft.evidence.requireStoredOnChain)} onChange={(event) => set({ evidence: { requireStoredOnChain: event.target.value === 'true' } })}><option value="true">yes (remark.store)</option><option value="false">no</option></select></Field>
+    </div>
+    <div className="field-row two">
+      <Field label="Fresh subject read" hint="re-read symbol, name, decimals and the address mapping on every evaluation"><select value={String(draft.evidence.requireFreshSubject === true)} onChange={(event) => set({ evidence: { requireFreshSubject: event.target.value === 'true' } })}><option value="false">no: metadata from the approved report</option><option value="true">yes: compare the current metadata with the approved report</option></select></Field>
+      <p className="muted assurance">{status.complete ? policyAssurance(status.policy).text : 'Complete the policy to see what a valid evaluation will assure about the subject.'}</p>
     </div>
     <div className="field-row">
       <Field label="Consumer contract" hint="the VerifiedTokenList this policy reads"><select value={draft.consumer ? 'yes' : 'no'} onChange={(event) => set({ consumer: event.target.value === 'yes' ? { ...POLICY_DEFAULTS.consumer } : null })}><option value="yes">required: VerifiedTokenList v{POLICY_DEFAULTS.consumer.version}</option><option value="no">not required</option></select></Field>
@@ -141,7 +146,7 @@ function Evaluation({ project, view, status }) {
       const work = (async () => {
         const api = await engine();
         const inputs = await api.collectPolicyInputs({ policy, binding });
-        const evaluation = api.evaluateBinding({ policy, binding, report, registry: inputs.registry, observation: inputs.observation, listing: inputs.listing, evidence: inputs.evidence, now: new Date() });
+        const evaluation = api.evaluateBinding({ policy, binding, report, registry: inputs.registry, observation: inputs.observation, listing: inputs.listing, evidence: inputs.evidence, subject: inputs.subject ?? null, now: new Date() });
         return { evaluation, entry: entryDecision(entryFor(project), report), inputs, policy, report };
       })();
       const timeout = new Promise((_, reject) => setTimeout(() => reject(Object.assign(new Error(`No answer within ${TIMEOUT_MS / 1000} s. The public nodes can be slow; read again.`), { kind: 'timeout' })), TIMEOUT_MS));
