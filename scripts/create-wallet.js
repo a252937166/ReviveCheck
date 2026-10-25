@@ -24,7 +24,8 @@ const walletPath = path.join(privateDirectory, role === 'development' ? 'wallet.
 const publicPath = path.join(root, 'docs', role === 'development' ? 'WALLET_PUBLIC.json' : `${role.toUpperCase().replace(/-/g, '_')}_WALLET_PUBLIC.json`);
 const title = role === 'development' ? 'ReviveCheck testnet wallet (private)' : `ReviveCheck testnet ${role} wallet (private)`;
 // The note written on 2026-10-23 carried an earlier, non-English name; point REVIVECHECK_OBSIDIAN_WALLET_NOTE at it to reuse it.
-const notePath = process.env.REVIVECHECK_OBSIDIAN_WALLET_NOTE || path.join(homedir(), `Documents/Obsidian Vault/Hackathons/DoraHacks/portaldot-hacker-house-2026/${title.replace(/^ReviveCheck testnet/, 'ReviveCheck Testnet').replace(/wallet \(private\)$/, 'Wallet (Private)')}.md`);
+const noteTitle = role === 'development' ? 'ReviveCheck Testnet Wallet (Private)' : `ReviveCheck Testnet ${role.charAt(0).toUpperCase()}${role.slice(1)} Wallet (Private)`;
+const notePath = process.env.REVIVECHECK_OBSIDIAN_WALLET_NOTE || path.join(homedir(), `Documents/Obsidian Vault/Hackathons/DoraHacks/portaldot-hacker-house-2026/${noteTitle}.md`);
 await cryptoWaitReady();
 await mkdir(privateDirectory, { recursive: true, mode: 0o700 });
 let wallet;
