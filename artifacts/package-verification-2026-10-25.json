@@ -1,13 +1,13 @@
 {
   "schema": "revivecheck.artifact-verification.v1",
   "version": "0.4.0",
-  "verifiedAt": "2026-10-25T13:22:36.342Z",
+  "verifiedAt": "2026-10-25T13:45:09.024Z",
   "node": "v22.23.1",
   "artifact": {
     "filename": "revivecheck-0.4.0.tgz",
-    "sha256": "a81bfb562b3995db79b1a0fa6625bd58648c48cad56af3340f1a304d8da2382f",
-    "bytes": 118382,
-    "unpackedBytes": 407496,
+    "sha256": "aa48acddc3c7d779cfc2849c7c5331c09802db24d50f6b28ddc0702ea87fcf35",
+    "bytes": 119138,
+    "unpackedBytes": 409927,
     "files": 44,
     "entries": [
       "LICENSE",
@@ -57,9 +57,9 @@
     ]
   },
   "install": {
-    "ms": 17527,
+    "ms": 23700,
     "packages": 204,
-    "nodeModulesBytes": 170599627,
+    "nodeModulesBytes": 170602058,
     "nodeModulesFiles": 15303
   },
   "exports": {
