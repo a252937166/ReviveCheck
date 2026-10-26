@@ -20,9 +20,10 @@ import { DEMO_RELEASES } from '../lib/demo.js';
 import { downloadJson, makeShareLink } from '../lib/share.js';
 import { TOKEN_LIST } from '../lib/tokenlist.js';
 import { listReceipt, describeListReceipt, describeReviewReceipt } from './receipts.js';
-import { clearSession, activeReport, passedActiveReport, activePlan, stepStatuses, completion, ledgerRows, createRequestFence, beginRequest, requestIsCurrent, supersedeRequests, READ_STAGES, txFailure } from './studio-state.js';
+import { clearSession, activeReport, passedActiveReport, activePlan, stepStatuses, completion, ledgerRows, txFailure } from './studio-state.js';
+import { studioRequests } from './studio-requests.js';
 import { listProjects, releaseLabelFor, planForCheck } from './projects.js';
-import { readStudio, writeSession, activateProject, applyToProject } from './studio-store.js';
+import { readStudio, writeSession, activateProject } from './studio-store.js';
 
 const TESTNET = NETWORKS.testnet, LIVE = NETWORKS.live;
 const engine = () => import('./engine.js');
@@ -39,28 +40,27 @@ const BUSY_TX = ['signing', 'submitted', 'in-block', 'finalized', 'readback'];
  * from the browser store when it arrives: a read answer (check, recheck, replay, promote,
  * watch, verify) applies only when it is still the latest request of that project and
  * stage; a write receipt or a readback always lands under its origin, whatever project is
- * on screen. The screen follows only when the origin is still the active project.
+ * on screen. The requests are owned above this mount (src/studio-requests.js): leaving
+ * the studio and opening it again neither revives an older read nor loses a newer one,
+ * and an answer applied by any mount refreshes the screen when it concerns the active
+ * project. The screen follows only when the origin is still the active project.
  */
 function useStudio() {
   const [state, setState] = useState(() => readStudio());
   const { project, session } = state;
-  const fence = useRef(createRequestFence());
   useEffect(() => { writeSession(session); }, [session]);
+  // An answer applied to the store (by this mount, or by a request an earlier mount started) refreshes the screen when it concerns the active project.
+  useEffect(() => studioRequests.subscribe(({ projectId, applied }) => { if (applied) setState((current) => current.project.id === projectId ? readStudio() : current); }), []);
   const identity = { projectId: project.id, projectName: project.name };
-  const route = (projectId, key, value) => {
-    const result = applyToProject({ projectId, key, value });
-    setState((current) => current.project.id === projectId ? { ...current, project: result.project ?? current.project, session: result.session } : current);
-    return result;
-  };
   /** Start a read request for the active project; the token names the origin and the generation. */
-  const begin = (key) => beginRequest(fence.current, project.id, key);
-  /** Settle a read request: discarded when a later request of the same project and stage started, or the project was reset. */
-  const settle = (token, value) => (READ_STAGES.includes(token.key) && !requestIsCurrent(fence.current, token)) ? { applied: false, reason: 'superseded' } : { applied: true, ...route(token.projectId, token.key, value) };
+  const begin = (key) => studioRequests.begin(project.id, key);
+  /** Settle a read request: discarded when a later request of the same project and stage started, or the project was reset, in this mount or another. */
+  const settle = (token, value) => studioRequests.settle(token, value);
   /** A finalized write receipt for the project this handler was created in. Never discarded. */
-  const apply = (key, value) => route(project.id, key, value);
+  const apply = (key, value) => studioRequests.apply(project.id, key, value);
   /** A readback for ONE transaction of the project this handler was created in. */
-  const readback = (stage, extrinsicHash, patch) => route(project.id, 'readback', { stage, extrinsicHash, patch });
-  const reset = () => { supersedeRequests(fence.current, project.id); const cleared = clearSession(session); writeSession(cleared); setState((current) => ({ ...current, session: cleared })); };
+  const readback = (stage, extrinsicHash, patch) => studioRequests.readback(project.id, stage, extrinsicHash, patch);
+  const reset = () => { studioRequests.supersede(project.id); const cleared = clearSession(session); writeSession(cleared); setState((current) => ({ ...current, session: cleared })); };
   const switchProject = (id) => { activateProject(id); setState(readStudio()); };
   return { project, session, identity, apply, begin, settle, readback, reset, switchProject, projects: listProjects(state.projects) };
 }

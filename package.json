@@ -1,6 +1,6 @@
 {
   "name": "revivecheck",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "private": true,
   "type": "module",
   "description": "Check Portaldot V3 releases against the chain, approve them on-chain, and assess promotion to V3 Live",
@@ -66,6 +66,7 @@
     "journey:adopt": "node test/browser/adopt-journey.mjs",
     "journey:import": "node test/browser/import-journey.mjs",
     "journey:race": "node test/browser/race-journey.mjs",
+    "journey:remount": "node test/browser/remount-journey.mjs",
     "catalog:release": "node scripts/catalog-release.js",
     "renewal:prepare": "node scripts/renewal-prepare.js"
   },

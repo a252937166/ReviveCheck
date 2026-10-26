@@ -101,21 +101,25 @@ test('R07-A, R07-B: a same-hash read from another chain, registry, consumer, tok
     assert.equal(health.reads[kind].predicates.domain, false, name);
     if (kind === 'registry') { assert.equal(health.approval.state, 'unknown', name); assert.equal(health.bound.onCurrentRevision, null, name); }
     if (kind === 'listing') assert.equal(health.listed.state, 'unknown', name);
+    // The observation places every other read on this policy's network: from another chain, the approval, the bound revision and the listing are unknown too.
+    if (kind === 'observation') { assert.equal(health.approval.state, 'unknown', name); assert.equal(health.listed.state, 'unknown', name); assert.equal(health.bound.onCurrentRevision, null, name); assert.match(health.approval.detail, /network observation is wrong-target/, name); }
     assert.ok(health.warnings.some((item) => item.code === 'read-wrong-target'), name);
     assert.equal(health.nextRole.stage, 'read', `${name}: the operator reads again; nothing is sent`);
     const plan = renewalPlan({ policy, binding, report: REPORT, successor, storage: { verified: true, reportHash: successor.evidenceHash, extrinsicHash: `0x${'ab'.repeat(32)}`, blockHash: `0x${'cd'.repeat(32)}` }, ...inputs, bindings, now: NOW });
-    if (kind !== 'observation') {
-      assert.equal(plan.stages.find((item) => item.stage === (kind === 'registry' ? 'submit' : 'list')).status, 'unknown', name);
-      assert.equal(plan.next, null, `${name}: no next stage while a stage is unknown`);
-      assert.ok(plan.stop.kinds.includes('unknown-state'), name);
-      assert.match(plan.stop.reason, /never send again merely because a result could not be established/, name);
-    }
+    assert.equal(plan.stages.find((item) => item.stage === (kind === 'listing' ? 'list' : 'submit')).status, 'unknown', name);
+    if (kind === 'observation') { assert.deepEqual(plan.stages.map((item) => item.status), ['done', 'done', 'unknown', 'unknown', 'unknown', 'unknown', 'pending'], name); assert.match(plan.stop.reason, /network observation is wrong-target/, name); }
+    assert.equal(plan.next, null, `${name}: no next stage while a stage is unknown`);
+    assert.ok(plan.stop.kinds.includes('unknown-state'), name);
+    assert.match(plan.stop.reason, /never send again merely because a result could not be established/, name);
   }
   const stale = evidenceHealth({ policy, binding, report: REPORT, ...fresh(capture, plus(NOW, -901_000)), now: NOW });
   assert.equal(stale.reads.registry.state, 'stale');
   assert.equal(stale.approval.state, 'unknown');
   const undated = evidenceHealth({ policy, binding, report: REPORT, ...reads, registry: { ...reads.registry, observedAt: undefined }, now: NOW });
   assert.equal(undated.reads.registry.state, 'undated');
+  const unidentifiedChain = evidenceHealth({ policy, binding, report: REPORT, ...reads, observation: { ...reads.observation, chainId: undefined, genesisHash: undefined }, now: NOW });
+  assert.equal(unidentifiedChain.reads.observation.state, 'undated', 'an observation that does not name its chain is undated, not from another target');
+  assert.equal(unidentifiedChain.approval.state, 'unknown');
   const disagreeing = evidenceHealth({ policy, binding, report: REPORT, ...reads, registry: { ...reads.registry, interfacesAgree: false }, now: NOW });
   assert.equal(disagreeing.reads.registry.state, 'disagreeing');
   assert.equal(disagreeing.approval.state, 'unknown');
@@ -258,4 +262,76 @@ test('the successor configuration keeps the policy and names the new report, rev
   assert.deepEqual(diff.changed.map((line) => line.pointer).filter((pointer) => pointer.startsWith('/release')), ['/release/reportHash', '/release/revision', '/release/storage/blockHash', '/release/storage/extrinsicHash']);
   assert.throws(() => successorConsumerConfig(consumerConfig, { report: { ...successor, status: 'failed' }, revision: '3', storage: null }), /intact, passed report/);
   assert.throws(() => successorConsumerConfig(consumerConfig, { report: successor, revision: '0', storage: null }), /positive integer/);
+});
+
+test('R07-F (follow-up): unread trusted decisions, a listing without a verified consumer identity, and a missing or wrong-network observation are unknown states that stop the plan; a read decision that does not approve is pending; a trusted request for changes refuses the successor; a verified storage receipt stays visible', () => {
+  const reads = fresh(capture, NOW);
+  const storage = { verified: true, reportHash: successor.evidenceHash, extrinsicHash: `0x${'ab'.repeat(32)}`, blockHash: `0x${'cd'.repeat(32)}`, blockNumber: '200000' };
+  const reviewer = policy.reviewers.trusted[0];
+  const registryR3 = (decisions) => ({ ...reads.registry, release: { ...reads.registry.release, revision: '3', reportHash: `0x${successor.evidenceHash}` }, decisions });
+  const approveOf = (plan) => plan.stages.find((item) => item.stage === 'approve');
+  const listOf = (plan) => plan.stages.find((item) => item.stage === 'list');
+  // 1. No trusted decision could be read (unavailable evidence): the approval is unknown, not pending; the plan stops; nothing suggests approving.
+  const unread = renewalPlan({ policy, binding, report: REPORT, successor, storage, ...reads, registry: registryR3({}), bindings, now: NOW });
+  assert.equal(approveOf(unread).status, 'unknown');
+  assert.match(approveOf(unread).verified.reason, /could not be read; whether revision 3 is approved is unknown, and an unread decision is not a missing one/);
+  assert.equal(unread.next, null);
+  assert.deepEqual([unread.stop.kinds, unread.stop.stages], [['unknown-state'], ['approve']]);
+  assert.equal(evidenceHealth({ policy, binding, report: REPORT, ...reads, registry: registryR3({}), reports: [successor], now: NOW }).approval.state, 'unknown');
+  // 2. The decision was read and does not approve yet (verified lack): pending, and approval is the next unperformed step.
+  const notYet = renewalPlan({ policy, binding, report: REPORT, successor, storage, ...reads, registry: registryR3({ [reviewer]: { reviewer, reviewed: false, approved: false } }), bindings, now: NOW });
+  assert.equal(approveOf(notYet).status, 'pending');
+  assert.match(approveOf(notYet).verified.reason, /every trusted decision was read and none approves/);
+  assert.equal(notYet.next.stage, 'approve');
+  assert.equal(notYet.stop, null);
+  // 3. A trusted reviewer requested changes on the successor revision: refused; the plan stops; another approval is not suggested.
+  const changes = renewalPlan({ policy, binding, report: REPORT, successor, storage, ...reads, registry: registryR3({ [reviewer]: { reviewer, reviewed: true, approved: false } }), bindings, now: NOW });
+  assert.equal(approveOf(changes).status, 'refused');
+  assert.equal(changes.next, null);
+  assert.ok(changes.stop.kinds.includes('changes-requested'));
+  assert.match(changes.stop.reason, /requested changes on revision 3/);
+  assert.doesNotMatch(changes.stop.reason, /approve the exact hash/);
+  // 4. A listing whose entry names the successor but whose consumer identity is not verified at the listing checkpoint, names another registry, or was read at another block: unidentified, so the listing is unknown and so is the list stage.
+  const approvedR3 = registryR3({ [reviewer]: { reviewer, reviewed: true, approved: true } });
+  const successorBinding = createBinding({ policy, report: successor, releaseId: binding.releaseId, revision: '3', boundBy: 'operator', boundAt: NOW, storage: { extrinsicHash: storage.extrinsicHash, blockHash: storage.blockHash }, id: 'binding-r3' });
+  const listedEntry = { ...reads.listing, entry: { ...reads.listing.entry, reportHash: `0x${successor.evidenceHash}` } };
+  const complete = renewalPlan({ policy, binding, report: REPORT, successor, storage, ...reads, registry: approvedR3, listing: listedEntry, bindings: [...bindings, successorBinding], now: NOW });
+  assert.equal(listOf(complete).status, 'done');
+  assert.ok(listOf(complete).verified.predicates.includes('consumer-identity'), 'a done listing names the identity predicate');
+  assert.equal(complete.next.stage, 'evaluate');
+  const identityCases = {
+    'no identity': null,
+    'another registry': { ...reads.listing.identity, evm: { ...reads.listing.identity.evm, registry: `0x${'ab'.repeat(20)}` }, native: { ...reads.listing.identity.native, registry: `0x${'ab'.repeat(20)}` } },
+    'another checkpoint': { ...reads.listing.identity, block: { ...reads.listing.identity.block, nativeHash: `0x${'ef'.repeat(32)}` } },
+    'interfaces disagree on it': { ...reads.listing.identity, interfacesAgree: false },
+  };
+  for (const [name, identity] of Object.entries(identityCases)) {
+    const plan = renewalPlan({ policy, binding, report: REPORT, successor, storage, ...reads, registry: approvedR3, listing: { ...listedEntry, identity }, bindings: [...bindings, successorBinding], now: NOW });
+    assert.equal(plan.reads.listing.state, 'unidentified', name);
+    assert.equal(plan.reads.listing.predicates.identity, false, name);
+    assert.equal(listOf(plan).status, 'unknown', name);
+    assert.equal(plan.next, null, name);
+    assert.deepEqual(plan.stop.stages, ['list'], name);
+    const health = evidenceHealth({ policy, binding, report: REPORT, ...reads, listing: { ...reads.listing, identity }, reports: [successor], now: NOW });
+    assert.equal(health.listed.state, 'unknown', name);
+    assert.ok(health.warnings.some((item) => item.code === 'read-unidentified'), name);
+    assert.equal(health.nextRole.stage, 'read', name);
+  }
+  // 5. The finalized-head observation is missing, unavailable or from another network while the registry and listing reads are fresh: no read can be placed on this policy's network, every chain-derived stage is unknown, the plan stops naming the observation, and the retrieved storage receipt stays visible as a fact.
+  const observationCases = { missing: null, unavailable: { error: 'node did not answer' }, 'another network': { ...reads.observation, chainId: 1 } };
+  for (const [name, observation] of Object.entries(observationCases)) {
+    const plan = renewalPlan({ policy, binding, report: REPORT, successor, storage, ...reads, observation, registry: approvedR3, listing: listedEntry, bindings: [...bindings, successorBinding], now: NOW });
+    assert.deepEqual(plan.stages.map((item) => item.status), ['done', 'done', 'unknown', 'unknown', 'unknown', 'unknown', 'pending'], name);
+    assert.equal(plan.next, null, name);
+    assert.ok(plan.stop.kinds.includes('unknown-state'), name);
+    assert.match(plan.stop.reason, /network observation is (unavailable|wrong-target)/, name);
+    assert.match(plan.stop.reason, /no read can be placed on this policy's network/, name);
+    assert.doesNotMatch(plan.stop.reason, /would open revision/, name);
+    assert.equal(plan.stages[1].verified.extrinsicHash, storage.extrinsicHash, `${name}: the verified storage receipt stays visible`);
+    const health = evidenceHealth({ policy, binding, report: REPORT, ...reads, observation, reports: [successor], now: NOW });
+    assert.equal(health.approval.state, 'unknown', name);
+    assert.equal(health.listed.state, 'unknown', name);
+    assert.equal(health.bound.onCurrentRevision, null, name);
+    assert.equal(health.nextRole.stage, 'read', name);
+  }
 });

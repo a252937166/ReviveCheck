@@ -26,6 +26,8 @@ const option = (name, fallback) => { const index = args.indexOf(name); return in
 const SITE = option('--site', 'http://127.0.0.1:4183/').replace(/\/?$/, '/');
 const SESSION = option('--session', 'projects');
 const OUT = option('--out', null);
+// Every CLI command is bounded: one that never returns (a stuck browser operation) ends the journey with a named failure and the observations so far.
+const CLI_TIMEOUT_MS = 120_000;
 const CONSUMER = option('--consumer', path.resolve(root, '../revivecheck-consumer-example'));
 const readJson = (file) => JSON.parse(readFileSync(path.join(root, file), 'utf8'));
 const REPORT = readJson('public/reports/1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51.json');
@@ -37,7 +39,8 @@ const observations = [];
 const scratch = mkdtempSync(path.join(tmpdir(), 'revivecheck-projects-'));
 
 function cli(...parts) {
-  const result = spawnSync('playwright-cli', ['-s', SESSION, ...parts], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  const result = spawnSync('playwright-cli', ['-s', SESSION, ...parts], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: CLI_TIMEOUT_MS, killSignal: 'SIGKILL' });
+  if (result.error) throw new Error(`playwright-cli ${parts[0]} ${result.error.code === 'ETIMEDOUT' ? `did not return within ${CLI_TIMEOUT_MS / 1000} s and was killed` : `could not run: ${result.error.message}`}`);
   if (result.status !== 0) throw new Error(`playwright-cli ${parts[0]} failed: ${(result.stderr || result.stdout).slice(0, 600)}`);
   return result.stdout;
 }
@@ -121,5 +124,5 @@ try {
   if (OUT) writeFileSync(OUT, `${JSON.stringify({ ok: false, error: error.message, observations }, null, 2)}\n`);
   process.exitCode = 1;
 } finally {
-  spawnSync('playwright-cli', ['-s', SESSION, 'close'], { encoding: 'utf8' });
+  spawnSync('playwright-cli', ['-s', SESSION, 'close'], { encoding: 'utf8', timeout: 30_000, killSignal: 'SIGKILL' });
 }

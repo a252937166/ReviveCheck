@@ -25,6 +25,8 @@ const args = process.argv.slice(2);
 const option = (name, fallback) => { const index = args.indexOf(name); return index >= 0 ? args[index + 1] : fallback; };
 const SITE = option('--site', 'http://127.0.0.1:4183/').replace(/\/?$/, '/');
 const OUT = option('--out', null);
+// Every CLI command is bounded: one that never returns (a stuck browser operation) ends the journey with a named failure and the observations so far.
+const CLI_TIMEOUT_MS = 120_000;
 const CONSUMER = option('--consumer', path.resolve(root, '../revivecheck-consumer-example'));
 const readJson = (file) => JSON.parse(readFileSync(path.join(root, file), 'utf8'));
 const REPORT = readJson('public/reports/1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a4766075c819a1d51.json');
@@ -35,7 +37,7 @@ const T = '2026-10-26T09:00:00.000Z';
 const observations = [];
 const scratch = mkdtempSync(path.join(tmpdir(), 'revivecheck-import-'));
 let session = 'import-a';
-function cli(...parts) { const result = spawnSync('playwright-cli', ['-s', session, ...parts], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }); if (result.status !== 0) throw new Error(`playwright-cli ${parts[0]} failed: ${(result.stderr || result.stdout).slice(0, 600)}`); return result.stdout; }
+function cli(...parts) { const result = spawnSync('playwright-cli', ['-s', session, ...parts], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: CLI_TIMEOUT_MS, killSignal: 'SIGKILL' }); if (result.error) throw new Error(`playwright-cli ${parts[0]} ${result.error.code === 'ETIMEDOUT' ? `did not return within ${CLI_TIMEOUT_MS / 1000} s and was killed` : `could not run: ${result.error.message}`}`); if (result.status !== 0) throw new Error(`playwright-cli ${parts[0]} failed: ${(result.stderr || result.stdout).slice(0, 600)}`); return result.stdout; }
 const evaluate = (js) => { const out = cli('--raw', 'eval', js).trim(); try { return JSON.parse(out); } catch { return out; } };
 const json = (js) => JSON.parse(evaluate(`JSON.stringify((() => { ${js} })())`) || 'null');
 async function waitFor(label, js, timeoutMs = 150_000) { const started = Date.now(); for (;;) { const value = json(js); if (value) return value; if (Date.now() - started > timeoutMs) throw new Error(`timed out waiting for ${label}`); await new Promise((resolve) => setTimeout(resolve, 2000)); } }
@@ -71,7 +73,7 @@ try {
   const bundle = JSON.parse(readFileSync(bundlePath, 'utf8'));
   assert(bundle.schema === 'revivecheck.project-bundle.v1' && bundle.bindings.length === 1 && bundle.release.owner === OWNER && bundle.sealedReports.length >= 1 && typeof bundle.policyHash === 'string', 'the exported bundle carries the binding, the declared owner and the sealed report', { owner: bundle.release.owner, bindings: bundle.bindings.length, policyHash: bundle.policyHash });
   const policyShown = evaluate(`document.querySelector('.project-policy > p:last-of-type')?.textContent`);
-  spawnSync('playwright-cli', ['-s', session, 'close'], { encoding: 'utf8' });
+  spawnSync('playwright-cli', ['-s', session, 'close'], { encoding: 'utf8', timeout: 30_000, killSignal: 'SIGKILL' });
 
   // Profile B: completely empty. Import through the page's own text path; nothing is seeded.
   session = 'import-b';
@@ -150,5 +152,5 @@ try {
   if (OUT) writeFileSync(OUT, `${JSON.stringify({ ok: false, error: error.message, observations }, null, 2)}\n`);
   process.exitCode = 1;
 } finally {
-  spawnSync('playwright-cli', ['-s', session, 'close'], { encoding: 'utf8' });
+  spawnSync('playwright-cli', ['-s', session, 'close'], { encoding: 'utf8', timeout: 30_000, killSignal: 'SIGKILL' });
 }

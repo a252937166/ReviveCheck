@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -27,7 +27,7 @@ const readJson = (file) => JSON.parse(readFileSync(file, 'utf8'));
 const sha256 = (file) => createHash('sha256').update(readFileSync(file)).digest('hex');
 const fresh = (name) => mkdtempSync(path.join(tmpdir(), `catalog-publication-${name}-`));
 const runRecords = (out) => readdirSync(path.join(out, 'runs')).map((id) => ({ id, outcome: readJson(path.join(out, 'runs', id, 'outcome.json')) }));
-const T1 = '2026-10-25T09:44:00.000Z', T2 = '2026-10-25T09:45:00.000Z', T3 = '2026-10-25T09:46:00.000Z';
+const T1 = '2026-10-25T09:44:00.000Z', T2 = '2026-10-25T09:45:00.000Z', T3 = '2026-10-25T09:46:00.000Z', T4 = '2026-10-25T09:47:00.000Z', T5 = '2026-10-25T09:48:00.000Z';
 
 test('R04-A, R04-C: a repeated preparation never changes an earlier release; identical bytes are reused explicitly, different bytes at an occupied version conflict', () => {
   const out = fresh('repeat');
@@ -149,4 +149,64 @@ test('R04-E, R04-F: a publication failure after evaluation yields no successful 
   const turned = publicationOutcome(permitted, { status: 'conflict', existingReleaseHash: 'cd'.repeat(32), runId: 'r' });
   assert.deepEqual([turned.status, turned.exitCode, turned.permitted, turned.release, turned.builtRelease.releaseHash], ['publication-conflict', 4, false, null, 'ab'.repeat(32)]);
   assert.equal(publicationOutcome({ status: 'refused', permitted: false, exitCode: 1 }, { status: 'not-attempted' }).status, 'refused');
+});
+
+test('R04-G (follow-up): a predecessor from another release line cannot fork the retained line, alone or concurrently; the retained line continues from its own latest release; a predecessor that directly follows the retained line, or any predecessor in an empty directory, is accepted', async () => {
+  const A = fresh('line-a'), B = fresh('line-b');
+  assert.equal(run('prepare', '--config', CONFIG, '--fixture', PERMITTED, '--out', A, '--now', T1).status, 0);
+  assert.equal(run('prepare', '--config', CONFIG, '--fixture', PERMITTED, '--out', B, '--now', T2).status, 0);
+  const aOne = path.join(A, 'catalog-release-1.json'), bOne = path.join(B, 'catalog-release-1.json');
+  assert.notEqual(readJson(aOne).releaseHash, readJson(bOne).releaseHash, 'two lines with the same configuration and different generation times');
+  const aBytes = sha256(aOne);
+  // B's version 1 as the predecessor of A's next version: a lineage conflict, exit 4, nothing written.
+  const forked = run('prepare', '--config', CONFIG, '--fixture', PERMITTED, '--out', A, '--previous', bOne, '--now', T3);
+  assert.equal(forked.status, EXIT['publication-conflict'], forked.stdout + forked.stderr);
+  const outcome = readJson(path.join(A, 'outcome.json'));
+  assert.deepEqual([outcome.status, outcome.permitted, outcome.release, outcome.publication.status, outcome.publication.kind, outcome.publication.existingReleaseHash], ['publication-conflict', false, null, 'conflict', 'lineage', readJson(aOne).releaseHash]);
+  assert.match(outcome.publication.detail, /a release from another line cannot continue this one/);
+  assert.match(outcome.nextAction, /not the release line this directory retains/);
+  assert.equal(existsSync(path.join(A, 'catalog-release-2.json')), false, 'no version 2 was written');
+  assert.equal(sha256(aOne), aBytes, 'A/1 keeps its bytes');
+  assert.match(forked.stdout, /^PUBLICATION-CONFLICT/m);
+  // Two concurrent forks from the other line: both refused, still nothing written.
+  const start = (previous, now) => new Promise((resolve) => { const child = spawn(process.execPath, [bin, 'prepare', '--config', CONFIG, '--fixture', PERMITTED, '--out', A, '--previous', previous, '--now', now], { cwd: root }); let stdout = ''; child.stdout.on('data', (chunk) => { stdout += chunk; }); child.on('close', (status) => resolve({ status, stdout })); });
+  const concurrent = await Promise.all([start(bOne, T3), start(bOne, T4)]);
+  assert.deepEqual(concurrent.map((result) => result.status), [EXIT['publication-conflict'], EXIT['publication-conflict']], JSON.stringify(concurrent.map((result) => result.stdout.split('\n')[0])));
+  assert.equal(existsSync(path.join(A, 'catalog-release-2.json')), false);
+  assert.deepEqual(readdirSync(A).filter((name) => name.includes('.tmp')), []);
+  // The retained line continues from its own latest release: A/1 → A/2, chained; the identical retry is reused; A/1 is still untouched.
+  assert.equal(run('prepare', '--config', CONFIG, '--fixture', PERMITTED, '--out', A, '--previous', aOne, '--now', T3).status, 0);
+  const aTwo = path.join(A, 'catalog-release-2.json');
+  assert.equal(JSON.parse(run('compare', aOne, aTwo, '--json').stdout).chained, true);
+  assert.equal(readJson(path.join(A, 'outcome.json')).publication.kind, null);
+  assert.equal(run('prepare', '--config', CONFIG, '--fixture', PERMITTED, '--out', A, '--previous', aOne, '--now', T3).status, 0);
+  assert.equal(readJson(path.join(A, 'outcome.json')).publication.status, 'reused');
+  assert.equal(sha256(aOne), aBytes);
+  // A predecessor the directory does not retain must directly follow the retained line: B/2 (which follows B/1, not A/2) is refused in A; so is B/3 in a directory that retains only version 1 (a gap).
+  assert.equal(run('prepare', '--config', CONFIG, '--fixture', PERMITTED, '--out', B, '--previous', bOne, '--now', T3).status, 0);
+  const bTwo = path.join(B, 'catalog-release-2.json');
+  assert.equal(run('prepare', '--config', CONFIG, '--fixture', PERMITTED, '--out', B, '--previous', bTwo, '--now', T4).status, 0);
+  const bThree = path.join(B, 'catalog-release-3.json');
+  const divergent = run('prepare', '--config', CONFIG, '--fixture', PERMITTED, '--out', A, '--previous', bThree, '--now', T5);
+  assert.equal(divergent.status, EXIT['publication-conflict'], divergent.stdout + divergent.stderr);
+  assert.match(readJson(path.join(A, 'outcome.json')).publication.detail, /belongs to another line/);
+  assert.equal(existsSync(path.join(A, 'catalog-release-4.json')), false);
+  const C = fresh('line-c');
+  assert.equal(run('prepare', '--config', CONFIG, '--fixture', PERMITTED, '--out', C, '--now', T1).status, 0);
+  const gap = run('prepare', '--config', CONFIG, '--fixture', PERMITTED, '--out', C, '--previous', bThree, '--now', T5);
+  assert.equal(gap.status, EXIT['publication-conflict'], gap.stdout + gap.stderr);
+  assert.match(readJson(path.join(C, 'outcome.json')).publication.detail, /neither retained here nor the successor of a retained version/);
+  assert.deepEqual(readdirSync(C).filter((name) => /^catalog-release-\d+\.json$/.test(name)), ['catalog-release-1.json']);
+  // A predecessor held elsewhere that directly follows the retained line is accepted: A/3 is published, moved out of A, and A/4 is published from it.
+  assert.equal(run('prepare', '--config', CONFIG, '--fixture', PERMITTED, '--out', A, '--previous', aTwo, '--now', T4).status, 0);
+  const moved = path.join(fresh('held-elsewhere'), 'catalog-release-3.json');
+  renameSync(path.join(A, 'catalog-release-3.json'), moved);
+  const continued = run('prepare', '--config', CONFIG, '--fixture', PERMITTED, '--out', A, '--previous', moved, '--now', T5);
+  assert.equal(continued.status, 0, continued.stdout + continued.stderr);
+  assert.equal(readJson(path.join(A, 'catalog-release-4.json')).previousReleaseHash, readJson(moved).releaseHash);
+  // An empty directory accepts any verified predecessor: the line continues there from the next version.
+  const D = fresh('line-d');
+  assert.equal(run('prepare', '--config', CONFIG, '--fixture', PERMITTED, '--out', D, '--previous', aTwo, '--now', T5).status, 0);
+  assert.deepEqual(readdirSync(D).filter((name) => /^catalog-release-\d+\.json$/.test(name)), ['catalog-release-3.json']);
+  assert.equal(readJson(path.join(D, 'catalog-release-3.json')).previousReleaseHash, readJson(aTwo).releaseHash);
 });

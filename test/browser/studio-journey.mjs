@@ -29,6 +29,8 @@ const option = (name, fallback) => { const index = args.indexOf(name); return in
 const SITE = option('--site', 'http://127.0.0.1:4183/').replace(/\/?$/, '/');
 const SESSION = option('--session', 'journey');
 const OUT = option('--out', null);
+// Every CLI command is bounded: one that never returns (a stuck browser operation) ends the journey with a named failure and the observations so far.
+const CLI_TIMEOUT_MS = 120_000;
 const readJson = (file) => JSON.parse(readFileSync(path.join(root, file), 'utf8'));
 const FAILED_A = readJson('public/reports/7f01ed85594c47523d44ecf4f87c3e42da920bff9925a33f4cd6fc0686b1dc14.json');
 const PASSED_A = readJson('public/reports/cbd78faa85f8759860d88366794e0c70052b74f9ed775be5bb37ad20118ed427.json');
@@ -39,7 +41,8 @@ const observations = [];
 const scratch = mkdtempSync(path.join(tmpdir(), 'revivecheck-journey-'));
 
 function cli(...parts) {
-  const result = spawnSync('playwright-cli', ['-s', SESSION, ...parts], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  const result = spawnSync('playwright-cli', ['-s', SESSION, ...parts], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: CLI_TIMEOUT_MS, killSignal: 'SIGKILL' });
+  if (result.error) throw new Error(`playwright-cli ${parts[0]} ${result.error.code === 'ETIMEDOUT' ? `did not return within ${CLI_TIMEOUT_MS / 1000} s and was killed` : `could not run: ${result.error.message}`}`);
   if (result.status !== 0) throw new Error(`playwright-cli ${parts[0]} failed: ${(result.stderr || result.stdout).slice(0, 600)}`);
   return result.stdout;
 }
@@ -132,5 +135,5 @@ try {
   if (OUT) writeFileSync(OUT, `${JSON.stringify({ ok: false, error: error.message, observations }, null, 2)}\n`);
   process.exitCode = 1;
 } finally {
-  spawnSync('playwright-cli', ['-s', SESSION, 'close'], { encoding: 'utf8' });
+  spawnSync('playwright-cli', ['-s', SESSION, 'close'], { encoding: 'utf8', timeout: 30_000, killSignal: 'SIGKILL' });
 }

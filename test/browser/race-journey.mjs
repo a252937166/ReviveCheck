@@ -27,13 +27,15 @@ const option = (name, fallback) => { const index = args.indexOf(name); return in
 const SITE = option('--site', 'http://127.0.0.1:4183/').replace(/\/?$/, '/');
 const SESSION = option('--session', 'race');
 const OUT = option('--out', null);
+// Every CLI command is bounded: one that never returns (a stuck browser operation) ends the journey with a named failure and the observations so far.
+const CLI_TIMEOUT_MS = 120_000;
 const DELAY_MS = Number(option('--delay', '0'));
 const readJson = (file) => JSON.parse(readFileSync(path.join(root, file), 'utf8'));
 const PASSED_A = readJson('public/reports/cbd78faa85f8759860d88366794e0c70052b74f9ed775be5bb37ad20118ed427.json');
 const T = '2026-10-26T09:00:00.000Z';
 const observations = [];
 const scratch = mkdtempSync(path.join(tmpdir(), 'revivecheck-race-'));
-function cli(...parts) { const result = spawnSync('playwright-cli', ['-s', SESSION, ...parts], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }); if (result.status !== 0) throw new Error(`playwright-cli ${parts[0]} failed: ${(result.stderr || result.stdout).slice(0, 600)}`); return result.stdout; }
+function cli(...parts) { const result = spawnSync('playwright-cli', ['-s', SESSION, ...parts], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: CLI_TIMEOUT_MS, killSignal: 'SIGKILL' }); if (result.error) throw new Error(`playwright-cli ${parts[0]} ${result.error.code === 'ETIMEDOUT' ? `did not return within ${CLI_TIMEOUT_MS / 1000} s and was killed` : `could not run: ${result.error.message}`}`); if (result.status !== 0) throw new Error(`playwright-cli ${parts[0]} failed: ${(result.stderr || result.stdout).slice(0, 600)}`); return result.stdout; }
 const evaluate = (js) => { const out = cli('--raw', 'eval', js).trim(); try { return JSON.parse(out); } catch { return out; } };
 const json = (js) => JSON.parse(evaluate(`JSON.stringify((() => { ${js} })())`) || 'null');
 async function waitFor(label, js, timeoutMs = 240_000) { const started = Date.now(); for (;;) { const value = json(js); if (value) return value; if (Date.now() - started > timeoutMs) throw new Error(`timed out waiting for ${label}`); await new Promise((resolve) => setTimeout(resolve, 2000)); } }
@@ -107,5 +109,5 @@ try {
   if (OUT) writeFileSync(OUT, `${JSON.stringify({ ok: false, error: error.message, observations, consoleTail }, null, 2)}\n`);
   process.exitCode = 1;
 } finally {
-  spawnSync('playwright-cli', ['-s', SESSION, 'close'], { encoding: 'utf8' });
+  spawnSync('playwright-cli', ['-s', SESSION, 'close'], { encoding: 'utf8', timeout: 30_000, killSignal: 'SIGKILL' });
 }

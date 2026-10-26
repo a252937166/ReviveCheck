@@ -24,7 +24,11 @@
 // later version names its verified predecessor explicitly (`--previous`), so repeating a
 // preparation in a directory that already holds release 1 conflicts instead of
 // overwriting it, unless the bytes are identical (then the existing file stands and the
-// outcome says `reused`). Every run has a run identity: its outcome and decision evidence
+// outcome says `reused`). The predecessor must be the line the directory retains: a
+// retained version with the predecessor's number must carry its exact hash, and a
+// predecessor the directory does not retain must directly follow the retained version
+// before it; anything else is a lineage conflict (exit 4, nothing written), so a release
+// from another directory cannot fork the retained line. Every run has a run identity: its outcome and decision evidence
 // are kept under `runs/<runId>/` (written once, never replaced), and `outcome.json` /
 // `decision-evidence.json` in the output directory are the most recent run's copies,
 // each naming its own run identity, written atomically.
@@ -103,6 +107,35 @@ async function inspectRelease(file) {
 }
 
 /**
+ * The supplied predecessor must be the line this directory retains (repair follow-up
+ * 2026-10-26, R-04): when the directory holds the predecessor's version, that retained
+ * file must verify and carry the predecessor's exact hash; when it holds releases but not
+ * that version, the predecessor must be the direct successor of the retained version
+ * before it (its `previousReleaseHash` is that file's verified hash), so the line stays
+ * coherent with at most one externally held link; a gap of two or more versions, a
+ * retained file that does not verify, or a predecessor from another line is refused
+ * before anything is written. An empty directory accepts an external predecessor and
+ * opens the next version there. Returns null when the line is coherent.
+ */
+async function checkLineage(existing, previous) {
+  const versions = existing.map((item) => item.version);
+  const atVersion = existing.find((item) => item.version === previous.version);
+  if (atVersion) {
+    const inspected = await inspectRelease(atVersion.file);
+    if (inspected.error) return { detail: `this directory retains version ${previous.version} at ${atVersion.file}, but ${inspected.error}; the line cannot be verified, so the supplied predecessor cannot be placed in it` };
+    if (inspected.releaseHash !== previous.releaseHash) return { existingReleaseHash: inspected.releaseHash, detail: `the supplied predecessor is version ${previous.version} with hash ${previous.releaseHash.slice(0, 12)}…, but this directory retains version ${previous.version} with hash ${inspected.releaseHash.slice(0, 12)}… (${atVersion.file}); a release from another line cannot continue this one` };
+    return null;
+  }
+  if (!existing.length) return null;
+  const before = existing.find((item) => item.version === previous.version - 1);
+  if (!before) return { detail: `this directory retains version${versions.length === 1 ? '' : 's'} ${versions.join(', ')} and the supplied predecessor is version ${previous.version}, which is neither retained here nor the successor of a retained version; copy its line's earlier releases here first (each is verified), or publish into another directory` };
+  const inspected = await inspectRelease(before.file);
+  if (inspected.error) return { detail: `this directory retains version ${before.version} at ${before.file}, but ${inspected.error}; the line cannot be verified` };
+  if (inspected.releaseHash !== previous.previousReleaseHash) return { existingReleaseHash: inspected.releaseHash, detail: `the supplied predecessor (version ${previous.version}) names ${String(previous.previousReleaseHash ?? 'no release').slice(0, 12)}… as its predecessor, but this directory retains version ${before.version} with hash ${inspected.releaseHash.slice(0, 12)}… (${before.file}); the supplied predecessor belongs to another line` };
+  return null;
+}
+
+/**
  * Publish a release at its version path without ever replacing an existing file: write
  * the complete document to a temporary file in the same directory, link it exclusively to
  * the final name (EEXIST when the version is occupied), remove the temporary name, then
@@ -111,10 +144,14 @@ async function inspectRelease(file) {
 async function publishRelease(out, release, { previous }) {
   const file = path.join(out, `catalog-release-${release.version}.json`);
   await mkdir(out, { recursive: true });
+  const existing = await existingReleases(out);
   // The release line: without a predecessor only version 1 may open it, and only in a directory that holds no release yet.
   if (!previous) {
-    const existing = (await existingReleases(out)).filter((item) => item.version !== release.version);
-    if (existing.length) { const latest = existing.at(-1); const inspected = await inspectRelease(latest.file); return { status: 'conflict', file, existingReleaseHash: inspected.releaseHash ?? null, detail: `this directory already holds a release line up to version ${latest.version} (${latest.file}); pass --previous ${latest.file} to publish the next version` }; }
+    const others = existing.filter((item) => item.version !== release.version);
+    if (others.length) { const latest = others.at(-1); const inspected = await inspectRelease(latest.file); return { status: 'conflict', file, existingReleaseHash: inspected.releaseHash ?? null, detail: `this directory already holds a release line up to version ${latest.version} (${latest.file}); pass --previous ${latest.file} to publish the next version` }; }
+  } else {
+    const lineage = await checkLineage(existing, previous);
+    if (lineage) return { status: 'conflict', kind: 'lineage', file, existingReleaseHash: lineage.existingReleaseHash ?? null, detail: lineage.detail };
   }
   const temp = path.join(out, `.catalog-release-${release.version}.${RUN_ID}.tmp`);
   try {
