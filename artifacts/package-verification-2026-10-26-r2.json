@@ -1,0 +1,211 @@
+{
+  "schema": "revivecheck.artifact-verification.v1",
+  "version": "0.5.3",
+  "verifiedAt": "2026-10-26T10:33:43.304Z",
+  "node": "v22.23.1",
+  "artifact": {
+    "filename": "revivecheck-0.5.3.tgz",
+    "sha256": "2ac5f3bd55a28506904df3bc1af16f455c5f12ea943c79bfdeca9526bb48d89b",
+    "bytes": 167689,
+    "unpackedBytes": 604912,
+    "files": 55,
+    "entries": [
+      "LICENSE",
+      "README.md",
+      "contracts/deployed/v1/README.md",
+      "contracts/deployed/v1/ReviveCheckGuard.sol",
+      "contracts/deployed/v1/VerifiedTokenList.sol",
+      "contracts/ReleaseGate.sol",
+      "contracts/ReleaseRegistry.sol",
+      "contracts/ReviveCheckGuard.sol",
+      "contracts/ReviveProbe.sol",
+      "contracts/VerifiedTokenList.sol",
+      "docs/API.md",
+      "docs/INTEGRATION.md",
+      "docs/LIBRARY.md",
+      "docs/POLICY.md",
+      "examples/release-gate-starter/.github/workflows/release-gate.yml",
+      "examples/release-gate-starter/fixtures/reapprove-r2.inputs.json",
+      "examples/release-gate-starter/fixtures/revoke-r2.inputs.json",
+      "examples/release-gate-starter/package.json",
+      "examples/release-gate-starter/project.json",
+      "examples/release-gate-starter/read-example.mjs",
+      "examples/release-gate-starter/README.md",
+      "lib/attestation.js",
+      "lib/baseline.js",
+      "lib/catalog-release.js",
+      "lib/chain.js",
+      "lib/current.js",
+      "lib/decision.js",
+      "lib/demo.js",
+      "lib/deployment.js",
+      "lib/entry.js",
+      "lib/evidence.js",
+      "lib/execution.js",
+      "lib/explorer.js",
+      "lib/health.js",
+      "lib/lifecycle.js",
+      "lib/networks.js",
+      "lib/plan.js",
+      "lib/policy.js",
+      "lib/promotion.js",
+      "lib/registry.js",
+      "lib/rehearsal.js",
+      "lib/replay.js",
+      "lib/report.js",
+      "lib/service.js",
+      "lib/share.js",
+      "lib/subject.js",
+      "lib/tokenlist.deployments.js",
+      "lib/tokenlist.js",
+      "mcp/server.js",
+      "mcp/tools.js",
+      "package.json",
+      "public/lifecycle/reference.json",
+      "public/lifecycle/registry.json",
+      "scripts/catalog-release.js",
+      "scripts/revivecheck.js"
+    ]
+  },
+  "install": {
+    "ms": 17918,
+    "packages": 204,
+    "nodeModulesBytes": 170823022,
+    "nodeModulesFiles": 15315
+  },
+  "exports": {
+    "revivecheck": {
+      "ok": true,
+      "missing": []
+    },
+    "revivecheck/policy": {
+      "ok": true,
+      "missing": []
+    },
+    "revivecheck/entry": {
+      "ok": true,
+      "missing": []
+    },
+    "revivecheck/current": {
+      "ok": true,
+      "missing": []
+    },
+    "revivecheck/decision": {
+      "ok": true,
+      "missing": []
+    },
+    "revivecheck/catalog-release": {
+      "ok": true,
+      "missing": []
+    },
+    "revivecheck/health": {
+      "ok": true,
+      "missing": []
+    },
+    "revivecheck/service": {
+      "ok": true,
+      "missing": []
+    },
+    "revivecheck/report": {
+      "ok": true,
+      "missing": []
+    },
+    "revivecheck/registry": {
+      "ok": true,
+      "missing": []
+    },
+    "revivecheck/tokenlist": {
+      "ok": true,
+      "missing": []
+    },
+    "revivecheck/networks": {
+      "ok": true,
+      "missing": []
+    },
+    "revivecheck/chain": {
+      "ok": true,
+      "missing": []
+    },
+    "revivecheck/evidence": {
+      "ok": true,
+      "missing": []
+    },
+    "revivecheck/plan": {
+      "ok": true,
+      "missing": []
+    },
+    "revivecheck/demo": {
+      "ok": true,
+      "missing": []
+    },
+    "revivecheck/lib/share.js": {
+      "ok": true,
+      "missing": []
+    },
+    "revivecheck/contracts/VerifiedTokenList.sol": {
+      "ok": true
+    },
+    "revivecheck/package.json": {
+      "ok": true,
+      "missing": []
+    }
+  },
+  "cli": {
+    "toolsListed": 13
+  },
+  "mcp": {
+    "tools": [
+      "network_status",
+      "check_release",
+      "get_report",
+      "replay_report",
+      "compare_reports",
+      "assess_promotion",
+      "read_registry",
+      "evaluate_policy",
+      "prepare_transaction",
+      "retrieve_evidence",
+      "token_list_status",
+      "list_releases",
+      "verify_attestation"
+    ],
+    "resources": [
+      {
+        "uri": "revivecheck://lifecycle/reference",
+        "readable": true,
+        "bytes": 4282,
+        "sha256": "421f4caa454d509b8eeb2e4525973e69e20b5f5308331eed2ccf66917b18492e"
+      },
+      {
+        "uri": "revivecheck://registry",
+        "readable": true,
+        "bytes": 5459,
+        "sha256": "1e48c63d54049cd3d423603e0b0d831668bbffc0a7956bed7120f964074863d7"
+      }
+    ]
+  },
+  "starter": {
+    "installMs": 5196,
+    "permitted": {
+      "status": 0,
+      "version": 1,
+      "releaseHash": "43042c4abed9bd492f1a6ff66ac13adabcaa828852a6cea9db4d0006fea4262d",
+      "validUntil": "2026-10-25T09:58:29.145Z"
+    },
+    "refused": {
+      "status": 1,
+      "outcome": "refused",
+      "reasons": [
+        "approval-revoked",
+        "consumer-not-listed"
+      ],
+      "wroteRelease": false
+    },
+    "reader": {
+      "status": 0,
+      "usable": true
+    }
+  },
+  "ok": true,
+  "findings": []
+}
