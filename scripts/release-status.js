@@ -50,7 +50,7 @@ async function check(id, work) {
 const PUBLICATION = Object.freeze({
   site: 'https://revivecheck.axiqo.xyz/', hostingManifest: 'https://revivecheck.axiqo.xyz/hosting.json', hostingProcedure: 'docs/DEPLOYMENT.md', publicationRecords: ['docs/PUBLICATION_2026-10-24.md', 'docs/PUBLICATION_2026-10-25.md'],
   sourceRepository: 'https://github.com/a252937166/ReviveCheck', sourceBranch: 'main', build: 'https://dorahacks.io/build/50176', buildDescribes: 'the 2026-10-24 release; not yet updated',
-  consumerExample: { repository: 'revivecheck-consumer-example (separate repository; published state is recorded in its README)', interface: 'Token eligibility demo (browser) and a command line, installed from the packed 0.5.0 artifact; prepares a versioned catalog release (revivecheck.catalog-release.v1) that a separate reader consumes; author-built, portability not adoption' },
+  consumerExample: { repository: 'revivecheck-consumer-example (separate repository; published state is recorded in its README)', interface: 'Token eligibility demo (browser) and a command line, installed from the packed 0.5.2 artifact; prepares a versioned catalog release (revivecheck.catalog-release.v1) that a separate reader consumes; author-built, portability not adoption' },
   video: 'https://www.youtube.com/watch?v=CvpzlQfya4U', videoRecordedAgainst: '2026-10-24 release (v0.3): the v2 deployment and the simulated catalog lifecycle; it predates the live v2 lifecycle recorded on 2026-10-25',
   deck: 'docs/FINAL_DECK.md', historicalDeck: 'artifacts/ReviveCheck-Check-in-Deck.pdf', freeze: '2026-11-06T04:00:00Z (November 5, 2026, 23:00 EST)',
 });

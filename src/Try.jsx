@@ -16,13 +16,13 @@ import { short } from './components.jsx';
 import { Badge, ChainLink, CopyButton, fmt, useNetworkHead, useSubRoute, useTestnetHead } from './site.jsx';
 import { useWallet } from './WalletContext.jsx';
 import { NETWORKS, RUNTIME_HISTORY } from '../lib/networks.js';
-import { DEMO_RELEASES, demoPlan } from '../lib/demo.js';
+import { DEMO_RELEASES } from '../lib/demo.js';
 import { downloadJson, makeShareLink } from '../lib/share.js';
 import { TOKEN_LIST } from '../lib/tokenlist.js';
 import { listReceipt, describeListReceipt, describeReviewReceipt } from './receipts.js';
-import { recordCheck, recordRecheck, applyStage, clearSession, activeReport, passedActiveReport, activePlan, stepStatuses, completion, ledgerRows, STAGE_KEYS } from './studio-state.js';
-import { noteReport, listProjects, releaseLabelFor } from './projects.js';
-import { readStudio, writeSession, writeProject, activateProject } from './studio-store.js';
+import { clearSession, activeReport, passedActiveReport, activePlan, stepStatuses, completion, ledgerRows, createRequestFence, beginRequest, requestIsCurrent, supersedeRequests, READ_STAGES, txFailure } from './studio-state.js';
+import { listProjects, releaseLabelFor, planForCheck } from './projects.js';
+import { readStudio, writeSession, activateProject, applyToProject } from './studio-store.js';
 
 const TESTNET = NETWORKS.testnet, LIVE = NETWORKS.live;
 const engine = () => import('./engine.js');
@@ -35,25 +35,34 @@ const BUSY_TX = ['signing', 'submitted', 'in-block', 'finalized', 'readback'];
 /**
  * The active project, its studio session and the transitions. The session is written to
  * the browser on every change; switching projects switches to that project's own session.
+ * Every asynchronous answer is routed to the session of the project it STARTED in, read
+ * from the browser store when it arrives: a read answer (check, recheck, replay, promote,
+ * watch, verify) applies only when it is still the latest request of that project and
+ * stage; a write receipt or a readback always lands under its origin, whatever project is
+ * on screen. The screen follows only when the origin is still the active project.
  */
 function useStudio() {
   const [state, setState] = useState(() => readStudio());
   const { project, session } = state;
+  const fence = useRef(createRequestFence());
   useEffect(() => { writeSession(session); }, [session]);
   const identity = { projectId: project.id, projectName: project.name };
-  const apply = (key, value) => setState((current) => {
-    const at = new Date().toISOString();
-    let next;
-    if (key === 'check') next = recordCheck(current.session, { ...value, at });
-    else if (key === 'recheck') next = recordRecheck(current.session, { ...value, at });
-    else next = applyStage(current.session, key, value, { at });
-    let record = current.project;
-    if ((key === 'check' || key === 'recheck') && value.report) { record = noteReport(record, value.report, { source: key, at }); writeProject(record); }
-    return { ...current, project: record, session: next };
-  });
-  const reset = () => setState((current) => ({ ...current, session: clearSession(current.session) }));
+  const route = (projectId, key, value) => {
+    const result = applyToProject({ projectId, key, value });
+    setState((current) => current.project.id === projectId ? { ...current, project: result.project ?? current.project, session: result.session } : current);
+    return result;
+  };
+  /** Start a read request for the active project; the token names the origin and the generation. */
+  const begin = (key) => beginRequest(fence.current, project.id, key);
+  /** Settle a read request: discarded when a later request of the same project and stage started, or the project was reset. */
+  const settle = (token, value) => (READ_STAGES.includes(token.key) && !requestIsCurrent(fence.current, token)) ? { applied: false, reason: 'superseded' } : { applied: true, ...route(token.projectId, token.key, value) };
+  /** A finalized write receipt for the project this handler was created in. Never discarded. */
+  const apply = (key, value) => route(project.id, key, value);
+  /** A readback for ONE transaction of the project this handler was created in. */
+  const readback = (stage, extrinsicHash, patch) => route(project.id, 'readback', { stage, extrinsicHash, patch });
+  const reset = () => { supersedeRequests(fence.current, project.id); const cleared = clearSession(session); writeSession(cleared); setState((current) => ({ ...current, session: cleared })); };
   const switchProject = (id) => { activateProject(id); setState(readStudio()); };
-  return { project, session, identity, apply, reset, switchProject, projects: listProjects(state.projects) };
+  return { project, session, identity, apply, begin, settle, readback, reset, switchProject, projects: listProjects(state.projects) };
 }
 
 /** A long-running read with an elapsed counter; a failure is a retry, never a result. */
@@ -79,15 +88,8 @@ function Working({ task, children }) {
   return null;
 }
 
-/** The plan a choice names. The demonstration offers its two releases and an edit of them; an own project offers its own plan only. */
-function planFor(project, choice, custom) {
-  if (project.kind === 'own') { if (!project.plan) throw new Error('This project has no plan; define it on Check my token.'); return project.plan; }
-  if (choice === 'custom') { const base = demoPlan('v1.0.1'); return { ...base, release: 'custom', sourceRevision: 'pusd-token-list@custom', listing: { ...base.listing, symbol: custom.symbol, name: custom.name, decimals: Number(custom.decimals) } }; }
-  return demoPlan(DEMO_RELEASES[choice] ? choice : 'v1.0.0');
-}
-
 function ReleaseChooser({ project, choice, setChoice, custom, setCustom, disabled }) {
-  const plan = planFor(project, choice, custom);
+  const plan = planForCheck(project, choice, custom);
   const listing = plan.listing;
   if (project.kind === 'own') return <div className="release-chooser">
     <figure className="code-block entry">
@@ -207,17 +209,18 @@ function StepApi({ stage }) {
 }
 
 function CheckStep({ studio }) {
-  const { project, session, identity, apply } = studio;
+  const { project, session, identity, begin, settle } = studio;
   const own = project.kind === 'own';
   const [choice, setChoice] = useState(own ? 'own' : session.check?.choice && DEMO_RELEASES[session.check.choice] || session.check?.choice === 'custom' ? session.check.choice : 'v1.0.0');
   const [custom, setCustom] = useState(session.check?.custom && !session.check.custom.plan ? session.check.custom : DEMO_CUSTOM);
   const [task, run] = useTask();
   const report = session.check?.report;
   async function start() {
-    // Every plan goes through the general checker with THIS project's identity; a visitor's own plan is never swapped for the demonstration.
-    const plan = planFor(project, choice, custom);
+    // Every plan goes through the general checker with THIS project's identity (its CURRENT plan); a visitor's own plan is never swapped for the demonstration.
+    const plan = planForCheck(project, choice, custom);
+    const token = begin('check');
     const result = await run('Reading the V3 testnet through both interfaces…', async () => (await engine()).checkRelease(plan, identity));
-    if (result) apply('check', { choice: own ? 'own' : choice, custom: own ? { symbol: plan.listing.symbol, name: plan.listing.name, decimals: plan.listing.decimals, plan } : custom, report: result });
+    if (result) settle(token, { choice: own ? 'own' : choice, custom: own ? { symbol: plan.listing.symbol, name: plan.listing.name, decimals: plan.listing.decimals, plan } : custom, report: result });
   }
   return <StepFrame id="check" purpose={`Compare ${own ? `${project.name}'s release` : 'a token-list release'} with what the chain reports, at one finalized block, through native Assets storage and the ERC-20 precompile. The result is sealed into a SHA-256 report and becomes this project's active report, whatever its result.`}
     next={report && (report.status === 'passed' ? <a className="btn btn-primary" href="#/app/run/replay">Replay it<ArrowRight size={15}/></a> : <a className="btn btn-primary" href="#/app/run/recheck">Fix it and recheck<ArrowRight size={15}/></a>)}>
@@ -232,7 +235,7 @@ function CheckStep({ studio }) {
 }
 
 function RecheckStep({ studio }) {
-  const { project, session, identity, apply } = studio;
+  const { project, session, identity, begin, settle } = studio;
   const own = project.kind === 'own';
   const previous = session.check?.report;
   const [choice, setChoice] = useState(own ? 'own' : session.recheck?.choice && (DEMO_RELEASES[session.recheck.choice] || session.recheck.choice === 'custom') ? session.recheck.choice : previous?.release === 'v1.0.1' ? 'custom' : 'v1.0.1');
@@ -240,9 +243,10 @@ function RecheckStep({ studio }) {
   const [task, run] = useTask();
   const { report, comparison } = session.recheck || {};
   async function start() {
-    const plan = planFor(project, choice, custom);
+    const plan = planForCheck(project, choice, custom);
+    const token = begin('recheck');
     const result = await run('Rechecking and comparing…', async () => { const api = await engine(); const next = await api.checkRelease(plan, { ...identity, previous }); return { report: next, comparison: api.compare(previous, next) }; });
-    if (result) apply('recheck', { choice: own ? 'own' : choice, custom: own ? { symbol: plan.listing.symbol, name: plan.listing.name, decimals: plan.listing.decimals, plan } : custom, ...result });
+    if (result) settle(token, { choice: own ? 'own' : choice, custom: own ? { symbol: plan.listing.symbol, name: plan.listing.name, decimals: plan.listing.decimals, plan } : custom, ...result });
   }
   if (!previous) return <StepFrame id="recheck" purpose="Check a corrected release and compare it with the first report."><Locked action={<a className="btn btn-secondary btn-sm" href="#/app/run/check">Go to Check</a>}>Run a check first; the recheck compares against it.</Locked></StepFrame>;
   return <StepFrame id="recheck" purpose={`Check ${own ? 'the release again (after correcting it on Check my token, or at a later block)' : 'the corrected release'}. It gets a new report of its own, which becomes the active report whatever its result; the comparison shows which checks changed against the first one.`}
@@ -260,10 +264,11 @@ function RecheckStep({ studio }) {
   </StepFrame>;
 }
 
-function ReplayCard({ report, session, apply }) {
+function ReplayCard({ report, studio }) {
+  const { session, begin, settle } = studio;
   const [task, run] = useTask();
   const result = report && session.replay?.reportHash === report.evidenceHash ? session.replay : null;
-  async function start() { const replayed = await run('Re-reading the pinned block…', async () => (await engine()).replay(report)); if (replayed) apply('replay', replayed); }
+  async function start() { const token = begin('replay'); const replayed = await run('Re-reading the pinned block…', async () => (await engine()).replay(report)); if (replayed) settle(token, replayed); }
   return <div className="sub-card">
     <h3>Replay it at its block</h3>
     <p>Re-read every observation of this report at block #{fmt(report.network.finalizedBlockNumber)} through both interfaces, and compare value by value. Read-only; no wallet needed.</p>
@@ -285,7 +290,7 @@ function NeedsPass({ id, purpose, session }) {
 }
 
 function StoreStep({ studio }) {
-  const { session, apply } = studio;
+  const { project, session, apply, readback } = studio;
   const report = passedActiveReport(session);
   const { account, blocker } = useSigner('polkadot');
   const [prepared, setPrepared] = useState(null);
@@ -298,13 +303,13 @@ function StoreStep({ studio }) {
     let alive = true;
     engine().then((api) => api.prepareTransaction({ action: 'store', report })).then((next) => {
       if (!alive) return;
-      setPrepared({ ...next, forReport: report.evidenceHash });
+      setPrepared({ ...next, forReport: report.evidenceHash, forProject: project.id });
       if (account?.kind === 'polkadot') walletModule().then((module) => module.nativeFee(account, next)).then((value) => alive && setFee(value)).catch(() => {});
     }).catch(() => {});
     return () => { alive = false; };
   }, [report?.evidenceHash, account?.address]);
   async function sign() {
-    if (prepared?.forReport !== report.evidenceHash) { setTx({ stage: 'error', failedAt: 'signing', error: 'The prepared bytes belong to another report; the active report changed. Prepare again.' }); return; }
+    if (prepared?.forReport !== report.evidenceHash || prepared.forProject !== project.id) { setTx({ stage: 'error', failedAt: 'signing', error: 'The prepared bytes belong to another report or project; the active report changed. Prepare again.' }); return; }
     setTx({ stage: 'signing' });
     try {
       const result = await (await walletModule()).sendStore(account, prepared.hex, (status) => setTx((value) => ({ ...value, ...status })));
@@ -312,9 +317,9 @@ function StoreStep({ studio }) {
       apply('store', { reportHash: report.evidenceHash, bytes: prepared.bytes, contentHash: prepared.contentHash, tx: result });
       setTx({ stage: 'readback', result });
       const retrieved = await (await engine()).retrieveEvidence({ extrinsicHash: result.extrinsicHash, blockHash: result.blockHash, expectedHash: report.evidenceHash });
-      apply('store', (value) => value && value.reportHash === report.evidenceHash ? { ...value, retrieved: { verified: retrieved.verified, publisher: retrieved.publisher, contentHash: retrieved.contentHash, blockNumber: retrieved.blockNumber, reasons: retrieved.reasons } } : value);
+      readback('store', result.extrinsicHash, { retrieved: { verified: retrieved.verified, publisher: retrieved.publisher, contentHash: retrieved.contentHash, blockNumber: retrieved.blockNumber, reasons: retrieved.reasons } });
       setTx({ stage: 'done', result });
-    } catch (error) { setTx((value) => ({ ...value, stage: 'error', failedAt: value.stage, error: error.message })); }
+    } catch (error) { setTx((value) => txFailure(value, error)); }
   }
   if (!report) return <NeedsPass id="store" purpose="Write the sealed report to Portaldot, and replay it at its block." session={session}/>;
   const busyTx = BUSY_TX.includes(tx.stage);
@@ -328,16 +333,16 @@ function StoreStep({ studio }) {
       {fee && <div className="kv"><dt>Fee estimate</dt><dd>{(Number(fee) / 1e14).toFixed(4)} tPOT</dd></div>}
     </dl>}
     {blocker || <>
-      <div className="step-actions"><button type="button" className="btn btn-primary" disabled={!prepared || busyTx} onClick={sign}><PenLine size={15}/>{stored ? 'Store again' : 'Sign and store'}</button><SignerLine id="store"/></div>
+      <div className="step-actions"><button type="button" className="btn btn-primary" disabled={!prepared || busyTx || tx.uncertain} onClick={sign}><PenLine size={15}/>{stored ? 'Store again' : 'Sign and store'}</button><SignerLine id="store"/></div>
       <TxProgress tx={tx}/>
-      {tx.stage === 'error' && <p className="form-error block" role="alert"><CircleAlert size={15}/>{tx.error}</p>}
+      <TxError tx={tx}/>
     </>}
     {stored && <div className="result-card passed">
       <div className="result-head"><Badge status={stored.retrieved?.verified ? 'passed' : 'pending'}>{stored.retrieved?.verified ? 'Retrieved and verified' : 'Stored'}</Badge><strong>{stored.bytes.toLocaleString('en-US')} bytes on Portaldot</strong></div>
       <TxResult result={stored.tx} title="Extrinsic"/>
       {stored.retrieved && <dl className="kv-list compact"><div className="kv"><dt>Retrieved</dt><dd>{stored.retrieved.verified ? `Remark.Stored names the publisher and content hash; the report's SHA-256 is ${short(report.evidenceHash, 12)}.` : stored.retrieved.reasons?.join(' ')}</dd></div></dl>}
     </div>}
-    <ReplayCard report={report} session={session} apply={apply}/>
+    <ReplayCard report={report} studio={studio}/>
   </StepFrame>;
 }
 
@@ -347,6 +352,12 @@ function TxProgress({ tx }) {
   const order = TX_STAGES.map(([id]) => id);
   const current = tx.stage === 'done' ? order.length : tx.stage === 'error' ? order.indexOf(tx.failedAt || 'signing') : order.indexOf(tx.stage);
   return <ol className="tx-progress" aria-label="Transaction progress">{TX_STAGES.map(([id, label], index) => <li key={id} className={index < current ? 'done' : index === current ? (tx.stage === 'error' ? 'failed' : 'current') : ''}><span className="tx-dot" aria-hidden="true">{index < current ? <Check size={11}/> : index === current && tx.stage !== 'error' ? <LoaderCircle className="spin" size={11}/> : null}</span>{label}</li>)}</ol>;
+}
+
+/** A failed transaction: what failed, and, when the send was handed to the network without an established result, a stop that no automatic retry follows. */
+function TxError({ tx }) {
+  if (tx?.stage !== 'error') return null;
+  return <div className={`form-error block${tx.uncertain ? ' uncertain' : ''}`} role="alert"><CircleAlert size={15}/><div><strong>{tx.uncertain ? 'Stop: the result of this transaction is unknown.' : 'Not completed.'}</strong> {tx.error} {tx.note}</div></div>;
 }
 
 function TxResult({ result, title }) {
@@ -385,7 +396,7 @@ function DryRun({ prepared, fee, info, account }) {
 }
 
 function SubmitStep({ studio }) {
-  const { project, session, apply } = studio;
+  const { project, session, apply, readback } = studio;
   const report = passedActiveReport(session);
   const { account, info, refresh, blocker } = useSigner();
   const defaultLabel = project.kind === 'demo' ? 'pusd-token-list' : releaseLabelFor(project.name);
@@ -402,7 +413,7 @@ function SubmitStep({ studio }) {
     let alive = true;
     run('Preparing and dry-running the call…', async () => {
       const next = await (await engine()).prepareTransaction({ action: 'submit', label: label.trim(), reportHash: report.evidenceHash, from: account.address });
-      if (alive) setPrepared({ ...next, forReport: report.evidenceHash, forLabel: label.trim() });
+      if (alive) setPrepared({ ...next, forReport: report.evidenceHash, forLabel: label.trim(), forProject: project.id });
     });
     return () => { alive = false; };
   }, [report?.evidenceHash, account?.address, label]);
@@ -415,21 +426,21 @@ function SubmitStep({ studio }) {
     return () => { alive = false; };
   }, [prepared]);
   async function sign() {
-    if (prepared?.forReport !== report.evidenceHash || prepared.forLabel !== label.trim()) { setTx({ stage: 'error', failedAt: 'signing', error: 'The prepared call belongs to another report or label. Prepare again.' }); return; }
+    if (prepared?.forReport !== report.evidenceHash || prepared.forLabel !== label.trim() || prepared.forProject !== project.id) { setTx({ stage: 'error', failedAt: 'signing', error: 'The prepared call belongs to another report, label or project. Prepare again.' }); return; }
     setTx({ stage: 'signing' });
     try {
       const result = await (await walletModule()).sendRegistryCall(account, prepared, (status) => setTx((value) => ({ ...value, ...status })));
       if (!result.success) throw new Error(`Included in block #${result.blockNumber}, but the call failed${result.failure ? ` (${result.failure})` : ''}.`);
       apply('submit', { label: label.trim(), releaseId: prepared.releaseId, reportHash: report.evidenceHash, from: account.address, sender: prepared.dryRun.sender, tx: result });
       setTx({ stage: 'readback', result });
-      const readback = await (await engine()).readRegistry({ releaseId: prepared.releaseId });
-      apply('submit', (value) => value && value.reportHash === report.evidenceHash ? { ...value, readback } : value);
+      const read = await (await engine()).readRegistry({ releaseId: prepared.releaseId });
+      readback('submit', result.extrinsicHash, { readback: read });
       setTx({ stage: 'done', result });
       refresh();
-    } catch (error) { setTx((value) => ({ ...value, stage: 'error', failedAt: value.stage, error: error.message })); }
+    } catch (error) { setTx((value) => txFailure(value, error)); }
   }
   if (!report) return <NeedsPass id="submit" purpose="Commit a passed report’s hash to the shared ReleaseRegistry." session={session}/>;
-  const readback = done?.readback;
+  const readBack = done?.readBack;
   return <StepFrame id="submit" purpose="Commit the active report’s hash to the shared ReleaseRegistry. The release ID is your address plus the label, and each submission opens a new revision with no approval."
     next={done && <a className="btn btn-primary" href="#/app/run/approve">Approve it<ArrowRight size={15}/></a>}>
     <ActiveLine session={session}/>
@@ -438,20 +449,20 @@ function SubmitStep({ studio }) {
       {prepared && <dl className="kv-list compact"><div className="kv"><dt>Release ID</dt><dd className="mono">{short(prepared.releaseId, 22)}<CopyButton value={prepared.releaseId} label="Copy"/></dd></div><div className="kv"><dt>Today</dt><dd>{current?.release?.exists ? `Revision ${current.release.revision}; this submission opens revision ${Number(current.release.revision) + 1} and clears its approval` : 'Not submitted yet; this opens revision 1'}</dd></div></dl>}
       <Working task={task}/>
       <DryRun prepared={prepared} fee={fee} info={info} account={account}/>
-      <div className="step-actions"><button type="button" className="btn btn-primary" disabled={!prepared?.dryRun?.ok || !!task.busy || BUSY_TX.includes(tx.stage)} onClick={sign}><PenLine size={15}/>{done ? 'Submit again (new revision)' : 'Sign and submit'}</button><SignerLine id="submit"/></div>
+      <div className="step-actions"><button type="button" className="btn btn-primary" disabled={!prepared?.dryRun?.ok || !!task.busy || BUSY_TX.includes(tx.stage) || tx.uncertain} onClick={sign}><PenLine size={15}/>{done ? 'Submit again (new revision)' : 'Sign and submit'}</button><SignerLine id="submit"/></div>
       <TxProgress tx={tx}/>
-      {tx.stage === 'error' && <p className="form-error block" role="alert"><CircleAlert size={15}/>{tx.error}</p>}
+      <TxError tx={tx}/>
     </>}
     {done && <div className="result-card passed">
-      <div className="result-head"><Badge status="finalized">Finalized</Badge><strong>Submitted “{done.label}”{readback ? `, revision ${readback.release.revision}` : ''}</strong></div>
+      <div className="result-head"><Badge status="finalized">Finalized</Badge><strong>Submitted “{done.label}”{readBack ? `, revision ${readBack.release.revision}` : ''}</strong></div>
       <TxResult result={done.tx} title="Extrinsic"/>
-      {readback && <dl className="kv-list compact"><div className="kv"><dt>Read back</dt><dd>{readback.interfacesAgree ? 'EVM RPC and ReviveApi agree' : 'Interfaces disagree'} at <ChainLink hash={readback.block.nativeHash}>#{fmt(readback.block.number)}</ChainLink></dd></div><div className="kv"><dt>Stored hash</dt><dd className="mono">{short(readback.release.reportHash, 20)} {readback.release.reportHash === `0x${report.evidenceHash}` ? <Badge status="passed">matches</Badge> : <Badge status="failed">differs</Badge>}</dd></div></dl>}
+      {readBack && <dl className="kv-list compact"><div className="kv"><dt>Read back</dt><dd>{readBack.interfacesAgree ? 'EVM RPC and ReviveApi agree' : 'Interfaces disagree'} at <ChainLink hash={readBack.block.nativeHash}>#{fmt(readBack.block.number)}</ChainLink></dd></div><div className="kv"><dt>Stored hash</dt><dd className="mono">{short(readBack.release.reportHash, 20)} {readBack.release.reportHash === `0x${report.evidenceHash}` ? <Badge status="passed">matches</Badge> : <Badge status="failed">differs</Badge>}</dd></div></dl>}
     </div>}
   </StepFrame>;
 }
 
 function ApproveStep({ studio }) {
-  const { session, apply } = studio;
+  const { project, session, apply, readback } = studio;
   const { account, info, refresh, blocker } = useSigner();
   const passed = passedActiveReport(session);
   const submitted = passed && session.submit?.reportHash === passed.evidenceHash ? session.submit : null;
@@ -477,24 +488,24 @@ function ApproveStep({ studio }) {
       if (!current.release.exists) return;
       const next = await api.prepareTransaction({ action: 'review', releaseId, reportHash: current.release.reportHash, approved, from: account.address });
       if (!alive) return;
-      setPrepared({ ...next, approved, forRelease: releaseId, forReport: current.release.reportHash, forRevision: current.release.revision });
+      setPrepared({ ...next, approved, forRelease: releaseId, forReport: current.release.reportHash, forRevision: current.release.revision, forProject: project.id });
       if (account.kind === 'polkadot' && next.dryRun?.ok) walletModule().then((module) => module.nativeFee(account, next)).then((value) => alive && setFee(value)).catch(() => {});
     });
     return () => { alive = false; };
   }, [releaseId, account?.address, approved]);
   async function sign() {
-    if (prepared?.forRelease !== releaseId || prepared.forReport !== state?.release?.reportHash) { setTx({ stage: 'error', failedAt: 'signing', error: 'The prepared decision names another release or report than the one shown. Read again.' }); return; }
+    if (prepared?.forRelease !== releaseId || prepared.forReport !== state?.release?.reportHash || prepared.forProject !== project.id) { setTx({ stage: 'error', failedAt: 'signing', error: 'The prepared decision names another release, report or project than the one shown. Read again.' }); return; }
     setTx({ stage: 'signing' });
     try {
       const result = await (await walletModule()).sendRegistryCall(account, prepared, (status) => setTx((value) => ({ ...value, ...status })));
       if (!result.success) throw new Error(`Included in block #${result.blockNumber}, but the call failed${result.failure ? ` (${result.failure})` : ''}.`);
       apply('approve', { releaseId, approved, reportHash: state.release.reportHash, revision: state.release.revision, reviewer: prepared.dryRun.sender, from: account.address, tx: result });
       setTx({ stage: 'readback', result });
-      const readback = await (await engine()).readRegistry({ releaseId, reviewer: prepared.dryRun.sender });
-      apply('approve', (value) => value && value.releaseId === releaseId && value.tx?.extrinsicHash === result.extrinsicHash ? { ...value, readback } : value);
+      const read = await (await engine()).readRegistry({ releaseId, reviewer: prepared.dryRun.sender });
+      readback('approve', result.extrinsicHash, { readback: read });
       setTx({ stage: 'done', result });
       refresh();
-    } catch (error) { setTx((value) => ({ ...value, stage: 'error', failedAt: value.stage, error: error.message })); }
+    } catch (error) { setTx((value) => txFailure(value, error)); }
   }
   // The saved decision counts for the operation in front of the visitor only: this release, the active report and the registry's current revision.
   const done = session.approve?.tx && session.approve.releaseId === releaseId ? session.approve : null;
@@ -517,9 +528,9 @@ function ApproveStep({ studio }) {
         <label className={!approved ? 'selected' : ''}><input type="radio" name="decision" checked={!approved} onChange={() => setApproved(false)}/>Request changes</label>
       </fieldset>}
       <DryRun prepared={prepared} fee={fee} info={info} account={account}/>
-      {state?.release.exists && <div className="step-actions"><button type="button" className="btn btn-primary" disabled={!prepared?.dryRun?.ok || !!task.busy || busyTx} onClick={sign}><PenLine size={15}/>{approved ? 'Sign the approval' : 'Sign “changes requested”'}</button><SignerLine id="approve"/></div>}
+      {state?.release.exists && <div className="step-actions"><button type="button" className="btn btn-primary" disabled={!prepared?.dryRun?.ok || !!task.busy || busyTx || tx.uncertain} onClick={sign}><PenLine size={15}/>{approved ? 'Sign the approval' : 'Sign “changes requested”'}</button><SignerLine id="approve"/></div>}
       <TxProgress tx={tx}/>
-      {tx.stage === 'error' && <p className="form-error block" role="alert"><CircleAlert size={15}/>{tx.error}</p>}
+      <TxError tx={tx}/>
     </>}
     {done && <div className={`result-card ${decision.kind === 'historical' || otherReport ? '' : done.approved ? 'passed' : 'failed'}`}>
       <div className="result-head"><Badge status={decision.kind === 'historical' || otherReport ? 'idle' : done.approved ? 'approved' : 'changes-requested'}>{decision.kind === 'historical' || otherReport ? 'Historical' : done.approved ? 'Approved' : 'Changes requested'}</Badge><strong>Revision {done.revision}, report {short(done.reportHash, 14)}</strong></div>
@@ -528,11 +539,12 @@ function ApproveStep({ studio }) {
       {otherReport && decision.kind !== 'historical' && <p className="muted">This decision names report {short(done.reportHash, 14)}, not the active report {short(passed.evidenceHash, 14)}; it does not approve the active report.</p>}
       {done.readback?.decision && <dl className="kv-list compact"><div className="kv"><dt>Read back</dt><dd>decisionOf → reviewed {String(done.readback.decision.reviewed)}, approved {String(done.readback.decision.approved)} · {done.readback.interfacesAgree ? 'both interfaces agree' : 'interfaces disagree'} at <ChainLink hash={done.readback.block.nativeHash}>#{fmt(done.readback.block.number)}</ChainLink></dd></div></dl>}
     </div>}
-    <AttestCard session={session} apply={apply}/>
+    <AttestCard studio={studio}/>
   </StepFrame>;
 }
 
-function AttestCard({ session, apply }) {
+function AttestCard({ studio }) {
+  const { session, apply, readback, begin, settle } = studio;
   const report = passedActiveReport(session);
   const { account, blocker } = useSigner('polkadot');
   const [decision, setDecision] = useState('accepted');
@@ -550,11 +562,11 @@ function AttestCard({ session, apply }) {
       apply('remark', { decision, reportHash: report.evidenceHash, tx: result });
       setTx({ stage: 'readback', result });
       const verification = await (await engine()).verifyAttestation({ extrinsicHash: result.extrinsicHash, blockHash: result.blockHash });
-      apply('remark', (value) => value && value.reportHash === report.evidenceHash ? { ...value, verification } : value);
+      readback('remark', result.extrinsicHash, { verification });
       setTx({ stage: 'done', result });
-    } catch (error) { setTx((value) => ({ ...value, stage: 'error', failedAt: value.stage, error: error.message })); }
+    } catch (error) { setTx((value) => txFailure(value, error)); }
   }
-  async function verifyPasted(event) { event.preventDefault(); const verification = await run('Verifying from chain data…', async () => (await engine()).verifyAttestation({ extrinsicHash: paste.trim() })); if (verification) apply('verified', verification); }
+  async function verifyPasted(event) { event.preventDefault(); const token = begin('verified'); const verification = await run('Verifying from chain data…', async () => (await engine()).verifyAttestation({ extrinsicHash: paste.trim() })); if (verification) settle(token, verification); }
   const own = session.remark?.reportHash === report?.evidenceHash ? session.remark : null;
   const verification = own?.verification;
   return <div className="sub-card" id="attest">
@@ -566,9 +578,9 @@ function AttestCard({ session, apply }) {
         <label className={decision === 'changes-requested' ? 'selected' : ''}><input type="radio" name="remark" checked={decision === 'changes-requested'} onChange={() => setDecision('changes-requested')}/>Changes requested</label>
       </fieldset>
       <div className="remark-preview"><code>{remark}</code><CopyButton value={remark}/></div>
-      <div className="step-actions"><button type="button" className="btn btn-secondary" onClick={sign} disabled={BUSY_TX.includes(tx.stage)}><PenLine size={15}/>Sign the remark</button><span className="muted">{fee ? `Fee about ${(Number(fee) / 1e14).toFixed(4)} tPOT` : ''}</span></div>
+      <div className="step-actions"><button type="button" className="btn btn-secondary" onClick={sign} disabled={BUSY_TX.includes(tx.stage) || tx.uncertain}><PenLine size={15}/>Sign the remark</button><span className="muted">{fee ? `Fee about ${(Number(fee) / 1e14).toFixed(4)} tPOT` : ''}</span></div>
       <TxProgress tx={tx}/>
-      {tx.stage === 'error' && <p className="form-error block" role="alert"><CircleAlert size={15}/>{tx.error}</p>}
+      <TxError tx={tx}/>
     </>}
     {verification && <Verified result={verification}/>}
     <form className="paste-verify" onSubmit={verifyPasted}>
@@ -586,7 +598,7 @@ function Verified({ result, lookup = false }) {
 }
 
 function ConsumeStep({ studio }) {
-  const { session, apply } = studio;
+  const { project, session, apply, readback } = studio;
   const { account, info, refresh, blocker } = useSigner();
   const passed = passedActiveReport(session);
   const plan = activePlan(session);
@@ -620,24 +632,24 @@ function ConsumeStep({ studio }) {
       if (!current.release.exists) return;
       const next = await api.prepareTransaction({ action: 'list', token, releaseId, reportHash: current.release.reportHash, reviewer, decimals: Number(decimals), from: account.address });
       if (!alive) return;
-      setPrepared({ ...next, forRelease: releaseId, forReport: current.release.reportHash, forToken: token });
+      setPrepared({ ...next, forRelease: releaseId, forReport: current.release.reportHash, forToken: token, forProject: project.id });
       if (account.kind === 'polkadot' && next.dryRun?.ok) walletModule().then((module) => module.nativeFee(account, next)).then((value) => alive && setFee(value)).catch(() => {});
     });
     return () => { alive = false; };
   }, [releaseId, account?.address, token, decimals, reviewer]);
   async function sign() {
-    if (prepared?.forRelease !== releaseId || prepared.forToken !== token || prepared.forReport !== state?.release?.reportHash) { setTx({ stage: 'error', failedAt: 'signing', error: 'The prepared listing names another release, token or report than the one shown. Read again.' }); return; }
+    if (prepared?.forRelease !== releaseId || prepared.forToken !== token || prepared.forReport !== state?.release?.reportHash || prepared.forProject !== project.id) { setTx({ stage: 'error', failedAt: 'signing', error: 'The prepared listing names another release, token, report or project than the one shown. Read again.' }); return; }
     setTx({ stage: 'signing' });
     try {
       const result = await (await walletModule()).sendContractCall(account, prepared, (status) => setTx((value) => ({ ...value, ...status })));
       if (!result.success) throw new Error(`Included in block #${result.blockNumber}, but the call failed${result.failure ? ` (${result.failure})` : ''}.`);
       apply('consume', listReceipt({ network: TESTNET, consumer: TOKEN_LIST, token, decimals, releaseId, reportHash: state.release.reportHash, revision: state.release.revision, reviewer, from: account.address, sender: prepared.dryRun.sender, tx: result }));
       setTx({ stage: 'readback', result });
-      const readback = await (await engine()).readTokenList({ token });
-      apply('consume', (value) => value && value.tx?.extrinsicHash === result.extrinsicHash ? { ...value, readback } : value);
+      const read = await (await engine()).readTokenList({ token });
+      readback('consume', result.extrinsicHash, { readback: read });
       setTx({ stage: 'done', result });
       refresh();
-    } catch (error) { setTx((value) => ({ ...value, stage: 'error', failedAt: value.stage, error: error.message })); }
+    } catch (error) { setTx((value) => txFailure(value, error)); }
   }
   if (TOKEN_LIST.knownIssue) return <StepFrame id="consume" purpose="Inspect the recorded consumer while its corrected replacement awaits deployment."><Locked action={<a className="btn btn-secondary btn-sm" href="#/app/tokens">Read the recorded listing</a>}>New token-list writes are disabled for v1 because existing entries can be replaced by another release owner. The corrected v2 must be deployed, verified and activated before listing resumes. Historical transactions and live reads remain available.</Locked></StepFrame>;
   if (!passed) return <NeedsPass id="consume" purpose="Let a contract act on the approval." session={session}/>;
@@ -655,9 +667,9 @@ function ConsumeStep({ studio }) {
       {state?.release.exists && !state.decision?.approved && <p className="form-error"><CircleAlert size={14}/>Reviewer <span className="mono">{short(reviewer, 12)}</span> has not approved the current revision; the list call checks the registry. Name the account that approved it, or approve it first.</p>}
       {state?.release.exists && state.decision?.approved && <p className="muted">Reviewer <span className="mono">{short(reviewer, 12)}</span> approved revision {state.release.revision}; the contract re-checks that approval on every <code>isListed</code> read.</p>}
       <DryRun prepared={prepared} fee={fee} info={info} account={account}/>
-      <div className="step-actions"><button type="button" className="btn btn-primary" disabled={!prepared?.dryRun?.ok || !!task.busy || busyTx} onClick={sign}><PenLine size={15}/>{done ? 'List again' : 'Sign and list'}</button><SignerLine id="consume"/></div>
+      <div className="step-actions"><button type="button" className="btn btn-primary" disabled={!prepared?.dryRun?.ok || !!task.busy || busyTx || tx.uncertain} onClick={sign}><PenLine size={15}/>{done ? 'List again' : 'Sign and list'}</button><SignerLine id="consume"/></div>
       <TxProgress tx={tx}/>
-      {tx.stage === 'error' && <p className="form-error block" role="alert"><CircleAlert size={15}/>{tx.error}</p>}
+      <TxError tx={tx}/>
     </>}
     {done && <div className="result-card passed">
       <div className="result-head"><Badge status={receipt.completion === 'failed' ? 'failed' : receipt.listed ? 'listed' : receipt.listed === false ? 'pending' : 'finalized'}>{receipt.completion === 'failed' ? 'Failed' : receipt.listed ? 'Listed' : receipt.listed === false ? (receipt.readback?.matched ? 'Finalized · not listed' : 'Finalized · readback unmatched') : 'Finalized'}</Badge><strong>{short(done.token, 14)} in the VerifiedTokenList v{done.consumer.version}</strong></div>
@@ -677,11 +689,11 @@ function ConsumeStep({ studio }) {
 }
 
 function PromoteStep({ studio }) {
-  const { session, apply } = studio;
+  const { session, begin, settle } = studio;
   const report = passedActiveReport(session);
   const [task, run] = useTask();
   const result = report && session.promote?.from === report.evidenceHash ? session.promote.report : null;
-  async function start() { const next = await run('Reading V3 Live…', async () => (await engine()).assessPromotion(report)); if (next) apply('promote', { from: report.evidenceHash, report: next }); }
+  async function start() { const token = begin('promote'); const next = await run('Reading V3 Live…', async () => (await engine()).assessPromotion(report)); if (next) settle(token, { from: report.evidenceHash, report: next }); }
   if (!report) return <NeedsPass id="promote" purpose="Ask V3 Live whether a passed testnet report can stand for it." session={session}/>;
   return <StepFrame id="promote" purpose={`Ask V3 Live itself whether report ${short(report.evidenceHash, 12)} can stand for it: network identity, the chain the release names, the runtime and the asset. Read-only.`}
     next={result && <a className="btn btn-primary" href="#/app/run/watch">Watch for changes<ArrowRight size={15}/></a>}>
@@ -693,13 +705,13 @@ function PromoteStep({ studio }) {
 }
 
 function WatchStep({ studio }) {
-  const { session, identity, apply } = studio;
+  const { session, identity, begin, settle } = studio;
   const report = activeReport(session);
   const head = useTestnetHead();
   const live = useNetworkHead('live');
   const [task, run] = useTask();
   const watched = report && session.watch?.comparison?.baselineHash === report.evidenceHash ? session.watch : null;
-  async function start() { const result = await run('Rechecking at the current head…', async () => { const api = await engine(); const next = await api.checkRelease(report.input, { ...identity, previous: report }); return { report: next, comparison: api.compare(report, next) }; }); if (result) apply('watch', result); }
+  async function start() { const token = begin('watch'); const result = await run('Rechecking at the current head…', async () => { const api = await engine(); const next = await api.checkRelease(report.input, { ...identity, previous: report }); return { report: next, comparison: api.compare(report, next) }; }); if (result) settle(token, result); }
   const pinned = report ? `${report.network?.specName}/${report.network?.specVersion}` : null;
   const now = head.specVersion ? `${head.specName}/${head.specVersion}` : null;
   return <StepFrame id="watch" purpose="A report holds for the runtime and block it pinned. This page follows both networks live; when the runtime or the release changes, recheck and the loop starts again.">

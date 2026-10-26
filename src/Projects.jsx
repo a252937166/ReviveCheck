@@ -75,7 +75,7 @@ function PolicyEditor({ project, view, onChange }) {
       {draft.consumer && <Field label="Consumer address"><input value={draft.consumer.address} spellCheck="false" onChange={(event) => set({ consumer: { address: event.target.value.trim() } })}/></Field>}
       {draft.consumer && <Field label="Version"><input type="number" min="1" value={draft.consumer.version} onChange={(event) => set({ consumer: { version: Number(event.target.value) } })}/></Field>}
     </div>
-    <p className={status.complete ? 'muted' : 'form-error'}>{status.complete ? <>Policy complete · hash <span className="mono">{short(status.policyHash, 16)}</span><CopyButton value={status.policyHash}/>{view?.submission?.owner ? ` · owner ${short(view.submission.owner, 10)} from this project's submission` : ' · no owner yet: the submission in the studio establishes it'}</> : <><CircleAlert size={14} aria-hidden="true"/> {status.error}</>}</p>
+    <p className={status.complete ? 'muted' : 'form-error'}>{status.complete ? <>Policy complete · hash <span className="mono">{short(status.policyHash, 16)}</span><CopyButton value={status.policyHash}/>{view?.submission?.owner ? ` · owner ${short(view.submission.owner, 10)} from this project's submission` : project.release?.owner ? ` · owner ${short(project.release.owner, 10)} declared by the imported bundle; verified against the registry when the project is evaluated` : ' · no owner yet: the submission in the studio establishes it'}</> : <><CircleAlert size={14} aria-hidden="true"/> {status.error}</>}</p>
   </div>;
 }
 
@@ -96,6 +96,8 @@ function Candidate({ project, view }) {
     <div className="kv"><dt>Submitted</dt><dd>{submission ? <>“{submission.label}” · release <span className="mono">{short(submission.releaseId, 18)}</span> · revision {submission.revision ?? 'not read back'} · owner <span className="mono">{short(submission.owner, 12)}</span> · #{fmt(submission.blockNumber)}</> : <span className="muted">not submitted in this browser</span>}</dd></div>
     <div className="kv"><dt>Reviewed</dt><dd>{review ? <><Badge status={review.approved ? 'approved' : 'changes-requested'}>{review.approved ? 'approved' : 'changes requested'}</Badge> revision {review.revision} by <span className="mono">{short(review.reviewer, 12)}</span> · #{fmt(review.blockNumber)} (a receipt of this browser; the policy evaluation reads the registry itself)</> : <span className="muted">no review receipt in this browser</span>}</dd></div>
     <div className="kv"><dt>Binding candidate</dt><dd>{candidate ? <><strong>report <span className="mono">{candidate.reportHash}</span></strong> on release <span className="mono">{short(candidate.releaseId, 14)}</span>, revision {candidate.revision}{candidate.storage ? `, stored in ${short(candidate.storage.extrinsicHash, 12)}` : ''}. {candidate.complete ? 'Complete. A candidate is not an approval: binding records what this project relies on; the evaluation says whether it holds.' : `Incomplete: ${missing.join('; ')}.`}</> : <span className="muted">none yet: {missing.join('; ')}</span>}</dd></div>
+    {view.declared && <div className="kv declared"><dt>Declared by the imported bundle</dt><dd><Badge status="idle">declaration</Badge> owner <span className="mono">{view.declared.owner ? short(view.declared.owner, 12) : 'none'}</span> · release <span className="mono">{view.declared.releaseId ? short(view.declared.releaseId, 14) : 'none'}</span>{view.declared.submission?.revision ? ` · revision ${view.declared.submission.revision}` : ''}{view.declared.storage?.extrinsicHash ? <> · stored in <ChainLink hash={view.declared.storage.extrinsicHash} kind="extrinsic"/></> : ''}<small className="block">{view.declared.note} Exported {when(view.declared.exportedAt)}; imported {when(view.declared.at)}. Not a receipt of this browser.</small></dd></div>}
+    {view.missingEvidence.length > 0 && <div className="kv missing-evidence"><dt>Missing evidence</dt><dd><Badge status="pending">not in this browser</Badge> {view.missingEvidence.map((hash) => <span key={hash} className="mono block">{hash}</span>)}<small className="block">This project references these sealed reports but holds no copy of them; nothing is fabricated in their place. Import the report JSON (Check my token → Import a plan reads plans; the report itself comes from its exporter or from the public reports) to evaluate the binding.</small></dd></div>}
   </dl>;
 }
 
@@ -255,9 +257,9 @@ function ProjectList({ store }) {
       const project = store.projects.projects[imported.project.id] ? { ...imported.project, id: `${imported.project.id}-${Date.now().toString(36)}`, name: `${imported.project.name} (imported)` } : imported.project;
       const { sealedReports } = imported;
       store.update(project);
-      let studio = store.studio;
+      // The sealed report the bindings name becomes the active report of the new project's own session (an intact artifact, verified by its hash); nothing else is created for it: no receipt, no approval, no storage.
       const active = sealedReports.find((item) => project.bindings.at(-1)?.reportHash === item.evidenceHash) ?? sealedReports.at(-1);
-      if (active) { const session = recordImport(sessionFor(studio, studioProject(project)), { plan: project.plan, report: active }); store.updateSession(session); }
+      if (active) { const session = recordImport(sessionFor(store.studio, studioProject(project)), { plan: project.plan, report: active }); store.updateSession(session); }
       setImportError(''); setImportText('');
       location.hash = `#/app/projects/${encodeURIComponent(project.id)}`;
     } catch (error) { setImportError(error.message); }

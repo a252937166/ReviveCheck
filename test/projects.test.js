@@ -161,3 +161,73 @@ test('the browser store holds the demonstration project and the visitor\'s own; 
   assert.equal(studioProject(alpha).plan.listing.symbol, 'pUSD');
   assert.equal(studioProject(demoProjectRecord()).plan, undefined, 'the demonstration project offers the demo releases, not one fixed plan');
 });
+
+// Repair handoff 2026-10-26, R-03: a bundle imported into a browser that holds nothing
+// of the original session keeps the policy fingerprint (through the declared owner), the
+// existing binding and the exports; declarations stay declarations; contradictions fail.
+test('R03-A to R03-E, R03-H: the bundle round-trips into an empty browser with the same policy hash and an intact binding; exports work; declarations are cross-checked; a references-only bundle names its missing evidence', async () => {
+  const { loadConsumerConfig } = await import('../lib/catalog-release.js');
+  const { project, session } = established('Alpha list');
+  const view = projectView(project, session);
+  const { project: bound } = bindCandidate(project, { view, report: REPORT, boundBy: 'operator', at: T, id: 'alpha-binding-1' });
+  const bundle = exportBundle(bound, projectView(bound, session), { reports: [REPORT], at: T });
+  assert.equal(bundle.release.owner, OWNER, 'the bundle declares the owner the submission established');
+  assert.equal(bundle.release.releaseId, RELEASE);
+  assert.equal(bundle.storage.extrinsicHash, '0x80d46a8611bb486f3b71bdd6e9e15c96e522c536e2671c9f35d0a4496792feb3');
+  // A completely empty browser: no session, no receipts. Only the sealed report the bundle embeds is handed to the new session, as the page does.
+  const imported = importBundle(JSON.stringify(bundle), { at: '2026-10-26T09:00:00.000Z' });
+  assert.deepEqual(imported.missingEvidence, []);
+  assert.equal(imported.project.release.owner, OWNER);
+  assert.equal(imported.project.release.releaseId, RELEASE);
+  assert.equal(imported.project.release.declared.source, 'bundle');
+  assert.match(imported.project.release.declared.note, /not by importing/);
+  const freshSession = recordImport(emptySession(studioProject(imported.project)), { plan: imported.project.plan, report: imported.sealedReports[0], at: '2026-10-26T09:00:00.000Z' });
+  const freshView = projectView(imported.project, freshSession);
+  assert.equal(freshView.submission, null, 'no submission receipt in this browser');
+  assert.equal(freshView.candidate, null, 'no candidate is fabricated from declarations');
+  assert.equal(freshView.declared.owner, OWNER, 'the declaration is shown as a declaration');
+  assert.deepEqual(freshView.missingEvidence, []);
+  // R03-D: before the reviewers are confirmed, nothing evaluates.
+  assert.match(policyStatus(imported.project, freshView).error, /confirm it as your own policy choice/);
+  const confirmed = confirmReviewers(imported.project, { at: '2026-10-26T09:01:00.000Z' });
+  const status = policyStatus(confirmed, freshView);
+  assert.equal(status.complete, true, status.error);
+  assert.equal(status.policyHash, bundle.policyHash, 'R03-A: the effective policy fingerprint survives the empty browser');
+  assert.equal(status.policy.registry.owner, OWNER);
+  assert.equal(verifyBinding(confirmed.bindings[0], status.policy), true, 'the existing binding is intact under the reconstructed policy');
+  // R03-B, R03-C: the configuration exports without the original session, and both loaders accept it; fresh evaluation decides.
+  const config = consumerConfigFor(confirmed, freshView);
+  assert.equal(config.release.owner, OWNER);
+  assert.equal(config.release.reportHash, REPORT.evidenceHash);
+  assert.equal(config.release.revision, '2');
+  loadConfigShape(config);
+  assert.equal(loadConsumerConfig(config, 'exported').policyHash, bundle.policyHash);
+  const fixture = JSON.parse(await readFile(new URL('../../revivecheck-consumer-example/fixtures/valid-r2.json', import.meta.url), 'utf8'));
+  const evaluation = evaluateBinding({ policy: config.policy, binding: confirmed.bindings[0], report: REPORT, ...fixture.inputs, now: fixture.now });
+  assert.equal(evaluation.status, 'valid', JSON.stringify(evaluation.reasons));
+  const revoked = JSON.parse(await readFile(new URL('../../revivecheck-consumer-example/fixtures/revoked-r2.json', import.meta.url), 'utf8'));
+  const withheld = evaluateBinding({ policy: config.policy, binding: confirmed.bindings[0], report: REPORT, ...revoked.inputs, now: revoked.now });
+  assert.equal(withheld.enable, false, 'R03-F: a revoked imported release stays inspectable and unavailable');
+  // The same bundle a second time gives the same project identity; the page keeps an existing one apart by renaming the copy (browser journey).
+  assert.equal(importBundle(JSON.stringify(bundle)).project.id, imported.project.id);
+  // R03-E: contradicting declarations fail explicitly; a declaration never bypasses the chain.
+  assert.throws(() => importBundle(JSON.stringify({ ...bundle, release: { ...bundle.release, owner: REVIEWER } })), /declares owner .* but its policy names/);
+  const foreignPolicyOwner = { ...bundle, policy: { ...bundle.policy, registry: { ...bundle.policy.registry, owner: REVIEWER } }, policyHash: undefined, release: { ...bundle.release, owner: REVIEWER, submission: { ...bundle.release.submission, owner: REVIEWER } } };
+  assert.throws(() => importBundle(JSON.stringify(foreignPolicyOwner)), /not made under the bundle's policy|does not derive/);
+  assert.throws(() => importBundle(JSON.stringify({ ...bundle, release: { ...bundle.release, releaseId: `0x${'ab'.repeat(32)}`, submission: { ...bundle.release.submission, releaseId: `0x${'ab'.repeat(32)}` } } })), /does not derive from the declared owner/);
+  assert.throws(() => importBundle(JSON.stringify({ ...bundle, storage: { ...bundle.storage, extrinsicHash: `0x${'cd'.repeat(32)}` } })), /latest binding names stored evidence/);
+  assert.throws(() => importBundle(JSON.stringify({ ...bundle, release: { ...bundle.release, owner: 'not-an-address', submission: { ...bundle.release.submission, owner: 'not-an-address' } }, policy: { ...bundle.policy, registry: { address: bundle.policy.registry.address, label: bundle.policy.registry.label } }, policyHash: undefined })), /H160 address|not made under/);
+  assert.throws(() => importBundle(JSON.stringify({ ...bundle, storage: { ...bundle.storage, blockHash: '0x12' } })), /storage locator/);
+  // R03-H: a references-only bundle keeps its declarations and names the evidence it lacks; nothing is fabricated.
+  const referencesOnly = exportBundle(bound, projectView(bound, session), { reports: [], at: T });
+  assert.equal(referencesOnly.sealedReports.length, 0);
+  const sparse = importBundle(JSON.stringify(referencesOnly), { at: '2026-10-26T09:02:00.000Z' });
+  assert.deepEqual(sparse.missingEvidence, [REPORT.evidenceHash]);
+  assert.deepEqual(sparse.project.imported.missingEvidence, [REPORT.evidenceHash]);
+  assert.equal(sparse.project.release.owner, OWNER, 'the declarations survive');
+  assert.equal(sparse.project.bindings.length, 1);
+  const sparseView = projectView(confirmReviewers(sparse.project), emptySession(studioProject(sparse.project)));
+  assert.equal(sparseView.report, null, 'no report is fabricated');
+  assert.deepEqual(sparseView.missingEvidence, [REPORT.evidenceHash]);
+  assert.equal(policyStatus(confirmReviewers(sparse.project), sparseView).policyHash, bundle.policyHash, 'the policy is still the same policy');
+});

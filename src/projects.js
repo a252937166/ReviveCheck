@@ -11,10 +11,10 @@
 // policy choice. A checksum never makes a reviewer trustworthy.
 import { normalizePolicy, policyHash, createBinding, verifyBinding, POLICY_SCHEMA, BINDING_SCHEMA } from '../lib/policy.js';
 import { validateImportedRun, verifyRun } from '../lib/report.js';
-import { REGISTRY } from '../lib/registry.js';
+import { REGISTRY, releaseIdOf } from '../lib/registry.js';
 import { TOKEN_LIST } from '../lib/tokenlist.js';
 import { NETWORKS } from '../lib/networks.js';
-import { demoPlan } from '../lib/demo.js';
+import { DEMO_RELEASES, demoPlan } from '../lib/demo.js';
 import { describeOwnPlan, importOwnPlan } from './own-plan.js';
 import { DEMO_PROJECT, activeReport, stageReportHash } from './studio-state.js';
 
@@ -60,7 +60,7 @@ export function createProject({ name, plan, id = null, at = new Date().toISOStri
     schema: PROJECT_SCHEMA, id: projectId, name: projectName, kind: 'own', createdAt: at, updatedAt: at,
     plan: described.plan, planHash: described.planHash, releaseArtifactHash: described.releaseArtifactHash,
     policy: { ...POLICY_DEFAULTS, name: policy.name || `${projectName} policy`, ...policy, reviewers: { ...POLICY_DEFAULTS.reviewers, ...(policy.reviewers || {}) }, evidence: { ...POLICY_DEFAULTS.evidence, ...(policy.evidence || {}) }, consumer: policy.consumer === null ? null : { ...POLICY_DEFAULTS.consumer, ...(policy.consumer || {}) } },
-    release: { label: releaseLabelFor(projectName) },
+    release: { label: releaseLabelFor(projectName), owner: null, releaseId: null, declared: null },
     roles: { owner: { control: roles.owner?.control || ROLE_DEFAULTS.owner }, reviewer: { control: roles.reviewer?.control || ROLE_DEFAULTS.reviewer }, operator: { control: roles.operator?.control || ROLE_DEFAULTS.operator } },
     reports: [], bindings: [], imported: null,
   };
@@ -70,7 +70,7 @@ export function createProject({ name, plan, id = null, at = new Date().toISOStri
 export function demoProjectRecord(at = '2026-10-23T00:00:00.000Z') {
   const plan = demoPlan('v1.0.1');
   const project = createProject({ name: DEMO_PROJECT.name, plan, id: DEMO_PROJECT.id, at, policy: { name: 'pUSD token list policy (studio demonstration)' } });
-  return { ...project, kind: 'demo', release: { label: 'pusd-token-list' } };
+  return { ...project, kind: 'demo', release: { label: 'pusd-token-list', owner: null, releaseId: null, declared: null } };
 }
 
 /** Record that a report was produced for this project (its exact hash and result); the report itself lives in the studio session or a file. */
@@ -90,6 +90,31 @@ export const renameProject = (project, name, { at = new Date().toISOString() } =
 export const setReleaseLabel = (project, label, { at = new Date().toISOString() } = {}) => { const text = String(label ?? '').trim(); if (!text || new TextEncoder().encode(text).length > 31) throw new Error('A release label is 1 to 31 bytes.'); return { ...project, release: { ...project.release, label: text }, updatedAt: at }; };
 /** The visitor confirms imported reviewer trust as this project's own policy choice. */
 export const confirmReviewers = (project, { at = new Date().toISOString() } = {}) => updatePolicy(project, { reviewers: { confirmed: true, confirmedAt: at } }, { at });
+
+/**
+ * Adopt a report and the plan it was made on as the project's CURRENT release content:
+ * the normalized plan, the acceptance-plan fingerprint and the release-artifact
+ * fingerprint come from the adopted input; identity, policy, roles, label, report
+ * references and binding history stay. The report must describe exactly this plan (both
+ * fingerprints), or the pair is refused: a project is never made to look coherent by
+ * relabelling evidence. A plan with another acceptance-plan fingerprint is another project.
+ */
+export function adoptPlan(project, { plan, report, at = new Date().toISOString() }) {
+  if (project.kind !== 'own') throw new Error('Only a browser-local project adopts a plan; the demonstration project checks its own releases.');
+  const described = describeOwnPlan(plan);
+  if (!report?.evidenceHash || !verifyRun(report)) throw new Error('The adopted report is not an intact sealed report.');
+  if (report.binding?.planHash !== described.planHash) throw new Error(`The report was made under plan ${String(report.binding?.planHash ?? 'none').slice(0, 12)}…, not this plan (${described.planHash.slice(0, 12)}…); a report describes the plan it was sealed on only.`);
+  if (report.binding?.releaseArtifactHash !== described.releaseArtifactHash) throw new Error(`The report verified release artifact ${String(report.binding?.releaseArtifactHash ?? 'none').slice(0, 12)}…, not this listing (${described.releaseArtifactHash.slice(0, 12)}…); the entry a project publishes is the one its report verified.`);
+  if (described.planHash !== project.planHash) throw new Error('The plan has another acceptance-plan fingerprint than this project; it belongs to a new project.');
+  return { ...project, plan: described.plan, planHash: described.planHash, releaseArtifactHash: described.releaseArtifactHash, updatedAt: at };
+}
+
+/** The plan a studio check runs for this project: the demonstration offers its two releases and an edit of them; an own project offers its CURRENT plan only, never a substitute. */
+export function planForCheck(project, choice, custom = null) {
+  if (project.kind === 'own') { if (!project.plan) throw new Error('This project has no plan; define it on Check my token.'); return project.plan; }
+  if (choice === 'custom') { const base = demoPlan('v1.0.1'); return { ...base, release: 'custom', sourceRevision: 'pusd-token-list@custom', listing: { ...base.listing, symbol: custom?.symbol, name: custom?.name, decimals: Number(custom?.decimals) } }; }
+  return demoPlan(DEMO_RELEASES[choice] ? choice : 'v1.0.0');
+}
 
 /**
  * What the studio session established for this project: the active report, where it is
@@ -112,7 +137,11 @@ export function projectView(project, session = null) {
   else if (!submission.revision) missing.push('the submission\'s revision read back');
   if (project.policy.evidence.requireStoredOnChain && !storage) missing.push('the stored report\'s extrinsic (Store)');
   const candidate = report && submission?.revision ? { reportHash: report.evidenceHash, release: report.release ?? null, releaseId: submission.releaseId, revision: String(submission.revision), storage: storage ? { extrinsicHash: storage.extrinsicHash, blockHash: storage.blockHash } : null, reviewed: review ? (review.approved ? 'approved by the named reviewer in this browser' : 'changes requested in this browser') : 'no review receipt in this browser', complete: missing.length === 0 } : null;
-  return { report, active, storage, submission, review, candidate, missing, bindings: project.bindings, latestBinding: project.bindings.at(-1) ?? null };
+  // Imported declarations stay apart from this browser's receipts; evidence the project references but holds no sealed copy of is named, never fabricated.
+  const declared = project.release?.declared ?? null;
+  const known = new Set([session?.check?.report?.evidenceHash, session?.recheck?.report?.evidenceHash].filter(Boolean));
+  const missingEvidence = [...new Set([...project.bindings.map((item) => item.reportHash), ...project.reports.map((item) => item.reportHash)])].filter((hash) => !known.has(hash));
+  return { report, active, storage, submission, review, candidate, missing, declared, missingEvidence, bindings: project.bindings, latestBinding: project.bindings.at(-1) ?? null };
 }
 
 /**
@@ -123,7 +152,8 @@ export function projectView(project, session = null) {
 export function policyFor(project, view = null) {
   const draft = project.policy;
   if (draft.reviewers?.confirmed === false) throw new Error('The reviewer trust was imported with this project; confirm it as your own policy choice before the policy can be used.');
-  const owner = view?.submission?.owner;
+  // The release owner: established by this browser's own submission, or declared by the imported bundle (verified against the registry when the project is evaluated, never by importing).
+  const owner = view?.submission?.owner || project.release?.owner || null;
   const policy = {
     schema: POLICY_SCHEMA, name: draft.name || `${project.name} policy`,
     network: { key: 'testnet', chainId: TESTNET.chainId, genesisHash: TESTNET.genesisHash },
@@ -195,8 +225,8 @@ export function exportBundle(project, view = null, { reports = [], at = new Date
     project: { id: project.id, name: project.name, kind: project.kind, createdAt: project.createdAt, updatedAt: project.updatedAt },
     plan: project.plan, planHash: project.planHash, releaseArtifactHash: project.releaseArtifactHash,
     policyDraft: project.policy, policy: status.policy, policyHash: status.policyHash, policyError: status.error,
-    release: { label: project.release.label, submission: view?.submission ?? null, review: view?.review ?? null },
-    storage: view?.storage ?? null, candidate: view?.candidate ?? null,
+    release: { label: project.release.label, owner: status.policy?.registry?.owner ?? view?.submission?.owner ?? project.release?.owner ?? null, releaseId: view?.submission?.releaseId ?? project.release?.releaseId ?? null, submission: view?.submission ?? project.release?.declared?.submission ?? null, review: view?.review ?? null },
+    storage: view?.storage ?? project.release?.declared?.storage ?? null, candidate: view?.candidate ?? null,
     reports: project.reports, bindings: project.bindings, roles: project.roles,
     consumerIdentity: project.policy.consumer, sealedReports: embedded,
     note: 'A bundle carries the project\'s own declarations and references. Its fingerprints are recomputed on import; chain evidence (registry, listing, stored report) is verified when the project is evaluated, not by importing this file. Reviewer trust in it is a declaration of the exporter and must be confirmed by the importer.',
@@ -237,8 +267,24 @@ export function importBundle(text, { at = new Date().toISOString() } = {}) {
     if (parsed.policyHash !== undefined && policyHash(stated) !== parsed.policyHash) throw new Error('The stated policyHash does not match the policy; the bundle was altered after export.');
     for (const binding of bindings) if (!verifyBinding(binding, stated)) throw new Error(`Binding ${binding.id} was not made under the bundle's policy.`);
   }
-  project = { ...project, bindings, imported: { at, exportedAt: parsed.exportedAt ?? null, policyHash: parsed.policyHash ?? null, bindings: bindings.length, sealedReports: sealed.length } };
-  return { project, sealedReports: sealed, reviewerTrust: { trusted: draft.reviewers?.trusted ?? [], basis: draft.reviewers?.basis ?? '', confirmed: false } };
+  // The durable declarations of the release line (owner, release ID, storage locator): validated, cross-checked against each other, the label and the bindings, and kept as declarations until the chain is read.
+  const declaredOwner = lower(parsed.release?.owner ?? parsed.release?.submission?.owner ?? parsed.policy?.registry?.owner ?? '') || null;
+  if (declaredOwner && !H160.test(declaredOwner)) throw new Error('The declared release owner is an H160 address.');
+  if (declaredOwner && parsed.policy?.registry?.owner && lower(parsed.policy.registry.owner) !== declaredOwner) throw new Error(`The bundle declares owner ${declaredOwner} but its policy names ${lower(parsed.policy.registry.owner)}; the declarations contradict each other.`);
+  const declaredReleaseId = lower(parsed.release?.releaseId ?? parsed.release?.submission?.releaseId ?? '') || null;
+  if (declaredReleaseId && !/^0x[0-9a-f]{64}$/.test(declaredReleaseId)) throw new Error('The declared release ID is a 0x-prefixed 32-byte hash.');
+  if (declaredReleaseId && declaredOwner) { let derived = null; try { derived = lower(releaseIdOf(declaredOwner, project.release.label)); } catch { derived = null; } if (derived !== declaredReleaseId) throw new Error(`The declared release ID ${declaredReleaseId.slice(0, 12)}… does not derive from the declared owner and the label "${project.release.label}"; the declarations contradict each other.`); }
+  const declaredStorage = parsed.storage ?? parsed.release?.declared?.storage ?? null;
+  if (declaredStorage && (!/^0x[0-9a-f]{64}$/.test(lower(declaredStorage.extrinsicHash ?? '')) || (declaredStorage.blockHash && !/^0x[0-9a-f]{64}$/.test(lower(declaredStorage.blockHash))))) throw new Error('The declared storage locator names a 0x-prefixed 32-byte extrinsic hash and, when given, block hash.');
+  for (const binding of bindings) if (declaredReleaseId && lower(binding.releaseId) !== declaredReleaseId) throw new Error(`Binding ${binding.id} names release ${lower(binding.releaseId).slice(0, 12)}…, not the declared release ${declaredReleaseId.slice(0, 12)}…; the declarations contradict each other.`);
+  const latest = bindings.at(-1) ?? null;
+  if (latest?.storage?.extrinsicHash && declaredStorage?.extrinsicHash && lower(latest.storage.extrinsicHash) !== lower(declaredStorage.extrinsicHash)) throw new Error(`The latest binding names stored evidence ${lower(latest.storage.extrinsicHash).slice(0, 12)}…, the bundle declares ${lower(declaredStorage.extrinsicHash).slice(0, 12)}…; the declarations contradict each other.`);
+  const declared = declaredOwner || declaredReleaseId || declaredStorage || parsed.release?.submission || parsed.release?.review
+    ? { at, exportedAt: parsed.exportedAt ?? null, source: 'bundle', owner: declaredOwner, releaseId: declaredReleaseId, submission: parsed.release?.submission ?? null, review: parsed.release?.review ?? null, storage: declaredStorage ? { reportHash: declaredStorage.reportHash ?? null, extrinsicHash: lower(declaredStorage.extrinsicHash), blockHash: declaredStorage.blockHash ? lower(declaredStorage.blockHash) : null, blockNumber: declaredStorage.blockNumber ?? null } : null, note: 'Declared by the exporter; verified against the registry, the consumer and chain data when the project is evaluated on fresh reads, not by importing.' }
+    : null;
+  const missingEvidence = [...new Set([...bindings.map((binding) => binding.reportHash), ...references.map((reference) => reference.reportHash)])].filter((hash) => !sealed.some((report) => report.evidenceHash === hash));
+  project = { ...project, release: { ...project.release, owner: declaredOwner, releaseId: declaredReleaseId, declared }, bindings, imported: { at, exportedAt: parsed.exportedAt ?? null, policyHash: parsed.policyHash ?? null, bindings: bindings.length, sealedReports: sealed.length, missingEvidence } };
+  return { project, sealedReports: sealed, missingEvidence, reviewerTrust: { trusted: draft.reviewers?.trusted ?? [], basis: draft.reviewers?.basis ?? '', confirmed: false } };
 }
 
 // ---- The browser store ----

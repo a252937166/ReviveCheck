@@ -172,3 +172,47 @@ test('the browser store keeps one session per project and migrates the legacy ke
   assert.equal(reread.sessions[DEMO_PROJECT.id].active.reportHash, PASSED.evidenceHash, 'the demo session is untouched by the other project');
   assert.equal(JSON.parse(memory.get(STORE_KEY)).schema, 'revivecheck.studio-store.v1');
 });
+
+// Repair handoff 2026-10-26, R-05: the pure pieces behind the fenced studio.
+test('a readback attaches to its own transaction only; a replaced receipt moves to the history; the same import changes nothing; the request fence and the uncertain-send rule', async () => {
+  const { recordReadback, createRequestFence, beginRequest, requestIsCurrent, supersedeRequests, txFailure, UNCERTAIN_STAGES } = await import('../src/studio-state.js');
+  let session = recordImport(emptySession(DEMO_PROJECT), { plan: PASSED_B.input, report: PASSED_B, at: T });
+  const same = recordImport(session, { plan: PASSED_B.input, report: PASSED_B, at: '2026-10-25T12:01:00.000Z' });
+  assert.equal(same.history.length, 0, 'the same report handed over again adds no history');
+  assert.equal(same.check, session.check);
+  const first = { ...tx(10), extrinsicHash: `0x${'aa'.repeat(32)}` }, second = { ...tx(20), extrinsicHash: `0x${'bb'.repeat(32)}` };
+  session = applyStage(session, 'submit', { label: 'x', releaseId: RELEASE, reportHash: PASSED_B.evidenceHash, tx: first }, { at: T });
+  session = applyStage(session, 'submit', { label: 'x', releaseId: RELEASE, reportHash: PASSED_B.evidenceHash, tx: second }, { at: T });
+  assert.equal(session.submit.tx.extrinsicHash, second.extrinsicHash);
+  assert.equal(session.history.at(-1).stages.submit.tx.extrinsicHash, first.extrinsicHash, 'the replaced receipt is history');
+  const patched = applyStage(session, 'submit', (value) => ({ ...value, note: 'same transaction' }), { at: T });
+  assert.equal(patched.history.length, session.history.length, 'an updater over the same transaction archives nothing');
+  const late = recordReadback(session, 'submit', { extrinsicHash: first.extrinsicHash, patch: { readback: { release: { revision: '1' } } } }, { at: T });
+  assert.equal(late.submit.readback, undefined);
+  assert.equal(late.history.at(-1).stages.submit.readback.release.revision, '1');
+  const current = recordReadback(late, 'submit', { extrinsicHash: second.extrinsicHash, patch: { readback: { release: { revision: '2' } } } }, { at: T });
+  assert.equal(current.submit.readback.release.revision, '2');
+  const orphan = recordReadback(current, 'submit', { extrinsicHash: `0x${'cc'.repeat(32)}`, patch: { readback: {} } }, { at: T });
+  assert.match(orphan.history.at(-1).reason, /no matching receipt/);
+  assert.throws(() => recordReadback(current, 'check', { extrinsicHash: first.extrinsicHash, patch: {} }), /no transaction readback/);
+  // The fence: only the latest request of a project and stage is current; a reset supersedes every request of that project.
+  const fence = createRequestFence();
+  const one = beginRequest(fence, 'p', 'check'), two = beginRequest(fence, 'p', 'check'), other = beginRequest(fence, 'q', 'check');
+  assert.equal(requestIsCurrent(fence, one), false);
+  assert.equal(requestIsCurrent(fence, two), true);
+  assert.equal(requestIsCurrent(fence, other), true, 'another project\'s request is independent');
+  supersedeRequests(fence, 'p');
+  assert.equal(requestIsCurrent(fence, two), false);
+  assert.equal(requestIsCurrent(fence, other), true);
+  // A failure after the transaction was handed to the network is uncertain: a stop, never a retry.
+  assert.deepEqual(UNCERTAIN_STAGES, ['submitted', 'in-block']);
+  const uncertain = txFailure({ stage: 'in-block' }, new Error('transport timeout'));
+  assert.deepEqual([uncertain.stage, uncertain.failedAt, uncertain.uncertain], ['error', 'in-block', true]);
+  assert.match(uncertain.note, /Do not sign it again/);
+  const notSent = txFailure({ stage: 'signing' }, 'Rejected by user');
+  assert.deepEqual([notSent.failedAt, notSent.uncertain, notSent.note], ['signing', false, 'Nothing was sent.']);
+  const readbackFailed = txFailure({ stage: 'readback' }, new Error('node did not answer'));
+  assert.equal(readbackFailed.uncertain, false);
+  assert.match(readbackFailed.note, /transaction is final/);
+  assert.equal(txFailure(undefined, 'x').failedAt, 'signing');
+});

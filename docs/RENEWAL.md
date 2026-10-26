@@ -43,6 +43,10 @@ Renewing on October 25 would expire again on November 1, before the freeze. The 
 
 That choice leaves an expected denial period: from the expiry at 2026-11-01T09:29:17.646Z until the successor report is approved, bound and listed (planned 2026-11-03), every evaluation of the published catalog returns `expired` and the entry is withheld, although nothing on the chain changes. The period is stated on the App's **Evidence health** page (`#/app/health`) with the policy lifetime against the freeze, and it will be recorded like the 2026-10-25 steps when it happens. A maintainer who needs continuous availability renews before the first expiry instead; the policy's `maxAgeSeconds` is the maintainer's choice, and the gap is the consequence of this one.
 
+## Verified state, unknown state, and what the plan never does
+
+The plan (`revivecheck/health`, `node scripts/renewal-prepare.js`, the Evidence health page) marks a stage done only when the evidence passes the evaluator's own predicates: a registry read dated, fresh, about this registry and this release, agreeing across interfaces; a listing read about this consumer and this token; a successor report intact, passed, newer, in this scope, on this network, about this subject, under this plan, on a supported runtime and not expired; a stored report retrieved by exact content hash (a storage receipt has no artificial lifetime; the freshness limits apply to the current reads). A read that is stale, undated, unavailable, from another target or disagreeing proves nothing: the stages it would prove are `unknown`, the plan has no next stage, and the stop names them. An unknown stage is read again, never performed again on the assumption that it did not happen; a pending send on either signer stops everything. Under a fresh-subject policy the subject read appears in the health view with its availability, freshness and comparison; under the legacy policy it is labelled not required, and no check of the current metadata is claimed. Offline captures (`--capture`) establish replayed behavior, not present signing readiness.
+
 ## Preparing the renewal (read-only)
 
 ```sh

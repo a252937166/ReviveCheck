@@ -13,6 +13,15 @@
 // session per browser-local project under `revivecheck.studio.v2`; the earlier flat
 // session (`revivecheck.studio.v1`) is migrated once, with every stage that cannot be
 // tied to one explicit report filed as history.
+//
+// Asynchronous answers are fenced (repair handoff 2026-10-26, R-05): a request carries
+// the project it started in and a generation; a read answer that is not the latest
+// request of its project and stage is discarded, a write receipt or a readback is routed
+// to the session of its ORIGIN project whatever project is active when it arrives, a
+// readback attaches only to the receipt of its own transaction, and a receipt replaced by
+// a later transaction of the same stage moves to the history instead of vanishing. A
+// failure after a transaction was handed to the network leaves its result uncertain: the
+// studio shows a stop and never signs it again on its own.
 import { describeListReceipt, describeReviewReceipt } from './receipts.js';
 
 export const SESSION_SCHEMA = 'revivecheck.studio-session.v2';
@@ -92,8 +101,10 @@ export function recordRecheck(session, { choice, custom = null, report, comparis
   return { ...next, recheck: { choice, custom, report, comparison }, active: { ...reportIdentity(report), source: 'recheck', at }, updatedAt: at };
 }
 
-/** A report handed over from Check my token: the active report of this project's session, with nothing carried over from an earlier one. */
+/** A report handed over from Check my token: the active report of this project's session, with nothing carried over from an earlier one. The same report handed over again changes nothing. */
 export function recordImport(session, { plan, report, at = new Date().toISOString() }) {
+  if (!report?.evidenceHash) throw new Error('An import records a sealed report.');
+  if (sameHash(session?.active?.reportHash, report.evidenceHash)) return { ...session, updatedAt: at };
   const custom = plan ? { symbol: plan.listing?.symbol, name: plan.listing?.name, decimals: plan.listing?.decimals, plan } : null;
   return recordCheck(session, { choice: 'own', custom, report, at, source: 'import' });
 }
@@ -114,7 +125,50 @@ export function applyStage(session, key, value, { at = new Date().toISOString() 
     if (!session.active) return { ...session, history: [...(session.history || []), { archivedAt: at, reason: `${key} answered while no report was active`, active: null, stages: { [key]: next } }], updatedAt: at };
     if (named && !sameHash(named, session.active.reportHash)) return { ...session, history: [...(session.history || []), { archivedAt: at, reason: `${key} answered for report ${bare(named).slice(0, 12)}…, not the active ${session.active.reportHash.slice(0, 12)}…`, active: session.active, stages: { [key]: next } }], updatedAt: at };
   }
-  return { ...session, [key]: next, updatedAt: at };
+  // A finalized receipt replaced by a later transaction of the same stage is history, never dropped: both transactions happened.
+  const current = session[key];
+  const replaces = current?.tx && next.tx && txHash(current.tx) && txHash(current.tx) !== txHash(next.tx);
+  const history = replaces ? [...(session.history || []), { archivedAt: at, reason: `${key} receipt ${txHash(current.tx).slice(0, 12)}… replaced by a later ${key} (${txHash(next.tx).slice(0, 12)}…); the earlier transaction stays as history`, active: session.active, stages: { [key]: current } }] : (session.history || []);
+  return { ...session, [key]: next, history, updatedAt: at };
+}
+const txHash = (tx) => lower(tx?.extrinsicHash ?? tx?.txHash ?? '');
+
+/**
+ * A readback (registry read, retrieval, attestation verification) for ONE transaction,
+ * named by its extrinsic hash: it attaches to the current receipt of the stage when that
+ * receipt is the same transaction, to the historical receipt of that transaction when a
+ * later one replaced it, and otherwise is filed as an orphan. It never attaches to another
+ * transaction, and never makes a historical receipt current.
+ */
+export function recordReadback(session, key, { extrinsicHash, patch }, { at = new Date().toISOString() } = {}) {
+  if (!REPORT_BOUND.includes(key)) throw new Error(`${key} has no transaction readback.`);
+  const hash = lower(extrinsicHash);
+  if (!hash) throw new Error('A readback names the extrinsic it belongs to.');
+  const current = session[key];
+  if (current?.tx && txHash(current.tx) === hash) return { ...session, [key]: { ...current, ...patch }, updatedAt: at };
+  const history = [...(session.history || [])];
+  const index = history.findIndex((entry) => entry.stages?.[key]?.tx && txHash(entry.stages[key].tx) === hash);
+  if (index >= 0) { history[index] = { ...history[index], stages: { ...history[index].stages, [key]: { ...history[index].stages[key], ...patch } } }; return { ...session, history, updatedAt: at }; }
+  return { ...session, history: [...history, { archivedAt: at, reason: `${key} readback for extrinsic ${hash.slice(0, 12)}… arrived with no matching receipt in this session; kept as history, attached to nothing`, active: session.active, stages: { [key]: { readbackOnly: true, extrinsicHash: hash, ...patch } } }], updatedAt: at };
+}
+
+/** The stages whose answer is a read: a superseded request's answer is discarded. A write receipt is never discarded. */
+export const READ_STAGES = Object.freeze(['check', 'recheck', 'replay', 'promote', 'watch', 'verified']);
+/** A fence over asynchronous requests: per project and stage, only the latest-started request may answer. */
+export const createRequestFence = () => ({ latest: Object.create(null) });
+export function beginRequest(fence, projectId, key) { const id = `${projectId}:${key}`; const generation = (fence.latest[id] ?? 0) + 1; fence.latest[id] = generation; return Object.freeze({ projectId, key, generation }); }
+export const requestIsCurrent = (fence, token) => fence.latest[`${token.projectId}:${token.key}`] === token.generation;
+/** Every request of a project is superseded (a reset): their answers are discarded when they arrive. */
+export function supersedeRequests(fence, projectId) { for (const id of Object.keys(fence.latest)) if (id.startsWith(`${projectId}:`)) fence.latest[id] += 1; }
+
+/** The stages at which a failure leaves the transaction's fate unknown: it was handed to the network and may still be included. */
+export const UNCERTAIN_STAGES = Object.freeze(['submitted', 'in-block']);
+/** A transaction failure as the studio records it: where it failed, whether the send is uncertain, and what that means. An uncertain send is a stop condition, never a retry. */
+export function txFailure(current, error) {
+  const failedAt = current?.stage && current.stage !== 'idle' && current.stage !== 'error' ? current.stage : (current?.failedAt ?? 'signing');
+  const uncertain = UNCERTAIN_STAGES.includes(failedAt);
+  const note = uncertain ? 'The transaction was handed to the network and its result could not be established; it may still be included. Do not sign it again until the chain has been read: a second signature is a second transaction.' : failedAt === 'finalized' || failedAt === 'readback' ? 'The transaction is final; only the readback failed. Read again; nothing needs to be signed.' : 'Nothing was sent.';
+  return { ...(current || {}), stage: 'error', failedAt, uncertain, error: String(error?.message || error || 'The transaction failed.'), note };
 }
 
 /** The studio session is cleared; the project identity stays. */
@@ -226,8 +280,10 @@ export function saveStudioStore(store, { storage = globalThis.localStorage } = {
 /** The session of one project, created empty when absent. */
 export function sessionFor(store, project) {
   const existing = store.sessions[project.id];
-  if (existing) return migrateSession(existing, project);
-  return emptySession(project);
+  if (!existing) return emptySession(project);
+  const migrated = migrateSession(existing, project);
+  // The session's project identity follows the project record (its name, kind and CURRENT plan); the receipts and the active report are the session's own.
+  return { ...migrated, project: { ...migrated.project, id: project.id, ...(project.name ? { name: project.name } : {}), ...(project.kind ? { kind: project.kind } : {}), ...(project.plan ? { plan: project.plan } : {}) } };
 }
 export function withSession(store, session) {
   return { ...store, sessions: { ...store.sessions, [session.project.id]: session } };
