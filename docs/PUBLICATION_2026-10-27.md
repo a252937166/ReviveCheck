@@ -49,3 +49,26 @@ The published film was recorded from the public App, separate consumer and offic
 ## Remaining operational boundaries
 
 The bound report still expires 2026-11-01T09:29:17.646Z under the existing seven-day policy. No renewal transaction has been sent. External adoption, npm publication and the maintainer pilot remain future work. A saved Build update does not establish organizer acceptance, finalist selection or a score.
+
+## Hosted release and final readback
+
+| Item | Verified result |
+| --- | --- |
+| Source commit | `647f6c42f450160ac3a0d6c23ecd39c23ff3641a`; built from `git archive`, with existing dependencies, excluding the untracked TLS note and local scratch/private files |
+| Release | `20261027-647f6c4-public-r1` |
+| Activated | `2026-10-27T07:29:24.861027Z` |
+| Files | **100/100** checked on the server and again over HTTPS |
+| Public index SHA-256 | `edffe025d4151489ffbc62733583afc861dc7e74137a14507f35ec5297fc1e9c` |
+| Payload | `revivecheck-public-20261027-647f6c4-public-r1.tar.gz`, 3010432 bytes, SHA-256 `cbdc41306d4d5ba2b19b1ef11c6cfa9d609283fcfaf1e756bdc46b4e9a155366` |
+| Hosting manifest SHA-256 | `191032f306dbd6bf7492dbd3ff357840fbba760a1656c02b8f84c465d8db1ea6` |
+| Previous release | `releases/20261026-0684981-public-r1` retained for rollback |
+
+The first HTTPS pass exceeded its 25-second transfer limit on the main JavaScript bundle and the historical v0.2 video. Only those two bodies were retried with a longer bound and compression where supported; both matched their expected SHA-256. The initial result and the successful result are retained. This was a transfer-bound failure, not a changed payload.
+
+The native Chrome player advanced through the published film with no media error, and after selecting 1080p the decoded video was 1920 x 1080; its settings also offer 2160p 4K. Anonymous YouTube metadata and formats establish public availability and HD access; the in-app browser's decoder does not support playback. The anonymous deployed homepage renders `Current demonstration - v0.4`, embeds the new video, and shows the new dated caption.
+
+The historical v0.3 video `CvpzlQfya4U` was set to `unlisted` only after the replacement was public, processed and linked from the saved project and published site. It remains reachable by its historical link and was not deleted. The original v0.1/v0.2 materials were not changed.
+
+`/.private/wallet.json`, `/api/workspaces` and `/._index.html` return 404. The demo and neighboring apex, ReCart health, Attest and Faktura sites all returned 200. Nginx, DNS, certificates, services and private wallet files were unchanged. No reload was needed.
+
+Receipts are retained in `scratchpad/public-release-20261027/` locally and `/var/www/revivecheck/ops/` on the server: deployment, hosting, per-file hashes, external file verification, hosting verification and health/isolation checks. Screenshots show the saved DoraHacks page and public HD player. The associated Obsidian progress and handoff notes were updated in English.

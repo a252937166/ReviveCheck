@@ -1,0 +1,124 @@
+{
+  "schema": "revivecheck.publication-evidence.v1",
+  "recordedAt": "2026-10-27T07:34:12.996807+00:00",
+  "video": {
+    "url": "https://www.youtube.com/watch?v=4F80-0C9gVM",
+    "localDurationSeconds": 172.313,
+    "uploadedSourceSha256": "524840b406975111fe23426678f1a4962eabb367286e70d4306f0f4248beb096",
+    "privacyStatus": "public",
+    "processingStatus": "succeeded",
+    "thumbnailSet": true,
+    "chapters": 9,
+    "anonymousAvailability": "public",
+    "browserPlayback": {
+      "browser": "Chrome",
+      "decodedWidth": 1920,
+      "decodedHeight": 1080,
+      "mediaError": null,
+      "ownerSession": true
+    },
+    "anonymousPlaybackLimit": "The in-app browser exposes the public page but does not support the media codec. Anonymous format extraction confirms HD stream availability.",
+    "historicalVideo": {
+      "id": "CvpzlQfya4U",
+      "privacyStatus": "unlisted",
+      "deleted": false
+    }
+  },
+  "website": {
+    "url": "https://revivecheck.axiqo.xyz/",
+    "sourceCommit": "647f6c42f450160ac3a0d6c23ecd39c23ff3641a",
+    "release": "20261027-647f6c4-public-r1",
+    "hosting": {
+      "schema": "revivecheck.hosting-manifest.v1",
+      "site": "https://revivecheck.axiqo.xyz/",
+      "release": "20261027-647f6c4-public-r1",
+      "sourceCommit": "647f6c42f450160ac3a0d6c23ecd39c23ff3641a",
+      "sourceUrl": "https://github.com/a252937166/ReviveCheck/commit/647f6c42f450160ac3a0d6c23ecd39c23ff3641a",
+      "builtAt": "2026-10-27T07:27:21.192Z",
+      "generatedAt": "2026-10-27T07:27:21.445Z",
+      "files": {
+        "count": 100,
+        "bytes": 5507139,
+        "manifestSha256": "5610aa68e450f6f28d501c7b73985d51060b267b154b3708e5fa5f842c58c1e8",
+        "indexSha256": "edffe025d4151489ffbc62733583afc861dc7e74137a14507f35ec5297fc1e9c"
+      },
+      "payload": {
+        "filename": "revivecheck-public-20261027-647f6c4-public-r1.tar.gz",
+        "bytes": 3010432,
+        "sha256": "cbdc41306d4d5ba2b19b1ef11c6cfa9d609283fcfaf1e756bdc46b4e9a155366"
+      },
+      "evidenceStatus": "release-status.json describes the published evidence records at its own commit; this manifest describes the hosted build. They are separate facts."
+    },
+    "hostingVerificationOk": true,
+    "httpsFilesMatched": 100,
+    "httpsFilesTotal": 100,
+    "health": [
+      {
+        "url": "https://revivecheck.axiqo.xyz/.private/wallet.json",
+        "httpStatus": "404",
+        "expected": "404"
+      },
+      {
+        "url": "https://revivecheck.axiqo.xyz/api/workspaces",
+        "httpStatus": "404",
+        "expected": "404"
+      },
+      {
+        "url": "https://revivecheck.axiqo.xyz/._index.html",
+        "httpStatus": "404",
+        "expected": "404"
+      },
+      {
+        "url": "https://axiqo.xyz/",
+        "httpStatus": "200",
+        "expected": "200"
+      },
+      {
+        "url": "https://recart.axiqo.xyz/api/health",
+        "httpStatus": "200",
+        "expected": "200"
+      },
+      {
+        "url": "https://attest.axiqo.xyz/",
+        "httpStatus": "200",
+        "expected": "200"
+      },
+      {
+        "url": "https://faktura.axiqo.xyz/",
+        "httpStatus": "200",
+        "expected": "200"
+      },
+      {
+        "url": "https://demo.revivecheck.axiqo.xyz/",
+        "httpStatus": "200",
+        "expected": "200"
+      }
+    ]
+  },
+  "submission": {
+    "url": "https://dorahacks.io/build/50176",
+    "mode": "existing-build-update",
+    "saved": true,
+    "anonymousReadback": true,
+    "track": "Modular Cloud & Middleware",
+    "eventCard": "Your Build",
+    "currentReviewBadge": null,
+    "organizerAcceptanceClaimed": false,
+    "duplicateRegistrationCreated": false,
+    "newAgreementRequired": false
+  },
+  "deck": {
+    "url": "https://revivecheck.axiqo.xyz/revivecheck-final-deck.pdf",
+    "sha256": "3297947a594129bbcbd1eb293fac07d9a5641aa79d411b551de969a3e7d38b32",
+    "pages": 6
+  },
+  "verification": {
+    "mainTestsPassed": 255,
+    "mainTestsFailed": 0,
+    "productionBuildPassed": true,
+    "evidenceIntegrityPassed": true,
+    "sealedEvidenceChanged": false,
+    "baselineChanged": false,
+    "chainTransactionsSent": 0
+  }
+}
