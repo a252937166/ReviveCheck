@@ -42,7 +42,9 @@ The published film was recorded from the public App, separate consumer and offic
 - YouTube upload returned the actual `public` visibility and a successful custom-thumbnail write. Anonymous metadata retrieval confirmed public availability, 172 seconds, all nine chapters and an available 1080p stream. The description matches after normalizing the platform's trailing whitespace. The embedded in-app browser cannot decode this media; native Chrome playback is checked separately.
 - Existing DoraHacks Build 50176 was saved once and read back on 2026-10-27. The page shows the new video link and embed, updated lifecycle, both public repositories, public consumer and final deck link. No new legal agreement or new-submission action was displayed. Existing team, contacts, category, identity and track were preserved.
 - This session reran all 255 main tests successfully, the offline release-status checks passed, and the production build passed. All edited text is English. No sealed report, baseline or transaction record was changed.
-- Hosted build identity, full file verification, final processing and previous-video visibility are recorded after deployment below.
+- YouTube API readback confirms `processingStatus=succeeded`, `uploadStatus=processed`, actual privacy `public` and embedding enabled. Anonymous extraction confirms 1080p availability and the nine chapters. A fresh in-app browser shows a Sign in control and the correct public title/description; its embedded codec is unsupported, so that browser does not establish playback.
+- The competition Build list shows `Your Build` for 50176 and track `Modular Cloud & Middleware`. The current card has no explicit `Under Review` badge, so the README now labels it registered rather than carrying forward a stale review label. Anonymous DoraHacks readback shows the updated description and links with a Log in control; no private-before-review banner appears. Organizer acceptance and finalist selection are not inferred.
+- Hosted build identity, full file verification and previous-video visibility are recorded after deployment below.
 
 ## Remaining operational boundaries
 
