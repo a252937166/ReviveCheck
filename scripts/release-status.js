@@ -48,11 +48,11 @@ async function check(id, work) {
 // deployment procedure writes beside the served files (hosting.json, scripts/hosting-manifest.mjs), never here,
 // so this record and the site cannot contradict each other about "the current release".
 const PUBLICATION = Object.freeze({
-  site: 'https://revivecheck.axiqo.xyz/', hostingManifest: 'https://revivecheck.axiqo.xyz/hosting.json', hostingProcedure: 'docs/DEPLOYMENT.md', publicationRecords: ['docs/PUBLICATION_2026-10-24.md', 'docs/PUBLICATION_2026-10-25.md'],
-  sourceRepository: 'https://github.com/a252937166/ReviveCheck', sourceBranch: 'main', build: 'https://dorahacks.io/build/50176', buildDescribes: 'the 2026-10-24 release; not yet updated',
-  consumerExample: { repository: 'revivecheck-consumer-example (separate repository; published state is recorded in its README)', interface: 'Token eligibility demo (browser) and a command line, installed from the packed 0.5.3 artifact; prepares a versioned catalog release (revivecheck.catalog-release.v1) that a separate reader consumes; author-built, portability not adoption' },
-  video: 'https://www.youtube.com/watch?v=CvpzlQfya4U', videoRecordedAgainst: '2026-10-24 release (v0.3): the v2 deployment and the simulated catalog lifecycle; it predates the live v2 lifecycle recorded on 2026-10-25',
-  deck: 'docs/FINAL_DECK.md', historicalDeck: 'artifacts/ReviveCheck-Check-in-Deck.pdf', freeze: '2026-11-06T04:00:00Z (November 5, 2026, 23:00 EST)',
+  site: 'https://revivecheck.axiqo.xyz/', hostingManifest: 'https://revivecheck.axiqo.xyz/hosting.json', hostingProcedure: 'docs/DEPLOYMENT.md', publicationRecords: ['docs/PUBLICATION_2026-10-24.md', 'docs/PUBLICATION_2026-10-25.md', 'docs/PUBLICATION_2026-10-26.md', 'docs/PUBLICATION_2026-10-27.md'],
+  sourceRepository: 'https://github.com/a252937166/ReviveCheck', sourceBranch: 'main', build: 'https://dorahacks.io/build/50176', buildDescribes: 'updated and read back on 2026-10-27: package 0.5.3, the recorded live v2 lifecycle, public consumer, v0.4 video and final deck',
+  consumerExample: { repository: 'https://github.com/a252937166/revivecheck-consumer-example', site: 'https://demo.revivecheck.axiqo.xyz/', interface: 'Token eligibility demo (browser) and a command line, installed from the packed 0.5.3 artifact; prepares a versioned catalog release (revivecheck.catalog-release.v1) that a separate reader consumes; author-built, portability not adoption' },
+  video: 'https://www.youtube.com/watch?v=4F80-0C9gVM', videoRecordedAgainst: 'v0.4 explainer, recorded 2026-10-26 from the public App, separate consumer and official explorer: checks, exact-report replay, recorded on-chain lifecycle and application eligibility; no transaction signed on camera',
+  deck: 'https://revivecheck.axiqo.xyz/revivecheck-final-deck.pdf', deckSource: 'docs/final-deck.md', historicalDeck: 'artifacts/ReviveCheck-Check-in-Deck.pdf', freeze: '2026-11-06T04:00:00Z (November 5, 2026, 23:00 EST)',
 });
 
 // 1. Integrity of every published record.
@@ -286,7 +286,6 @@ const status = {
     ...(levels.lifecycle?.established ? [] : [{ item: 'live v2 lifecycle', why: levels.lifecycle?.why }]),
     { item: 'Independent adoption', why: 'No external builder has installed or configured ReviveCheck; the second consumer and the benchmark are author-run.' },
     { item: 'Maintainer pilot', why: 'docs/PILOT_PROTOCOL.md describes the study; no participant has run it.' },
-    { item: 'Video and DoraHacks build', why: 'The video, recorded on 2026-10-24, and the DoraHacks build description still describe the 2026-10-24 release; the hosted build is identified by hosting.json on the site, not by this record.' },
     { item: 'Evidence renewal', why: `The bound report ${v2.binding?.reportHash ? `${v2.binding.reportHash.slice(0, 12)}…` : ''} is acceptable under the seven-day policy until ${v2.binding ? new Date(Date.parse((await json(`public/reports/${v2.binding.reportHash}.json`)).completedAt) + v2.config.policy.evidence.maxAgeSeconds * 1000).toISOString() : 'unknown'}; docs/RENEWAL.md is the runbook. No renewal transaction has been sent.` },
   ],
 };

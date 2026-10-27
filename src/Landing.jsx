@@ -68,11 +68,11 @@ function Hero({ data, head }) {
 
 function ReleaseUpdate() {
   return <section className="section" id="release" aria-labelledby="release-title">
-    <div className="section-head row"><div><p className="hero-source">Current release · v0.3</p><h2 id="release-title">An approval needs a lifecycle.</h2><p>Check the evidence, enable a catalog entry, and require a fresh decision when its context changes.</p></div><a className="link-arrow" href="./release-status.json" target="_blank" rel="noreferrer">Release status<ArrowUpRight size={15}/></a></div>
+    <div className="section-head row"><div><p className="hero-source">Current demonstration · v0.4</p><h2 id="release-title">An approval needs a lifecycle.</h2><p>Check the evidence, enable a catalog entry, and require a fresh decision when its context changes.</p></div><a className="link-arrow" href="./release-status.json" target="_blank" rel="noreferrer">Release status<ArrowUpRight size={15}/></a></div>
     <div className="release-grid">
       <figure className="release-video visual-card">
-        <iframe src="https://www.youtube-nocookie.com/embed/CvpzlQfya4U" title="ReviveCheck v0.3 demonstration" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen/>
-        <figcaption>Footage from the 2026-10-24 release; it predates the live v2 lifecycle recorded on 2026-10-25. The local lifecycle it shows is labelled SIMULATED; historical testnet transactions and live reads are identified separately. <a className="text-link" href="https://www.youtube.com/watch?v=CvpzlQfya4U" target="_blank" rel="noreferrer">Watch on YouTube</a>.</figcaption>
+        <iframe src="https://www.youtube-nocookie.com/embed/4F80-0C9gVM" title="ReviveCheck v0.4 demonstration" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen/>
+        <figcaption>Recorded on 2026-10-26 from the public App, separate consumer and official explorer: corrected acceptance checks, exact-report replay and application eligibility. On-chain writes and refusal replays are labelled RECORDED; no transaction is signed on camera. <a className="text-link" href="https://www.youtube.com/watch?v=4F80-0C9gVM" target="_blank" rel="noreferrer">Watch on YouTube</a>.</figcaption>
       </figure>
       <div className="release-summary">
         <article><h3>Evidence that can expire</h3><p>The application policy checks the target, plan, runtime, evidence age and trusted reviewer. Expired or unavailable verification blocks use. A policy decision is separate from an on-chain approval.</p><a className="link-arrow" href="#/docs/policy">Inspect the policy<ArrowRight size={14}/></a></article>

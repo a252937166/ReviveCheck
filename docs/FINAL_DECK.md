@@ -1,3 +1,5 @@
+> Current final deck, 2026-10-27: [six-page PDF](https://revivecheck.axiqo.xyz/revivecheck-final-deck.pdf), [English source](final-deck.md). The earlier outline below remains historical preparation.
+
 # Final deck outline (v0.4)
 
 The current counterpart of the historical Check-in deck (`artifacts/ReviveCheck-Check-in-Deck.pdf`, kept unchanged). Twelve slides built around one maintainer problem, one complete refusal, correction, review and rebinding example, the Portaldot modules that make it possible, reusable integration evidence and measured value. Every number on a slide must trace to `public/release-status.json`, `docs/LIFECYCLE.md` or `docs/VALUE_EXPERIMENT.md`; the slide notes below say which. Prepared 2026-10-25. The slide source is `docs/deck/final-deck.html` (12 slides, 1920 × 1080, self-contained); `node scripts/render-deck.mjs` fills the source commit into slide 12 and renders the PDF. `artifacts/ReviveCheck-Final-Deck-2026-10-25.pdf` is the rendering for commit `6b7402f`; it is re-rendered whenever the cited source changes, so the deck never claims more than the published source.

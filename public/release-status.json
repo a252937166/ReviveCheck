@@ -1,7 +1,7 @@
 {
   "schema": "revivecheck.release-status.v2",
-  "checkedAt": "2026-10-26T10:41:30.422Z",
-  "commit": "2cc2d63f0d9d17c18fb7f5cfac01fce0d79af2cc",
+  "checkedAt": "2026-10-27T07:24:21.541Z",
+  "commit": "83a209b8b90a069b3ece8573327c34181ab68a4d",
   "status": "ok",
   "network": {
     "key": "testnet",
@@ -335,19 +335,23 @@
     "hostingProcedure": "docs/DEPLOYMENT.md",
     "publicationRecords": [
       "docs/PUBLICATION_2026-10-24.md",
-      "docs/PUBLICATION_2026-10-25.md"
+      "docs/PUBLICATION_2026-10-25.md",
+      "docs/PUBLICATION_2026-10-26.md",
+      "docs/PUBLICATION_2026-10-27.md"
     ],
     "sourceRepository": "https://github.com/a252937166/ReviveCheck",
     "sourceBranch": "main",
     "build": "https://dorahacks.io/build/50176",
-    "buildDescribes": "the 2026-10-24 release; not yet updated",
+    "buildDescribes": "updated and read back on 2026-10-27: package 0.5.3, the recorded live v2 lifecycle, public consumer, v0.4 video and final deck",
     "consumerExample": {
-      "repository": "revivecheck-consumer-example (separate repository; published state is recorded in its README)",
+      "repository": "https://github.com/a252937166/revivecheck-consumer-example",
+      "site": "https://demo.revivecheck.axiqo.xyz/",
       "interface": "Token eligibility demo (browser) and a command line, installed from the packed 0.5.3 artifact; prepares a versioned catalog release (revivecheck.catalog-release.v1) that a separate reader consumes; author-built, portability not adoption"
     },
-    "video": "https://www.youtube.com/watch?v=CvpzlQfya4U",
-    "videoRecordedAgainst": "2026-10-24 release (v0.3): the v2 deployment and the simulated catalog lifecycle; it predates the live v2 lifecycle recorded on 2026-10-25",
-    "deck": "docs/FINAL_DECK.md",
+    "video": "https://www.youtube.com/watch?v=4F80-0C9gVM",
+    "videoRecordedAgainst": "v0.4 explainer, recorded 2026-10-26 from the public App, separate consumer and official explorer: checks, exact-report replay, recorded on-chain lifecycle and application eligibility; no transaction signed on camera",
+    "deck": "https://revivecheck.axiqo.xyz/revivecheck-final-deck.pdf",
+    "deckSource": "docs/final-deck.md",
     "historicalDeck": "artifacts/ReviveCheck-Check-in-Deck.pdf",
     "freeze": "2026-11-06T04:00:00Z (November 5, 2026, 23:00 EST)"
   },
@@ -359,10 +363,6 @@
     {
       "item": "Maintainer pilot",
       "why": "docs/PILOT_PROTOCOL.md describes the study; no participant has run it."
-    },
-    {
-      "item": "Video and DoraHacks build",
-      "why": "The video, recorded on 2026-10-24, and the DoraHacks build description still describe the 2026-10-24 release; the hosted build is identified by hosting.json on the site, not by this record."
     },
     {
       "item": "Evidence renewal",
