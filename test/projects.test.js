@@ -16,6 +16,13 @@ const REPORT = await load('1faef921a720bf7af7ea87f6fd4875089b61de7617a16b3a47660
 const REVIEWER = '0x95db300103ec8b45884b13ed85230fbf02114065', OWNER = '0x48b9e37a2a2c9621172745dc377b9fc6b9a6a71b';
 const RELEASE = '0x28ab8a86a4d1ca4f5b38784d8f0a32c14ed163ae7f1ff9f4f5b5128fe5fdd927';
 const T = '2026-10-25T12:00:00.000Z';
+// These versioned captures are also the source of the separate consumer's valid-r2
+// and revoked-r2 fixtures. Read their raw evidence and clock without another checkout.
+async function consumerCapture(name) {
+  const capture = JSON.parse(await readFile(new URL(`../examples/token-catalog/data/testnet-v2/captures/${name}.inputs.json`, import.meta.url), 'utf8'));
+  const { observation, registry, listing, evidence } = capture.tokens['0x00001e6100000000000000000000000000010000'];
+  return { inputs: { observation, registry, listing, evidence }, now: capture.now };
+}
 const form = (projectName) => ({ projectName, logicalContractId: 'token-list:portaldot-v3:pusd', release: 'v1.0.1', sourceRevision: 'pusd-token-list@1.0.1', assetId: '7777', holder: '', symbol: 'pUSD', tokenName: 'Portaldot USD (test)', decimals: '6' });
 const tx = (block) => ({ route: 'native', extrinsicHash: `0x${'31'.repeat(32)}`, blockHash: `0x${'32'.repeat(32)}`, blockNumber: String(block), success: true });
 
@@ -103,7 +110,7 @@ test('binding the candidate is an explicit act; the consumer configuration names
   assert.equal(config.roles.reviewer.address, REVIEWER);
   loadConfigShape(config);
   // The separate consumer's evaluator accepts it: the same evaluation the Token eligibility demo makes, offline on the captured reads.
-  const fixture = JSON.parse(await readFile(new URL('../../revivecheck-consumer-example/fixtures/valid-r2.json', import.meta.url), 'utf8'));
+  const fixture = await consumerCapture('12-reapprove-r2');
   const evaluation = evaluateBinding({ policy: config.policy, binding, report: REPORT, ...fixture.inputs, now: fixture.now });
   assert.equal(evaluation.status, 'valid', JSON.stringify(evaluation.reasons));
   const broken = { ...bound, bindings: [{ ...binding, storage: null }] };
@@ -202,10 +209,10 @@ test('R03-A to R03-E, R03-H: the bundle round-trips into an empty browser with t
   assert.equal(config.release.revision, '2');
   loadConfigShape(config);
   assert.equal(loadConsumerConfig(config, 'exported').policyHash, bundle.policyHash);
-  const fixture = JSON.parse(await readFile(new URL('../../revivecheck-consumer-example/fixtures/valid-r2.json', import.meta.url), 'utf8'));
+  const fixture = await consumerCapture('12-reapprove-r2');
   const evaluation = evaluateBinding({ policy: config.policy, binding: confirmed.bindings[0], report: REPORT, ...fixture.inputs, now: fixture.now });
   assert.equal(evaluation.status, 'valid', JSON.stringify(evaluation.reasons));
-  const revoked = JSON.parse(await readFile(new URL('../../revivecheck-consumer-example/fixtures/revoked-r2.json', import.meta.url), 'utf8'));
+  const revoked = await consumerCapture('11-revoke-r2');
   const withheld = evaluateBinding({ policy: config.policy, binding: confirmed.bindings[0], report: REPORT, ...revoked.inputs, now: revoked.now });
   assert.equal(withheld.enable, false, 'R03-F: a revoked imported release stays inspectable and unavailable');
   // The same bundle a second time gives the same project identity; the page keeps an existing one apart by renaming the copy (browser journey).

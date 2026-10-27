@@ -72,3 +72,13 @@ The historical v0.3 video `CvpzlQfya4U` was set to `unlisted` only after the rep
 `/.private/wallet.json`, `/api/workspaces` and `/._index.html` return 404. The demo and neighboring apex, ReCart health, Attest and Faktura sites all returned 200. Nginx, DNS, certificates, services and private wallet files were unchanged. No reload was needed.
 
 Receipts are retained in `scratchpad/public-release-20261027/` locally and `/var/www/revivecheck/ops/` on the server: deployment, hosting, per-file hashes, external file verification, hosting verification and health/isolation checks. Screenshots show the saved DoraHacks page and public HD player. The associated Obsidian progress and handoff notes were updated in English.
+
+## Clean-checkout verification repair
+
+The publication checks exposed two existing CI assumptions. Three tests read configuration or capture files from a sibling consumer checkout that GitHub does not have. The package verifier completed its probes but could not write its final record because the requested output directory did not exist.
+
+The tests now read the tracked starter configuration and the versioned raw captures from this repository. The policy, release, entry, raw evidence and captured clock match the consumer inputs; no assertions were removed or skipped. All **255/255 tests passed**, with zero skips, in an isolated archive checkout without the sibling repository. The verifier now creates the requested output parent recursively. A real clean install of 204 packages, all 19 export probes, 13 CLI/MCP tools, two MCP resources and the starter acceptance/refusal cases passed; its record was successfully written into a previously absent nested directory with `ok: true` and no findings.
+
+Local logs are `scratchpad/public-release-20261027/isolated-full-test.log` and `scratchpad/artifact-output-parent-20261027/fresh/nested/package-verification.json`. GitHub workflow outcomes for the repair commit are verified separately after pushing. These changes affect verification tooling and tests; the hosted application remains the build from `647f6c42f450160ac3a0d6c23ecd39c23ff3641a` described above.
+
+The previously untracked historical demo TLS receipt is also committed as `docs/2026-10-26_demo-tls-repair.md`, with a banner distinguishing its original pending-application state from the later successful consumer publication. No TLS configuration changed during this publication.

@@ -9,7 +9,7 @@
 //   node scripts/verify-artifact.mjs [--out <record.json>] [--keep]
 import { createHash } from 'node:crypto';
 import { execFile } from 'node:child_process';
-import { mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { promisify } from 'node:util';
@@ -139,6 +139,10 @@ try {
 record.ok = findings.length === 0;
 record.findings = findings;
 const out = option('--out');
-if (out) await writeFile(path.resolve(root, out), `${JSON.stringify({ ...record, workDir: keep ? work : undefined }, null, 2)}\n`);
+if (out) {
+  const outputPath = path.resolve(root, out);
+  await mkdir(path.dirname(outputPath), { recursive: true });
+  await writeFile(outputPath, `${JSON.stringify({ ...record, workDir: keep ? work : undefined }, null, 2)}\n`);
+}
 console.log(JSON.stringify({ ok: record.ok, artifact: record.artifact && { sha256: record.artifact.sha256, bytes: record.artifact.bytes, files: record.artifact.files }, install: record.install, findings }, null, 2));
 process.exitCode = record.ok ? 0 : 1;

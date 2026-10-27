@@ -146,8 +146,10 @@ test('releases chain and compare: a second release names the first, and the diff
   assert.throws(() => buildCatalogRelease({ name: 'x', producer: PRODUCER, decisions: [decide(reapproved), decide(reapproved)] }), /one entry per subject/);
 });
 
-test('the gate reads the consumer configuration the App exports and the separate consumer uses, and refuses a malformed one', async () => {
-  const consumer = JSON.parse(await readFile(new URL('../../revivecheck-consumer-example/config/allowlist.json', import.meta.url), 'utf8'));
+test('the gate reads the shipped starter consumer configuration and refuses a malformed one', async () => {
+  // The starter and separate consumer share these policy, release and entry declarations.
+  // Keep the test reproducible from this repository without a sibling checkout.
+  const consumer = await load('examples/release-gate-starter/project.json');
   const loaded = loadConsumerConfig(consumer, 'allowlist');
   assert.equal(loaded.policy.subject.address, SUBJECT);
   assert.match(loaded.policyHash, /^[a-f0-9]{64}$/);
